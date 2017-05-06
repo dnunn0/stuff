@@ -15,6 +15,6 @@ public class AllianceSectorNavController {
 
     private AllianceNavCard drawCard(Request req, Response res) {
         System.out.println("Received request");
-        return new AllianceNavCard("Alliance: Keep Flying");
+        return AllianceNavCard.KEEP_FLYING;
     }
 }
