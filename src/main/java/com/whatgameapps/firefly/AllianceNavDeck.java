@@ -1,25 +1,31 @@
 package com.whatgameapps.firefly;
 
+import com.google.common.collect.ImmutableList;
 import com.whatgameapps.firefly.rest.AllianceNavCard;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class AllianceNavDeck {
 
-    List<AllianceNavCard> cards = new ArrayList<>();
+    public final ImmutableList<AllianceNavCard> cards;
 
-    public AllianceNavDeck(Map<AllianceNavCard, Integer> deckSpec) {
+    public AllianceNavDeck(AllianceNavDeckSpecification deckSpec) {
 //        for(Map.Entry<AllianceNavCard, Integer> cardsSpec: deckSpec.entrySet())
 //            for(int i = 0; i < cardsSpec.getValue(); ++i)
 //                cards.add(cardsSpec.getKey().clone());
 
+        List<AllianceNavCard> tempCards = new ArrayList<>();
+
         deckSpec.entrySet().stream().forEach(
                 (cardsSpec) ->
-                        cards.addAll(Collections.nCopies(cardsSpec.getValue(), cardsSpec.getKey()))
+                        tempCards.addAll(Collections.nCopies(cardsSpec.getValue(), cardsSpec.getKey()))
         );
+        tempCards.addAll(Collections.nCopies(deckSpec.count - tempCards.size(), AllianceNavCard.UNKNOWN));
+
+        Collections.shuffle(tempCards);
+        this.cards = ImmutableList.copyOf(tempCards);
     }
 
     public int size() {
