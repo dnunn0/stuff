@@ -7,6 +7,7 @@ import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -76,6 +77,14 @@ public class AllianceNavDeckTest {
             card = sut.take();
         } while (!AllianceNavCard.RESHUFFLE.equals(card.get()));
         card = sut.take();
+        assertTrue(!card.isPresent());
+    }
+
+    @Test
+    public void cantTakeCardsAftePulledAll() {
+        IntStream.range(1, sut.spec.count)
+                .forEach(i -> sut.take());
+        final Optional<AllianceNavCard> card = sut.take();
         assertTrue(!card.isPresent());
     }
 

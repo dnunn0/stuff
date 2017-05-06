@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
-import java.util.function.Consumer;
 
 public class AllianceNavDeck {
 
@@ -63,10 +62,6 @@ public class AllianceNavDeck {
             cards.clear();
         }
         return Optional.of(card);
-    }
-
-    public void forEach(final Consumer<? super AllianceNavCard> consumer) {
-        this.cards.forEach(consumer);
     }
 
     public Stack<AllianceNavCard> discards() {

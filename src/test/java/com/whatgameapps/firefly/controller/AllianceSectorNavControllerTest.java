@@ -1,7 +1,6 @@
 package com.whatgameapps.firefly.controller;
 
 import com.whatgameapps.firefly.AllianceNavDeckSpecification;
-import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
 import com.whatgameapps.firefly.rest.AllianceNavCard;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.After;
@@ -22,10 +21,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class AllianceSectorNavControllerTest {
-    private static TestUtils testUtils;
-    final AllianceSectorNavController sut = new AllianceSectorNavController();
-    final Request req = new SparkRequestStub();
-    final spark.Response res = new SparkResponseWrapper();
+    private final AllianceSectorNavController sut = new AllianceSectorNavController();
+    private final Request req = new SparkRequestStub();
+    private final spark.Response res = new SparkResponseWrapper();
     private PrintStream originalOut;
     private ByteArrayOutputStream output;
 
@@ -64,7 +62,7 @@ public class AllianceSectorNavControllerTest {
 
     @Test
     public void shouldEventuallyRunOutOfCardsWithError() {
-        final boolean gotExpectedError = IntStream.range(1, AllianceNavDeckSpecification.BASIC.count)
+        final boolean gotExpectedError = IntStream.range(1, AllianceNavDeckSpecification.BASIC.count + 1)
                 .map(i -> {
                     sut.drawCard(req, res);
                     return res.status();

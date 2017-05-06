@@ -11,15 +11,10 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 import static org.hamcrest.CoreMatchers.containsString;
 
 public class AllianceSectorNavControllerIntegratedTest {
     private static TestUtils testUtils;
-    private PrintStream originalOut;
-    private ByteArrayOutputStream output;
 
     @BeforeClass
     public static void setUp() {
@@ -30,7 +25,6 @@ public class AllianceSectorNavControllerIntegratedTest {
     public static void tearDown() {
         testUtils.cleanup();
     }
-
 
     @Before
     public void resetDeck() {
