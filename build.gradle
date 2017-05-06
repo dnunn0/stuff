@@ -1,0 +1,30 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+group = 'com.whatgameapps'
+version = '1.0-SNAPSHOT'
+
+description = 'firefly card handling'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.sparkjava:spark-core:2.5.5'
+    compile 'org.apache.commons:commons-lang3:3.5'
+    compile 'org.apache.httpcomponents:httpclient:4.5.2'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'org.slf4j:slf4j-jdk14:1.7.25'
+    testCompile 'junit:junit:4.12'
+    testCompile 'com.jayway.restassured:rest-assured:2.4.0'
+}
+
+task createDistribution(type: Exec, dependsOn: assembleDist) {
+    commandLine = ['cmd', '/c', 'createDistribution.bat']
+}
+
+mainClassName = 'com.whatgameapps.firefly.Main'
+
