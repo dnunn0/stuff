@@ -1,8 +1,8 @@
 package com.whatgameapps.firefly.com.whatgameapps.firefly.helper;
 
 import com.jayway.restassured.RestAssured;
-import com.jayway.restassured.builder.RequestSpecBuilder;
-import com.jayway.restassured.specification.RequestSpecification;
+import com.jayway.restassured.builder.ResponseSpecBuilder;
+import com.jayway.restassured.http.ContentType;
 import com.whatgameapps.firefly.Main;
 
 import java.util.logging.Handler;
@@ -12,12 +12,11 @@ import java.util.logging.Logger;
 
 public class TestUtils {
     private Main main;
-    private RequestSpecification serverConnection;
 
     public TestUtils(int port) {
         squelchLogs();
         main = startApplication(port);
-        serverConnection = new RequestSpecBuilder().setBaseUri(main.url()).build();
+        RestAssured.port = port;
     }
 
     public static void squelchLogs() {
@@ -29,7 +28,6 @@ public class TestUtils {
 
     public void cleanup() {
         stopApplication();
-        serverConnection = null;
     }
 
     private Main startApplication(int port) {
@@ -40,9 +38,11 @@ public class TestUtils {
         main.stop();
     }
 
-    public RequestSpecification given() {
-        return RestAssured.given(serverConnection);
+    public ResponseSpecBuilder getSpecBuilder(int status) {
+        ResponseSpecBuilder builder = new ResponseSpecBuilder();
+        builder.expectStatusCode(status);
+        builder.expectContentType(ContentType.JSON);
+        return builder;
     }
-
 
 }

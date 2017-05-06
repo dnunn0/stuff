@@ -1,7 +1,7 @@
 package com.whatgameapps.firefly;
 
 import com.whatgameapps.firefly.controller.AfterAll;
-import com.whatgameapps.firefly.controller.AllianceSectorController;
+import com.whatgameapps.firefly.controller.AllianceSectorNavController;
 import com.whatgameapps.firefly.controller.StopController;
 import spark.Service;
 
@@ -26,7 +26,7 @@ public class Main {
 
     private void addEndpoints() {
 
-        new AllianceSectorController(spark());
+        new AllianceSectorNavController(spark());
         new AfterAll(spark());
         new StopController(spark());
     }

@@ -1,7 +1,15 @@
 package com.whatgameapps.firefly.controller;
 
+import com.jayway.restassured.RestAssured;
+import com.jayway.restassured.builder.ResponseSpecBuilder;
+import com.jayway.restassured.response.Response;
+import com.jayway.restassured.specification.ResponseSpecification;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -10,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class AllianceSectorControllerIntegratedTest {
+public class AllianceSectorNavControllerIntegratedTest {
     private static TestUtils testUtils;
     private PrintStream originalOut;
     private ByteArrayOutputStream output;
@@ -41,23 +49,32 @@ public class AllianceSectorControllerIntegratedTest {
 
     @Test
     public void shouldReturn200WhenSuccessful() throws Exception {
-        sendOnePacketToRecorderEndpoint();
+        fly(getSpecBuilder().build());
+    }
+
+    private ResponseSpecBuilder getSpecBuilder() {
+        return testUtils.getSpecBuilder(200);
     }
 
     @Test
     public void shouldLogRequestToStdout() throws Exception {
-        sendOnePacketToRecorderEndpoint();
+        fly(getSpecBuilder().build());
 
         String result = new String(output.toByteArray(), StandardCharsets.UTF_8);
         assertThat(result, containsString("Received"));
     }
 
-    private void sendOnePacketToRecorderEndpoint() {
-        testUtils.given()
-                .when()
-                .get(AllianceSectorController.PATH)
-                .then()
-                .statusCode(200);
+    @Test
+    public void shouldReplyWithCard() throws Exception {
+        ResponseSpecBuilder builder = getSpecBuilder();
+        builder.expectBody("action", containsString("Alliance"));
+
+        fly(builder.build());
     }
 
-}
+    private void fly(ResponseSpecification spec) {
+        Response response = RestAssured.get(AllianceSectorNavController.PATH).andReturn();
+        response.then().spec(spec);
+    }
+
+   }
