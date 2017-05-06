@@ -8,36 +8,37 @@ import spark.Service;
 public class Main {
     private SparkWrapper spark;
     private int port = 4567;
+    private AllianceNavDeckSpecification spec;
 
-    public Main(String[] args) {
+    public Main(String[] args) throws Exception {
         processCommandLine(args);
         spark = new SparkWrapper(port);
         addEndpoints();
+        System.out.println(String.format("Listening on: %s with %s", spark.url(), this.spec));
     }
 
-    public static void main(String args[]) {
-        Main main = new Main(args);
-        System.out.println(String.format("Listening on: %s", main.url()));
+    private void processCommandLine(String[] args) throws Exception {
+        if (args.length != 2) System.exit(-1);
+        port = Integer.parseInt(args[0]);
+        spec = getSpecForSpecName(args[1]);
     }
 
-    public String url() {
-        return spark.url();
-    }
-
-    private void addEndpoints() {
-
-        new AllianceSectorNavController(spark());
+    private void addEndpoints() throws Exception {
+        new AllianceSectorNavController(spark(), spec);
         new AfterAll(spark());
         new StopController(spark());
     }
 
-    private void processCommandLine(String[] args) {
-        if (args.length > 0)
-            port = Integer.parseInt(args[0]);
+    private AllianceNavDeckSpecification getSpecForSpecName(final String specName) throws IllegalAccessException, NoSuchFieldException {
+        return (AllianceNavDeckSpecification) AllianceNavDeckSpecification.class.getField(specName).get(null);
     }
 
     public Service spark() {
         return spark.spark();
+    }
+
+    public static void main(String args[]) throws Exception {
+        new Main(args);
     }
 
     public void stop() {

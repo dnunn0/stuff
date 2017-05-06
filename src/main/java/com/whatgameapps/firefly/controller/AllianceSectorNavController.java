@@ -16,14 +16,14 @@ public class AllianceSectorNavController {
     public static final String PATH = "/allianceSectorNav";
     private final AllianceNavDeck deck;
 
-    public AllianceSectorNavController(Service spark) {
-        this();
+    public AllianceSectorNavController(Service spark, AllianceNavDeckSpecification spec) {
+        this(spec);
         spark.delete(PATH, this::resetDeck);
         spark.get(PATH, this::drawCard, JsonTransformer.getInstance());
     }
 
-    public AllianceSectorNavController() {
-        this.deck = new AllianceNavDeck(AllianceNavDeckSpecification.BASIC);
+    public AllianceSectorNavController(AllianceNavDeckSpecification spec) {
+        this.deck = new AllianceNavDeck(spec);
     }
 
     public String resetDeck(Request request, Response response) {

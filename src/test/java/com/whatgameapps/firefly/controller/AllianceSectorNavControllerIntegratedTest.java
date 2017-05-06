@@ -18,7 +18,7 @@ public class AllianceSectorNavControllerIntegratedTest {
 
     @BeforeClass
     public static void setUp() {
-        testUtils = new TestUtils(9876);
+        testUtils = new TestUtils(9876, "BASIC");
     }
 
     @AfterClass

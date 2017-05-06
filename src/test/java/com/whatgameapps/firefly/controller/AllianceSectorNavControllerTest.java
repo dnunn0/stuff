@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class AllianceSectorNavControllerTest {
-    private final AllianceSectorNavController sut = new AllianceSectorNavController();
+    private final AllianceSectorNavController sut = new AllianceSectorNavController(AllianceNavDeckSpecification.BASIC);
     private final Request req = new SparkRequestStub();
     private final spark.Response res = new SparkResponseWrapper();
     private PrintStream originalOut;

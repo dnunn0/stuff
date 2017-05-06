@@ -13,9 +13,9 @@ import java.util.logging.Logger;
 public class TestUtils {
     private Main main;
 
-    public TestUtils(int port) {
+    public TestUtils(int port, String spec) {
         squelchLogs();
-        main = startApplication(port);
+        main = startApplication(port, spec);
         RestAssured.port = port;
     }
 
@@ -26,12 +26,16 @@ public class TestUtils {
         }
     }
 
-    public void cleanup() {
-        stopApplication();
+    private Main startApplication(int port, String spec) {
+        try {
+            return new Main(new String[]{Integer.toString(port), spec});
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    private Main startApplication(int port) {
-        return new Main(new String[]{Integer.toString(port)});
+    public void cleanup() {
+        stopApplication();
     }
 
     private void stopApplication() {

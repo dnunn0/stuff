@@ -36,6 +36,7 @@ public class AllianceNavDeck {
     }
 
     private List<AllianceNavCard> createCards(final AllianceNavCard prototype, final Integer count) {
+        if (count <= 0) return Collections.emptyList();
         return Collections.nCopies(count, prototype);
     }
 
