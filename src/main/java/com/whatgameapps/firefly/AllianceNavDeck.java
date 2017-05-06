@@ -2,9 +2,9 @@ package com.whatgameapps.firefly;
 
 import com.whatgameapps.firefly.rest.AllianceNavCard;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.function.Consumer;
 
@@ -24,19 +24,16 @@ public class AllianceNavDeck {
     }
 
     private void createDeck(final AllianceNavDeckSpecification deckSpec) {
-        List<AllianceNavCard> tempCards = new ArrayList<>();
 
         deckSpec.entrySet().stream().forEach(
                 cardsSpec -> {
                     List<AllianceNavCard> copies = createCards(cardsSpec.getKey(), cardsSpec.getValue());
-                    tempCards.addAll(copies);
+                    cards.addAll(copies);
                 }
         );
-        tempCards.addAll(createCards(AllianceNavCard.UNKNOWN, deckSpec.count - tempCards.size()));
+        cards.addAll(createCards(AllianceNavCard.UNKNOWN, deckSpec.count - cards.size()));
 
-        tempCards.forEach(cards::push);
         shuffle();
-
     }
 
     private List<AllianceNavCard> createCards(final AllianceNavCard prototype, final Integer count) {
@@ -44,13 +41,9 @@ public class AllianceNavDeck {
     }
 
     public void shuffle() {
-        List<AllianceNavCard> tempCards = new ArrayList<>();
-        tempCards.addAll(cards);
-        tempCards.addAll(discards);
-        Collections.shuffle(tempCards);
-        cards.clear();
+        cards.addAll(discards);
         discards.clear();
-        tempCards.forEach(cards::push);
+        Collections.shuffle(cards);
     }
 
     public int size() {
@@ -61,10 +54,15 @@ public class AllianceNavDeck {
         return (int) cards.stream().filter(c -> c.equals(target)).count();
     }
 
-    public AllianceNavCard take() {
+    public Optional<AllianceNavCard> take() {
+        if (cards.empty()) return Optional.empty();
         AllianceNavCard card = cards.pop();
         discards.push(card);
-        return card;
+        if (AllianceNavCard.RESHUFFLE.equals(card)) {
+            discards.addAll(cards);
+            cards.clear();
+        }
+        return Optional.of(card);
     }
 
     public void forEach(final Consumer<? super AllianceNavCard> consumer) {

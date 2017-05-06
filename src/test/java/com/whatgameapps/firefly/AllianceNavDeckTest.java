@@ -1,14 +1,20 @@
 package com.whatgameapps.firefly;
 
 import com.whatgameapps.firefly.rest.AllianceNavCard;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AllianceNavDeckTest {
 
+    @Rule
+    public ExpectedException expectedExcetion = ExpectedException.none();
     AllianceNavDeck sut = new AllianceNavDeck(AllianceNavDeckSpecification.BASIC);
 
     @Test
@@ -29,11 +35,11 @@ public class AllianceNavDeckTest {
 
     @Test
     public void deckShuffledAfterCreation() {
-        int deckCount = 50000;
+        int deckCount = 20000;
         long count = Collections.nCopies(deckCount, 1)
                 .stream()
                 .map(i -> new AllianceNavDeck(AllianceNavDeckSpecification.BASIC))
-                .map(deck -> deck.take())
+                .map(deck -> deck.take().get())
                 .filter(AllianceNavCard.KEEP_FLYING::equals)
                 .count();
 
@@ -44,9 +50,9 @@ public class AllianceNavDeckTest {
     @Test
     public void takingACardDiscardsIt() {
         final int originalDiscardCount = sut.discards().size();
-        final AllianceNavCard card = sut.take();
+        final Optional<AllianceNavCard> card = sut.take();
         assertEquals(originalDiscardCount + 1, sut.discards().size());
-        assertEquals(card, sut.discards().peek());
+        assertEquals(card.get(), sut.discards().peek());
     }
 
     @Test
@@ -61,6 +67,16 @@ public class AllianceNavDeckTest {
         assertEquals(sut.spec.count, sut.size());
         assertEquals(0, sut.discards().size());
 //        sut.forEach(System.out::println);
+    }
+
+    @Test
+    public void cantTakeCardsAfterReshufflePulled() {
+        Optional<AllianceNavCard> card;
+        do {
+            card = sut.take();
+        } while (!AllianceNavCard.RESHUFFLE.equals(card.get()));
+        card = sut.take();
+        assertTrue(!card.isPresent());
     }
 
 }

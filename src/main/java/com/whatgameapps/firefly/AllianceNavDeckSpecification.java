@@ -20,7 +20,6 @@ public class AllianceNavDeckSpecification {
             .put(AllianceNavCard.KEEP_FLYING, 25)
             .put(AllianceNavCard.CRUISER_CONTACT, 4)
             .put(AllianceNavCard.CORVETTE_CONTACT, 4)
-            .put(AllianceNavCard.UNKNOWN, 27)
             .put(AllianceNavCard.RESHUFFLE, 1)
             .build()
     );
