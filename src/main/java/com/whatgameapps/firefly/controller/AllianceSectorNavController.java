@@ -48,7 +48,7 @@ public class AllianceSectorNavController {
     }
 
     private void logReply(String action, Response res, Object reply) {
-        System.out.println(String.format("%s, Status: %d - Reply Object: %s", action, res.status(), reply));
+        //     System.out.println(String.format("%s, Status: %d - Locked %s -  Reply Object: %s", action, res.status(),this.deckState.isLocked(), reply));
     }
 
     AllianceNavCard drawCard(Request req, Response res) {

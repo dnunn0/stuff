@@ -10,24 +10,33 @@ import com.whatgameapps.firefly.AllianceNavDeckSpecification;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
 import com.whatgameapps.firefly.rest.AllianceNavCard;
 import org.eclipse.jetty.http.HttpStatus;
+import org.hamcrest.CoreMatchers;
 import org.junit.After;
 import org.junit.Test;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 
 public class AllianceSectorNavControllerIntegratedTest {
     private static Gson gson = new Gson();
-    private TestUtils testUtils;
+    private TestUtils testUtils = new TestUtils(8888, "RESHUFFLE");
 
     @After
     public void tearDown() {
         testUtils.cleanup();
     }
 
+    @After
+    public void restoreStdout() {
+        testUtils.restoreStdout();
+    }
+
     @Test
-    public void shouldReturn200WhenSuccessful() throws Exception {
-        testUtils = new TestUtils(9876, "BASIC");
+    public void shouldLogRequestToStdout() throws Exception {
+        testUtils.redirectStdout();
         fly(getSpecBuilder().build());
+        String result = testUtils.outStream.toString();
+        assertThat(result, CoreMatchers.containsString(AllianceSectorNavController.PATH));
     }
 
     private Response fly(ResponseSpecification spec) {
@@ -41,8 +50,12 @@ public class AllianceSectorNavControllerIntegratedTest {
     }
 
     @Test
+    public void shouldReturn200WhenSuccessful() throws Exception {
+        fly(getSpecBuilder().build());
+    }
+
+    @Test
     public void shouldReplyWithJsonCard() throws Exception {
-        testUtils = new TestUtils(8888, "RESHUFFLE");
         ResponseSpecBuilder builder = getSpecBuilder();
         builder.expectContent(containsString(getTopCardAsJson()));
 
@@ -57,14 +70,12 @@ public class AllianceSectorNavControllerIntegratedTest {
 
     @Test
     public void flyingPastReshuffleGivesError() {
-        testUtils = new TestUtils(9876, "RESHUFFLE");
         fly(getSpecBuilder().build());
         fly(testUtils.getSpecBuilder(AllianceSectorNavController.NOT_FOUND_ERROR).build());
     }
 
     @Test
     public void postingReshufflesDeck() {
-        testUtils = new TestUtils(9876, "RESHUFFLE");
         fly(getSpecBuilder().build());
         RestAssured.when().post(AllianceSectorNavController.PATH).then().statusCode(HttpStatus.OK_200);
         fly(getSpecBuilder().build());

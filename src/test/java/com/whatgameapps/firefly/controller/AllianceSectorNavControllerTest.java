@@ -15,8 +15,6 @@ import spark.SparkResponseWrapper;
 
 import java.util.stream.IntStream;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -45,14 +43,6 @@ public class AllianceSectorNavControllerTest {
         final AllianceNavCard card = sut.drawCard(req, res);
         assertNotNull(card);
 
-    }
-
-    @Test
-    public void shouldLogRequestToStdout() throws Exception {
-        testUtils.redirectStdout();
-        sut.drawCard(req, res);
-        String result = testUtils.outStream.toString();
-        assertThat(result, containsString(AllianceSectorNavController.PREFIX));
     }
 
     @Test

@@ -1,97 +1,145 @@
 <!DOCTYPE html>
 <html>
-    <head>
+<head>
 
-        <title>Firefly</title>
+    <title>Firefly</title>
+    <script>
+	var allianceNavPath = "/alliance/nav";
+	var allianceNavStatusPath = allianceNavPath + "/status";
+	var allianceNavLockPath = allianceNavPath + "/lock";
 
-    </head>
-
-    <body>
- 
-
-<button type="button" onclick="get('/alliance/nav')">Request nav card</button>
-<button type="button" onclick="post('/alliance/nav')">shuffle</button>
-<button type="button" onclick="post('/alliance/nav/lock')">lock</button>
-<button type="button" onclick="del('/alliance/nav/lock')">unlock</button>
-
-<p id="demo"></p>
-
-
-<script>
-function sendRequest(method, path) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-   processResponse(this);
-  };
-  xhttp.open(method, getUrl(path), true);
-  xhttp.send();
-}
-
-function getUrl(path) {
-	return "http://192.168.1.86:4567"+path+"?t=" + Math.random()
-}
-
-function processResponse(xhttp) {
- if (xhttp.readyState == 4) {
-    var result = "none";
-	var addEmphasis = true;
-	switch(xhttp.status) {
-	 case 200: result = xhttp.responseText;
-		addEmphasis = false;
-		break;
-	case 404: result = "Needs shuffling!";
-	break;
-		case 409: result = "Locked!";
-	break;
-	default:
-	 	    result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
-	 }
-	 if (addEmphasis ) 
-	   result = "<font color='red'>" + result + "</font>" ;
-	 
-	  document.getElementById("demo").innerHTML = result;
-
+	function sendRequest(method, path, callbackProcess, successCallback) {
+	  var xhttp = new XMLHttpRequest();
+	  xhttp.onreadystatechange = function() {
+	    callbackProcess(this, successCallback);
+	  };
+	  xhttp.open(method, getUrl(path), true);
+	  xhttp.send();
 	}
-}
-</script>
-<script>
-function get(path) {
-  sendRequest("GET", path);
-}
-</script>
-<script>
-function post(path) {
- sendRequest("POST", path);
-}
-</script>
 
-<script>
-function del(path) {
- sendRequest("DELETE", path);
-}
+	function getUrl(path) {
+	  return "http://192.168.1.86:4567" + path + "?t=" + Math.random()
+	}
 
-</script>
+	function updateElement(target, addEmphasis, newInner) {
+	  if (addEmphasis) var result = "<font color='red'>" + newInner + "</font>";
 
-    </body>
+	  document.getElementById(target).innerHTML = result;
+	}
+
+	function processActionResponse(xhttp, target, successCallback) {
+	  if (xhttp.readyState == 4) {
+	    var result = "none";
+	    switch (xhttp.status) {
+	      case 200:
+	        successCallback(xhttp, target)
+	        break;
+	      case 404:
+	        updateElement(target, true, "Needs shuffling!");
+	        break;
+	      case 409:
+	        updateElement(target, true, "Locked!");
+	        break;
+	      default:
+	        var result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
+	        updateElement(target, true, result);
+	    }
+	    //need to get status in here after the action has completed
+	    //  because DELETE first sends an OPTION, and then the next GET for *status*,
+	    //  and only then after that does it send the DELETE. 
+	    getStatus();
+
+	  }
+	}
+
+	function processStatusResponse(xhttp, target) {
+	  if (xhttp.readyState == 4) {
+	    var result = "none";
+	    var addEmphasis = true;
+	    switch (xhttp.status) {
+	      case 200:
+	        return updateDeckStatus(xhttp, target);
+	        break;
+	      default:
+	        var result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
+	        updateElement(target, true, result);
+	    }
+	  }
+	}
+
+	function justDisplayResponse(xhttp, target) {
+	  var result = xhttp.responseText;
+	  document.getElementById(target).innerHTML = result;
+	}
+
+	function displayNavCard(xhttp, target) {
+	  var result = JSON.parse(xhttp.responseText).action;
+	  document.getElementById(target).innerHTML = result;
+	}
+
+	function updateDeckStatus(xhttp, target) {
+	  var stat = JSON.parse(xhttp.responseText);
+	  var result = "<p>Cards: " + stat.cardCount;
+	  result += "<br>Discards: " + stat.discardsCount;
+	  result += "<br>Is Locked: " + stat.isLocked;
+	  //  result += "<br>" + xhttp.responseText
+	  result += "<\p>";
+	  document.getElementById(target).innerHTML = result;
+
+	  var hasCards = stat.cardCount > 0;
+	  var isLocked = stat.isLocked;
+	  document.getElementById("draw").disabled = !hasCards || isLocked;
+	  document.getElementById("shuffle").disabled = isLocked;
+	  document.getElementById("unlock").disabled = !isLocked;
+	}
+
+	function processActionResponseFun(xhttp, successCallback) {
+	  return processActionResponse(xhttp, "requestResult", successCallback);
+	}
+
+	function processStatusResponseFun(xhttp) {
+	  return processStatusResponse(xhttp, "status");
+	}
+
+	function justDisplayResponseFun(xhttp, target) {
+	  return justDisplayResponse(xhttp, target);
+	}
+
+	function getStatus() {
+	  sendRequest("GET", allianceNavStatusPath, processStatusResponseFun);
+	}
+
+	function get(path) {
+	  sendRequest("GET", path, processActionResponseFun, displayNavCard);
+	}
+
+	function post(path) {
+	  sendRequest("POST", path, processActionResponseFun, justDisplayResponse);
+	}
+
+	function del(path) {
+	  sendRequest("DELETE", path, processActionResponseFun, justDisplayResponse);
+	}
+
+	window.onload = function(e) {
+	  getStatus();
+	};
+
+    </script>
+</head>
+
+<body>
+
+
+<button id="draw" type="button" onclick="get(allianceNavPath)">Request nav card</button>
+<button id="shuffle" type="button" onclick="post(allianceNavPath)">Shuffle</button>
+<button id="lock" type="button" onclick="post(allianceNavLockPath)">lock</button>
+<button id="unlock" type="button" onclick="del(allianceNavLockPath)">unlock</button>
+
+<p id="requestResult"><br></p>
+<p id="status"></p>
+
+
+</body>
 </html>
 
-<script>
-
-function loadNav2() {
-var url = "http://192.168.1.86:4567/allianceSectorNav";
-var representationOfDesiredState = "The cheese is old and moldy, where is the bathroom?";
-
-var client = new XMLHttpRequest();
-
-client.open("PUT", url, false);
-
-client.setRequestHeader("Content-Type", "text/plain");
-
-client.send(representationOfDesiredState);
-
-if (client.status == 200)
-    alert("The request succeeded!\n\nThe response representation was:\n\n" + client.responseText)
-else
-    alert("The request did not succeed!\n\nThe response status was: " + client.status + " " + client.statusText + ".");
-	}
-	</script>

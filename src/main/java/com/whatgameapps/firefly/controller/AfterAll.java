@@ -8,7 +8,9 @@ import spark.Service;
 public class AfterAll {
     public AfterAll(Service spark) {
         spark.after((Request req, Response res) -> {
-                    res.type(ContentType.APPLICATION_JSON.toString());
+            System.out.format("Request %s %s Status %d responseText %s\n", req.requestMethod(), req.uri(), res.status(), res.body());
+
+            res.type(ContentType.APPLICATION_JSON.toString());
                     res.header("Cache-Control", "no-cache");
                     res.header("Access-Control-Allow-Origin", "*");
                     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");

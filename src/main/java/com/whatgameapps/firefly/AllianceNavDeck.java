@@ -39,7 +39,6 @@ public class AllianceNavDeck {
     }
 
     public void shuffle() {
-        System.out.println("============ Shuffle =============");
         moveCardsToOtherPile(discards, cards);
         Collections.shuffle(cards);
     }

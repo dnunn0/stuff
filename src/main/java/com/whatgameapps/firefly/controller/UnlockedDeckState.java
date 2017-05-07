@@ -18,7 +18,6 @@ public class UnlockedDeckState implements DeckState {
     @Override
     public AllianceNavCard drawCard(AllianceSectorNavController controller, Response res) {
         Optional<AllianceNavCard> card = controller.deck.take();
-        System.out.println(AllianceSectorNavController.PREFIX + card);
 
         int status = AllianceSectorNavController.NOT_FOUND_ERROR;
         AllianceNavCard reply = null;
