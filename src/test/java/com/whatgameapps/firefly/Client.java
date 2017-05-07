@@ -19,7 +19,7 @@ public class Client {
     public static final String PATH = "/allianceSectorNav";
     public static final Gson gson = new Gson();
 
-    private int port;
+    private String hostPort;
 
     public Client(String[] args) {
         processCommandLine(args);
@@ -27,10 +27,13 @@ public class Client {
 
     private void processCommandLine(String[] args) {
         if (args.length != 1) {
-            System.out.println("Expected 1 args, got " + Arrays.asList(args));
+            System.out.println("Expected 1 args-host:hostPort e.g., localhost:4567, got " + Arrays.asList(args));
             System.exit(-1);
         }
-        port = Integer.parseInt(args[0]);
+        hostPort = args[0];
+        if (hostPort.indexOf(":") < 0) {
+            this.hostPort = "localhost:" + hostPort;
+        }
     }
 
     public static void main(String[] args) throws IOException {
@@ -38,6 +41,7 @@ public class Client {
     }
 
     private void start() throws IOException {
+        System.out.println("Connecting to " + getUrl(""));
         char action;
         do {
             System.out.print("1 - draw card\n2 - shuffle\n3 - lock\n4 - unlock\n> ");
@@ -75,23 +79,23 @@ public class Client {
     }
 
     private void unlock(CloseableHttpClient httpClient) throws IOException {
-        final HttpResponse response = deleteIgnoringIOException(PATH + "/lock", httpClient);
+        final HttpResponse response = delete(PATH + "/lock", httpClient);
         processResponse(response, "unlock", null);
     }
 
     private void lock(CloseableHttpClient httpClient) throws IOException {
-        final HttpResponse response = postIgnoringIOException(PATH + "/lock", httpClient);
+        final HttpResponse response = post(PATH + "/lock", httpClient);
         processResponse(response, "lock", null);
 
     }
 
     private void shuffle(CloseableHttpClient httpClient) throws IOException {
-        final HttpResponse response = postIgnoringIOException(PATH, httpClient);
+        final HttpResponse response = post(PATH, httpClient);
         processResponse(response, "shuffle", null);
     }
 
     private void drawCard(CloseableHttpClient httpClient) throws IOException {
-        final HttpResponse response = getIgnoringIOException(PATH, httpClient);
+        final HttpResponse response = get(PATH, httpClient);
         processResponse(response, "draw", this::displayCard);
     }
 
@@ -116,8 +120,7 @@ public class Client {
 
     private void displayCard(HttpResponse response) {
         try {
-            String jsonCard = null;
-            jsonCard = EntityUtils.toString(response.getEntity());
+            String jsonCard = EntityUtils.toString(response.getEntity());
             AllianceNavCard card = gson.fromJson(jsonCard, AllianceNavCard.class);
             System.out.println(card);
         } catch (IOException e) {
@@ -125,22 +128,28 @@ public class Client {
         }
     }
 
-    HttpResponse postIgnoringIOException(String path, CloseableHttpClient httpClient) throws IOException {
-        HttpPost request = new HttpPost(getUrl(path));
+    HttpResponse post(String path, CloseableHttpClient httpClient) throws IOException {
+        String url = getUrl(path);
+        System.out.println("Posting to " + url);
+        HttpPost request = new HttpPost(url);
         return httpClient.execute(request);
     }
 
-    HttpResponse getIgnoringIOException(String path, CloseableHttpClient httpClient) throws IOException {
-        HttpGet request = new HttpGet(getUrl(path));
+    HttpResponse get(String path, CloseableHttpClient httpClient) throws IOException {
+        String url = getUrl(path);
+        System.out.println("Getting from " + url);
+        HttpGet request = new HttpGet(url);
         return httpClient.execute(request);
     }
 
-    HttpResponse deleteIgnoringIOException(String path, CloseableHttpClient httpClient) throws IOException {
-        HttpDelete request = new HttpDelete(getUrl(path));
+    HttpResponse delete(String path, CloseableHttpClient httpClient) throws IOException {
+        String url = getUrl(path);
+        System.out.println("Deleting from " + url);
+        HttpDelete request = new HttpDelete(url);
         return httpClient.execute(request);
     }
 
     private String getUrl(String path) {
-        return String.format("http://localhost:%d%s", this.port, path);
+        return String.format("http://%s%s", this.hostPort, path);
     }
 }

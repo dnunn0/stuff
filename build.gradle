@@ -19,6 +19,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'org.slf4j:slf4j-jdk14:1.7.25' //used by Spark
     compile group: 'com.google.guava', name: 'guava', version: '21.0'
+
     testCompile 'junit:junit:4.12'
     testCompile 'com.jayway.restassured:rest-assured:2.4.0'
 }
@@ -26,6 +27,7 @@ dependencies {
 task createDistribution(type: Exec, dependsOn: assembleDist) {
     commandLine = ['cmd', '/c', 'createDistribution.bat']
 }
+
 
 mainClassName = 'com.whatgameapps.firefly.Main'
 
