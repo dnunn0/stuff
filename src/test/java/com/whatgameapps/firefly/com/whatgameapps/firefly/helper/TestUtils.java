@@ -72,7 +72,4 @@ public class TestUtils {
         builder.expectContentType(ContentType.JSON);
         return builder;
     }
-
-    public void restartApplication() {
-    }
 }

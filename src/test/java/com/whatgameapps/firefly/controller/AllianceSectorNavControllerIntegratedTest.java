@@ -31,7 +31,7 @@ public class AllianceSectorNavControllerIntegratedTest {
     }
 
     private Response fly(ResponseSpecification spec) {
-        Response response = RestAssured.get(AllianceSectorNavController.PATH).andReturn();
+        Response response = RestAssured.when().get(AllianceSectorNavController.PATH).andReturn();
         response.then().spec(spec);
         return response;
     }
@@ -53,6 +53,21 @@ public class AllianceSectorNavControllerIntegratedTest {
         AllianceNavDeck deck = new AllianceNavDeck(AllianceNavDeckSpecification.RESHUFFLE);
         final AllianceNavCard card = deck.take().get();
         return gson.toJson(card);
+    }
+
+    @Test
+    public void flyingPastReshuffleGivesError() {
+        testUtils = new TestUtils(9876, "RESHUFFLE");
+        fly(getSpecBuilder().build());
+        fly(testUtils.getSpecBuilder(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE_416).build());
+    }
+
+    @Test
+    public void postingReshufflesDeck() {
+        testUtils = new TestUtils(9876, "RESHUFFLE");
+        fly(getSpecBuilder().build());
+        RestAssured.when().post(AllianceSectorNavController.PATH).then().statusCode(HttpStatus.OK_200);
+        fly(getSpecBuilder().build());
     }
 
 }

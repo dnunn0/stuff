@@ -17,7 +17,7 @@ public class AllianceSectorNavController {
 
     public AllianceSectorNavController(Service spark, AllianceNavDeckSpecification spec) {
         this(spec);
-        spark.delete(PATH, this::resetDeck);
+        spark.post(PATH, this::resetDeck);
         spark.get(PATH, this::drawCard, JsonTransformer.getInstance());
     }
 
