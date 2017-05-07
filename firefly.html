@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <title>Firefly</title>
+
+    </head>
+
+    <body>
+ 
+
+<button type="button" onclick="get('/alliance/nav')">Request nav card</button>
+<button type="button" onclick="post('/alliance/nav')">shuffle</button>
+<button type="button" onclick="post('/alliance/nav/lock')">lock</button>
+<button type="button" onclick="del('/alliance/nav/lock')">unlock</button>
+
+<p id="demo"></p>
+
+
+<script>
+function processResponse(xhttp) {
+ if (xhttp.readyState == 4) {
+    var result = "none";
+	var addEmphasis = true;
+	switch(xhttp.status) {
+	 case 200: result = xhttp.responseText;
+		addEmphasis = false;
+		break;
+	case 404: result = ">Needs shuffling";
+	break;
+		case 409: result = "Locked";
+	break;
+	default:
+	 	    result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
+	 }
+	 if (addEmphasis ) 
+	   result = "<font color='red'>" + result + "</font>" ;
+	 
+	  document.getElementById("demo").innerHTML = result;
+
+	}
+}
+</script>
+<script>
+function get(path) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+   processResponse(this);
+  };
+  xhttp.open("GET", "http://192.168.1.86:4567"+path+"?t=" + Math.random(), true);
+  xhttp.send();
+}
+</script>
+<script>
+function post(path) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+   processResponse(this);
+  };
+  xhttp.open("POST", "http://192.168.1.86:4567"+path+"?t=" + Math.random(), true);
+  xhttp.send();
+}
+</script>
+
+<script>
+function del(path) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+   processResponse(this);
+  };
+  xhttp.open("DELETE", "http://192.168.1.86:4567"+path+"?t=" + Math.random(), true);
+  xhttp.send();
+}
+</script>
+
+    </body>
+</html>
+
+<script>
+
+function loadNav2() {
+var url = "http://192.168.1.86:4567/allianceSectorNav";
+var representationOfDesiredState = "The cheese is old and moldy, where is the bathroom?";
+
+var client = new XMLHttpRequest();
+
+client.open("PUT", url, false);
+
+client.setRequestHeader("Content-Type", "text/plain");
+
+client.send(representationOfDesiredState);
+
+if (client.status == 200)
+    alert("The request succeeded!\n\nThe response representation was:\n\n" + client.responseText)
+else
+    alert("The request did not succeed!\n\nThe response status was: " + client.status + " " + client.statusText + ".");
+	}
+	</script>

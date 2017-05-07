@@ -16,7 +16,8 @@ import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class Client {
-    public static final String PATH = "/allianceSectorNav";
+    public static final String NAVCARD_PATH = "/alliance/nav";
+    public static final String LOCK_PATH = "/alliance/nav/lock";
     public static final Gson gson = new Gson();
 
     private String hostPort;
@@ -79,23 +80,23 @@ public class Client {
     }
 
     private void unlock(CloseableHttpClient httpClient) throws IOException {
-        final HttpResponse response = delete(PATH + "/lock", httpClient);
+        final HttpResponse response = delete(LOCK_PATH, httpClient);
         processResponse(response, "unlock", null);
     }
 
     private void lock(CloseableHttpClient httpClient) throws IOException {
-        final HttpResponse response = post(PATH + "/lock", httpClient);
+        final HttpResponse response = post(LOCK_PATH, httpClient);
         processResponse(response, "lock", null);
 
     }
 
     private void shuffle(CloseableHttpClient httpClient) throws IOException {
-        final HttpResponse response = post(PATH, httpClient);
+        final HttpResponse response = post(NAVCARD_PATH, httpClient);
         processResponse(response, "shuffle", null);
     }
 
     private void drawCard(CloseableHttpClient httpClient) throws IOException {
-        final HttpResponse response = get(PATH, httpClient);
+        final HttpResponse response = get(NAVCARD_PATH, httpClient);
         processResponse(response, "draw", this::displayCard);
     }
 
