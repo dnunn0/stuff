@@ -1,9 +1,9 @@
 package com.whatgameapps.firefly;
 
+import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
 import com.whatgameapps.firefly.rest.AllianceNavCard;
-import org.junit.Rule;
+import org.junit.After;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -13,10 +13,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class AllianceNavDeckTest {
+    private final TestUtils testUtils = new TestUtils();
+    private final AllianceNavDeck sut = new AllianceNavDeck(AllianceNavDeckSpecification.BASIC);
 
-    @Rule
-    public ExpectedException expectedExcetion = ExpectedException.none();
-    AllianceNavDeck sut = new AllianceNavDeck(AllianceNavDeckSpecification.BASIC);
+    @After
+    public void restoreStdout() {
+        testUtils.restoreStdout();
+    }
 
     @Test
     public void deckContainsRightNumberOfCardsBasicDeck() {
@@ -36,6 +39,7 @@ public class AllianceNavDeckTest {
 
     @Test
     public void deckShuffledAfterCreation() {
+        testUtils.redirectStdout();
         int deckCount = 20000;
         long count = Collections.nCopies(deckCount, 1)
                 .stream()
@@ -67,22 +71,24 @@ public class AllianceNavDeckTest {
     public void deckContainsRightNumberOfCards() {
         assertEquals(sut.spec.count, sut.size());
         assertEquals(0, sut.discards().size());
-//        sut.forEach(System.out::println);
     }
 
     @Test
     public void cantTakeCardsAfterReshufflePulled() {
+        drainCards();
+        assertTrue(!sut.take().isPresent());
+    }
+
+    private void drainCards() {
         Optional<AllianceNavCard> card;
         do {
             card = sut.take();
         } while (!AllianceNavCard.RESHUFFLE.equals(card.get()));
-        card = sut.take();
-        assertTrue(!card.isPresent());
     }
 
     @Test
     public void cantTakeCardsAftePulledAll() {
-        IntStream.range(1, sut.spec.count)
+        IntStream.rangeClosed(1, sut.spec.count)
                 .forEach(i -> sut.take());
         final Optional<AllianceNavCard> card = sut.take();
         assertTrue(!card.isPresent());

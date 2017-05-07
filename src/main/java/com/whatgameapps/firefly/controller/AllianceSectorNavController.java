@@ -12,9 +12,8 @@ import java.util.Optional;
 
 public class AllianceSectorNavController {
     public static final String PREFIX = "Returning - ";
-
     public static final String PATH = "/allianceSectorNav";
-    private final AllianceNavDeck deck;
+    final AllianceNavDeck deck;
 
     public AllianceSectorNavController(Service spark, AllianceNavDeckSpecification spec) {
         this(spec);
@@ -34,9 +33,15 @@ public class AllianceSectorNavController {
     AllianceNavCard drawCard(Request req, Response res) {
         Optional<AllianceNavCard> card = this.deck.take();
         System.out.println(PREFIX + card);
-        if (card.isPresent())
-            return card.get();
-        res.status(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE_416);
-        return null;
+
+        int status = HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE_416;
+        AllianceNavCard reply = null;
+
+        if (card.isPresent()) {
+            reply = card.get();
+            status = HttpStatus.OK_200;
+        }
+        res.status(status);
+        return reply;
     }
 }

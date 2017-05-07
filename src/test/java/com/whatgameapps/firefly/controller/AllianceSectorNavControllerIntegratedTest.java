@@ -1,38 +1,32 @@
 package com.whatgameapps.firefly.controller;
 
+import com.google.gson.Gson;
 import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.builder.ResponseSpecBuilder;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.ResponseSpecification;
+import com.whatgameapps.firefly.AllianceNavDeck;
+import com.whatgameapps.firefly.AllianceNavDeckSpecification;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
+import com.whatgameapps.firefly.rest.AllianceNavCard;
 import org.eclipse.jetty.http.HttpStatus;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
+import org.junit.After;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.core.StringContains.containsString;
 
 public class AllianceSectorNavControllerIntegratedTest {
-    private static TestUtils testUtils;
+    private static Gson gson = new Gson();
+    private TestUtils testUtils;
 
-    @BeforeClass
-    public static void setUp() {
-        testUtils = new TestUtils(9876, "BASIC");
-    }
-
-    @AfterClass
-    public static void tearDown() {
+    @After
+    public void tearDown() {
         testUtils.cleanup();
-    }
-
-    @Before
-    public void resetDeck() {
-        RestAssured.delete(AllianceSectorNavController.PATH).then().statusCode(HttpStatus.OK_200);
     }
 
     @Test
     public void shouldReturn200WhenSuccessful() throws Exception {
+        testUtils = new TestUtils(9876, "BASIC");
         fly(getSpecBuilder().build());
     }
 
@@ -48,10 +42,17 @@ public class AllianceSectorNavControllerIntegratedTest {
 
     @Test
     public void shouldReplyWithJsonCard() throws Exception {
+        testUtils = new TestUtils(8888, "RESHUFFLE");
         ResponseSpecBuilder builder = getSpecBuilder();
-        builder.expectBody("action", containsString("Alliance"));
+        builder.expectContent(containsString(getTopCardAsJson()));
 
         fly(builder.build());
+    }
+
+    private String getTopCardAsJson() {
+        AllianceNavDeck deck = new AllianceNavDeck(AllianceNavDeckSpecification.RESHUFFLE);
+        final AllianceNavCard card = deck.take().get();
+        return gson.toJson(card);
     }
 
 }

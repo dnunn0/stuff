@@ -10,8 +10,11 @@ import java.util.Map;
 
 @Immutable
 public class AllianceNavDeckSpecification {
-    public static final AllianceNavDeckSpecification BASIC = new AllianceNavDeckSpecification(40, ImmutableMap.<AllianceNavCard, Integer>builder()
+    public static final AllianceNavDeckSpecification RESHUFFLE = new AllianceNavDeckSpecification(1, ImmutableMap.<AllianceNavCard, Integer>builder()
             .put(AllianceNavCard.RESHUFFLE, 1)
+            .build());
+
+    public static final AllianceNavDeckSpecification BASIC = new AllianceNavDeckSpecification(RESHUFFLE, 40, ImmutableMap.<AllianceNavCard, Integer>builder()
             .put(AllianceNavCard.KEEP_FLYING, 25)
             .put(AllianceNavCard.ALLIANCE_CRUISER, 3)
             .put(AllianceNavCard.CUSTOMS_INSPECTION, 2)
