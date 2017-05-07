@@ -5,6 +5,8 @@ import com.whatgameapps.firefly.controller.AllianceSectorNavController;
 import com.whatgameapps.firefly.controller.StopController;
 import spark.Service;
 
+import java.util.Arrays;
+
 public class Main {
     private SparkWrapper spark;
     private int port = 4567;
@@ -18,7 +20,10 @@ public class Main {
     }
 
     private void processCommandLine(String[] args) throws Exception {
-        if (args.length != 2) System.exit(-1);
+        if (args.length != 2) {
+            System.out.println("Expected 2 args, got " + Arrays.asList(args));
+            System.exit(-1);
+        }
         port = Integer.parseInt(args[0]);
         spec = getSpecForSpecName(args[1]);
     }

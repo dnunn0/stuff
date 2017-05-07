@@ -8,40 +8,53 @@ import spark.Request;
 import spark.Response;
 import spark.Service;
 
-import java.util.Optional;
-
 public class AllianceSectorNavController {
     public static final String PREFIX = "Returning - ";
     public static final String PATH = "/allianceSectorNav";
+    public static final String LOCK_PATH = PATH + "/lock";
+    public static final int NOT_FOUND_ERROR = HttpStatus.NOT_FOUND_404;
+    public static final int LOCK_ERROR = HttpStatus.CONFLICT_409;
     final AllianceNavDeck deck;
+    volatile DeckState deckState;
 
     public AllianceSectorNavController(Service spark, AllianceNavDeckSpecification spec) {
         this(spec);
-        spark.post(PATH, this::resetDeck);
+        spark.post(PATH, this::reset);
+        spark.post(LOCK_PATH, this::lock);
+        spark.delete(LOCK_PATH, this::unlock);
         spark.get(PATH, this::drawCard, JsonTransformer.getInstance());
     }
 
-    public AllianceSectorNavController(AllianceNavDeckSpecification spec) {
+    AllianceSectorNavController(AllianceNavDeckSpecification spec) {
         this.deck = new AllianceNavDeck(spec);
+        this.deckState = new UnlockedDeckState();
     }
 
-    public String resetDeck(Request request, Response response) {
-        this.deck.shuffle();
-        return "OK";
+    String reset(Request req, Response res) {
+        String reply = this.deckState.shuffle(this, res);
+        logReply("shuffle", res, reply);
+        return reply;
+    }
+
+    private void logReply(String action, Response res, Object reply) {
+        System.out.println(String.format("%s, Status: %d - Reply Object: %s", action, res.status(), reply));
     }
 
     AllianceNavCard drawCard(Request req, Response res) {
-        Optional<AllianceNavCard> card = this.deck.take();
-        System.out.println(PREFIX + card);
+        AllianceNavCard reply = this.deckState.drawCard(this, res);
+        logReply("draw", res, reply);
+        return reply;
+    }
 
-        int status = HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE_416;
-        AllianceNavCard reply = null;
+    String lock(Request req, Response res) {
+        String reply = this.deckState.lock(this, res);
+        logReply("lock", res, reply);
+        return reply;
+    }
 
-        if (card.isPresent()) {
-            reply = card.get();
-            status = HttpStatus.OK_200;
-        }
-        res.status(status);
+    String unlock(Request req, Response res) {
+        String reply = this.deckState.unlock(this, res);
+        logReply("unlock", res, reply);
         return reply;
     }
 }

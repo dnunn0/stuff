@@ -59,7 +59,7 @@ public class AllianceSectorNavControllerIntegratedTest {
     public void flyingPastReshuffleGivesError() {
         testUtils = new TestUtils(9876, "RESHUFFLE");
         fly(getSpecBuilder().build());
-        fly(testUtils.getSpecBuilder(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE_416).build());
+        fly(testUtils.getSpecBuilder(AllianceSectorNavController.NOT_FOUND_ERROR).build());
     }
 
     @Test

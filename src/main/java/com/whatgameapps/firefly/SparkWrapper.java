@@ -2,6 +2,9 @@ package com.whatgameapps.firefly;
 
 import spark.Service;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class SparkWrapper {
     public Service spark;
 
@@ -14,8 +17,14 @@ public class SparkWrapper {
     }
 
     public String urlFor(String endpoint) {
-        String checkedEndpoint = endpoint.startsWith("/") ? endpoint : String.format("/%s", endpoint);
-        return String.format("http://localhost:%d%s", spark().port(), checkedEndpoint);
+        final String checkedEndpoint = endpoint.startsWith("/") ? endpoint : String.format("/%s", endpoint);
+        try {
+            final InetAddress hostname = InetAddress.getLocalHost();
+            return String.format("http://%s:%d%s", hostname.getHostAddress(), spark().port(), checkedEndpoint);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public Service spark() {
