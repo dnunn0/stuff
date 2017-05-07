@@ -21,7 +21,7 @@ public class Main {
 
     private void processCommandLine(String[] args) throws Exception {
         if (args.length != 2) {
-            System.out.println("Expected 2 args, got " + Arrays.asList(args));
+            System.out.println("Expected 2 args, [port Spec-Name], got " + Arrays.asList(args));
             System.exit(-1);
         }
         port = Integer.parseInt(args[0]);
