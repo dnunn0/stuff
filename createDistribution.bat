@@ -50,7 +50,7 @@ Echo pushd %%app_dir%% >> %batchfile%
 Echo Set JAVA_HOME=%%app_dir%%runtime\jre\>> %batchfile%
 Echo set PATH=%%JAVA_HOME%%bin>> %batchfile%
 Echo Set JAVA_OPTS=-server -Xmx8m >>%batchfile%
-Echo Set DEBUG=y >>%batchfile%
+Echo rem Set DEBUG=y >>%batchfile%
 Echo app\bin\%app_name% %%* >> %batchfile%
 
 set batchfile= dist\%app_name%\run
@@ -61,7 +61,7 @@ Echo pushd $app_dir>> %batchfile%
 Echo export JAVA_HOME=${app_dir}/runtime/jre/>> %batchfile%
 Echo export PATH=${JAVA_HOME}bin:/usr/bin:/bin>> %batchfile%
 Echo export JAVA_OPTS='-server -Xmx8m' >> %batchfile%
-Echo export DEBUG=y >> %batchfile%
+Echo #export DEBUG=y >> %batchfile%
 Echo chmod 777 app/bin/%app_name% >> %batchfile%
 Echo chmod 777 runtime/bin/* >> %batchfile%
 Echo app/bin/%app_name% $ *>> %batchfile%

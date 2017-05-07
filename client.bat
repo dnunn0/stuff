@@ -1,0 +1,1 @@
+java -cp build\classes\test;build\classes\main;build\distributions\firefly-1.0-SNAPSHOT\lib\* com.whatgameapps.firefly.Client %*

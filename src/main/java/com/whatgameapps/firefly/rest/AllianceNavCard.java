@@ -8,7 +8,7 @@ import org.apache.http.annotation.Immutable;
 public class  AllianceNavCard {
     public static final AllianceNavCard RESHUFFLE = new AllianceNavCard("Alliance Cruiser Contact - Reshuffle", "");
     public static final AllianceNavCard UNKNOWN = new AllianceNavCard("Alliance Huh", "");
-    public static final AllianceNavCard KEEP_FLYING = new AllianceNavCard("Alliance: Tbe Big Black", "");
+    public static final AllianceNavCard KEEP_FLYING = new AllianceNavCard("Alliance: The Big Black", "");
     public static final AllianceNavCard ALLIANCE_CRUISER = new AllianceNavCard("Alliance Cruiser", "");
     public static final AllianceNavCard CUSTOMS_INSPECTION = new AllianceNavCard("Alliance Customs Inspection", "");
     public static final AllianceNavCard CORVETTE_CONTACT = new AllianceNavCard("Alliance Corvette Contact", "");
