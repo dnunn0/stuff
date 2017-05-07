@@ -35,7 +35,7 @@ public class AllianceNavDeckSpecification {
     public final int count;
     public final ImmutableMap<AllianceNavCard, Integer> deckSpec;
 
-    AllianceNavDeckSpecification(int count, ImmutableMap<AllianceNavCard, Integer> deckSpec) {
+    public AllianceNavDeckSpecification(int count, ImmutableMap<AllianceNavCard, Integer> deckSpec) {
         this.count = count;
         this.deckSpec = deckSpec;
     }

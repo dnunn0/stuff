@@ -1,8 +1,10 @@
 package com.whatgameapps.firefly.controller;
 
+import com.google.common.collect.ImmutableMap;
 import com.whatgameapps.firefly.AllianceNavDeckSpecification;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
 import com.whatgameapps.firefly.rest.AllianceNavCard;
+import com.whatgameapps.firefly.rest.AllianceNavDeckStatus;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;
@@ -21,11 +23,12 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class AllianceSectorNavControllerTest {
+    private final static AllianceNavDeckSpecification noReshuffleCardSpec = new AllianceNavDeckSpecification(3, ImmutableMap.<AllianceNavCard, Integer>builder()
+            .build());
     private final TestUtils testUtils = new TestUtils();
-    private final AllianceSectorNavController sut = new AllianceSectorNavController(AllianceNavDeckSpecification.BASIC);
     private final Request req = new SparkRequestStub();
     private final spark.Response res = new SparkResponseWrapper();
-
+    private AllianceSectorNavController sut = new AllianceSectorNavController(AllianceNavDeckSpecification.BASIC);
 
     @After
     public void restoreStdout() {
@@ -100,6 +103,47 @@ public class AllianceSectorNavControllerTest {
         sut.lock(req, res);
         sut.reset(req, res);
         assertEquals(AllianceSectorNavController.LOCK_ERROR, res.status());
+    }
+
+    @Test
+    public void statusAfterCreationShouldBeRight() {
+        checkStatus(sut.deck.spec.count, 0, false, sut.status(req, res));
+    }
+
+    private void checkStatus(int expectedCardCount, int expectedDiscardCount, boolean expectedIsLocked, AllianceNavDeckStatus status) {
+        assertEquals("card count", expectedCardCount, status.cardCount);
+        assertEquals("discard count", expectedDiscardCount, status.discardsCount);
+        assertEquals("lock state", expectedIsLocked, status.isLocked);
+    }
+
+    @Test
+    public void statusAfterDrawingOneCardShouldBeRight() {
+        sut = new AllianceSectorNavController(noReshuffleCardSpec);
+        sut.drawCard(req, res);
+        checkStatus(sut.deck.spec.count - 1, 1, false, sut.status(req, res));
+    }
+
+    @Test
+    public void statusAfterDrawingAllCardsShouldBeRight() {
+        sut = new AllianceSectorNavController(noReshuffleCardSpec);
+        IntStream.range(0, noReshuffleCardSpec.count).forEachOrdered(i -> sut.drawCard(req, res));
+        checkStatus(0, sut.deck.spec.count, false, sut.status(req, res));
+    }
+
+    @Test
+    public void statusAfterLockingShouldBeRight() {
+        sut = new AllianceSectorNavController(noReshuffleCardSpec);
+        IntStream.range(0, noReshuffleCardSpec.count).forEachOrdered(i -> sut.drawCard(req, res));
+        sut.lock(req, res);
+        checkStatus(0, sut.deck.spec.count, true, sut.status(req, res));
+    }
+
+    @Test
+    public void statusAfterUnLockingShouldBeRight() {
+        sut = new AllianceSectorNavController(noReshuffleCardSpec);
+        sut.lock(req, res);
+        sut.unlock(req, res);
+        checkStatus(sut.deck.spec.count, 0, false, sut.status(req, res));
     }
 
 }

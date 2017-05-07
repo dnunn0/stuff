@@ -29,4 +29,8 @@ public class LockedDeckState implements DeckState {
         controller.deckState = new UnlockedDeckState();
         return controller.deckState.unlock(controller, res);
     }
+
+    public boolean isLocked() {
+        return true;
+    }
 }

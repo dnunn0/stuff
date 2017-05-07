@@ -49,6 +49,11 @@ public class AllianceNavDeck {
         source.clear();
     }
 
+    /**
+     * count of cards remaining in deck
+     *
+     * @return
+     */
     public int size() {
         return cards.size();
     }

@@ -12,4 +12,9 @@ public interface DeckState {
     String lock(AllianceSectorNavController controller, Response res);
 
     String unlock(AllianceSectorNavController controller, Response res);
+
+    default boolean isLocked() {
+        return false;
+    }
+
 }

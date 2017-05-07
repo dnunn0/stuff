@@ -18,6 +18,19 @@
 
 
 <script>
+function sendRequest(method, path) {
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+   processResponse(this);
+  };
+  xhttp.open(method, getUrl(path), true);
+  xhttp.send();
+}
+
+function getUrl(path) {
+	return "http://192.168.1.86:4567"+path+"?t=" + Math.random()
+}
+
 function processResponse(xhttp) {
  if (xhttp.readyState == 4) {
     var result = "none";
@@ -26,9 +39,9 @@ function processResponse(xhttp) {
 	 case 200: result = xhttp.responseText;
 		addEmphasis = false;
 		break;
-	case 404: result = ">Needs shuffling";
+	case 404: result = "Needs shuffling!";
 	break;
-		case 409: result = "Locked";
+		case 409: result = "Locked!";
 	break;
 	default:
 	 	    result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
@@ -43,34 +56,20 @@ function processResponse(xhttp) {
 </script>
 <script>
 function get(path) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-   processResponse(this);
-  };
-  xhttp.open("GET", "http://192.168.1.86:4567"+path+"?t=" + Math.random(), true);
-  xhttp.send();
+  sendRequest("GET", path);
 }
 </script>
 <script>
 function post(path) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-   processResponse(this);
-  };
-  xhttp.open("POST", "http://192.168.1.86:4567"+path+"?t=" + Math.random(), true);
-  xhttp.send();
+ sendRequest("POST", path);
 }
 </script>
 
 <script>
 function del(path) {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-   processResponse(this);
-  };
-  xhttp.open("DELETE", "http://192.168.1.86:4567"+path+"?t=" + Math.random(), true);
-  xhttp.send();
+ sendRequest("DELETE", path);
 }
+
 </script>
 
     </body>
