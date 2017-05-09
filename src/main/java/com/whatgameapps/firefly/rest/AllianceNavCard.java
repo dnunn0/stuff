@@ -11,10 +11,11 @@ public class  AllianceNavCard {
     public static final AllianceNavCard RESHUFFLE = new AllianceNavCard("Alliance Cruiser - Reshuffle", true);
     public static final AllianceNavCard UNKNOWN = new AllianceNavCard("Alliance Huh");
     public static final AllianceNavCard KEEP_FLYING = new AllianceNavCard("The Big Black", true);
-    public static final AllianceNavCard ALLIANCE_CRUISER = new AllianceNavCard("Alliance Cruiser");
-    public static final AllianceNavCard CUSTOMS_INSPECTION = new AllianceNavCard("Alliance Customs Inspection");
+    public static final AllianceNavCard ALLIANCE_CRUISER = new AllianceNavCard("Alliance Contact - Cruiser", true);
+    public static final AllianceNavCard CUSTOMS_INSPECTION = new AllianceNavCard("Customs Inspection", true);
     public static final AllianceNavCard CORVETTE_CONTACT = new AllianceNavCard("Alliance Corvette Contact");
     public static final AllianceNavCard BREAKDOWN = new AllianceNavCard("Alliance Breakdown");
+    public static final AllianceNavCard IFN_THE_COIL = new AllianceNavCard("If'n The Coil Busts We're Driftin'", true);
     public static final AllianceNavCard WHATS_GOING_ON = new AllianceNavCard("What's Going On In The Engine Room?", true);
     public static final AllianceNavCard SALVAGE_OPS = new AllianceNavCard("Alliance Salvage Ops");
     public static final AllianceNavCard SALVAGE_OPS_ABANDONED = new AllianceNavCard("Abandoned Ship", true);

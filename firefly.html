@@ -74,23 +74,31 @@
 	  updateRequestId(xhttp, true);
 	}
 	
-	function updateHistory(lastCard) {
-		updateElement("history", false, "<li>"+lastCard+"</li>" + document.getElementById("history").innerHTML);
+	function updateHistory(card) {
+		var item = card.action;
+		if (card.hasPic) {
+			item = "<a href='"+getUrl(cardPicName(card))+"' target='_blank'>"+ card.action + "</a>";
+		}
+		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
 
 	function displayNavCard(xhttp, target) {
 	  var card = JSON.parse(xhttp.responseText);
 	  var newHtml = card.action;
 	  if (card.hasPic) {
-		  var picName = card.action.replace(/[^a-zA-Z]/g, "");
-		  newHtml = "<br><img src='" + getUrl(picName + ".png") 
+		  var picName = cardPicName(card);
+		  newHtml = "<br><img src='" + getUrl(picName) 
 				+ "' alt='"+card.action+"'"
 				+ " height='320' width='220'"
 				+"/>";
 	  }
 	  updateElement(target, false, newHtml);
 	  updateRequestId(xhttp, true);
-	  updateHistory(card.action);
+	  updateHistory(card);
+	}
+	
+	function cardPicName(card) {
+		return card.action.replace(/[^a-zA-Z]/g, "")+".png";
 	}
 
 	function updateDeckStatus(xhttp, target) {
@@ -139,6 +147,10 @@
 	function del(path) {
 	  sendRequest("DELETE", path, processActionResponseFun, justDisplayResponse);
 	}
+	
+	function clearHistory() {
+		updateElement("history", false, "");
+	}
 
 	window.onload = function(e) {
 		hostPort="35.166.255.19:24680";
@@ -156,8 +168,9 @@
 
 <button id="draw" type="button" onclick="get(allianceNavPath)">Request nav card</button>
 <button id="shuffle" type="button" onclick="post(allianceNavPath)">Shuffle</button>
-<button id="lock" type="button" onclick="post(allianceNavLockPath)">lock</button>
-<button id="unlock" type="button" onclick="del(allianceNavLockPath)">unlock</button>
+<button id="lock" type="button" onclick="post(allianceNavLockPath)">Lock Deck</button>
+<button id="unlock" type="button" onclick="del(allianceNavLockPath)">Unlock Deck</button>
+<button id="unlock" type="button" onclick="clearHistory()">Clear History</button>
 
 <p><span id="requestResult"/><br></p>
 <p><span id="status"/><br></p>
