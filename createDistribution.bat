@@ -16,7 +16,15 @@ del "%app_dir%dist\%app_name%\runtime\jre"\Welcome.html
 
 set FILE_LIST=(charsets deploy jce resources jfr jfxswt plugin management-agent )
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\lib\%%i.jar 
+
+set FILE_LIST=(hijrah-config-umalqura.properties classlist sound.properties javafx.properties calendars.properties fontconfig.properties.src psfontj2d.properties )
+for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\lib\%%i
+
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\applet
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\cmm
 CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\ext
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\fonts
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\images
 CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\management
 
 set FILE_LIST=(rmid rmiregistry tnameserv keytool kinit klist ktab policytool orbd servertool javaws javacpl jabswitch java-rmi jjs jp2launcher unpack200 )
@@ -38,22 +46,24 @@ pushd %app_dir%dist\%app_name%\app
 "C:\Program Files (x86)\7-Zip\7z" x %archive_name%.zip 
 robocopy "%archive_name%\bin" bin 
 robocopy "%archive_name%\lib" lib
-popd
 CALL :DELETE_DIR  %archive_name%
 rm *.zip
 rm *.tar
+robocopy %app_dir%build\resources\main\public resources\public
+IF %ERRORLEVEL% GTR %ROBOCOPY_OK% goto done
 popd
+
 
 set batchfile= dist\%app_name%\run.bat
 
 Echo setlocal> %batchfile%
 Echo Set app_dir=%%~dp0>> %batchfile%
-Echo pushd %%app_dir%% >> %batchfile%
-Echo Set JAVA_HOME=%%app_dir%%runtime\jre\>> %batchfile%
-Echo set PATH=%%JAVA_HOME%%bin>> %batchfile%
-Echo Set JAVA_OPTS=-server -Xmx8m >>%batchfile%
-Echo rem Set DEBUG=y >>%batchfile%
-Echo app\bin\%app_name% %%* >> %batchfile%
+Echo pushd "%%app_dir%%" >> %batchfile%
+ECHO Set JAVA_EXE=%%app_dir%%runtime\jre\bin\java.exe>> %batchfile%
+ECHO set PATH=>> %batchfile%
+ECHO Set CLASSPATH="%%app_dir%%app\resources";"%%app_dir%%app\lib\*">> %batchfile%
+ECHO "%%JAVA_EXE%%" -server -Xmx8m -cp %%CLASSPATH%% com.whatgameapps.firefly.Main %%*>> %batchfile%
+
 
 set batchfile= dist\%app_name%\run
 
