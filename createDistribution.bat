@@ -22,7 +22,8 @@ CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\management
 set FILE_LIST=(rmid rmiregistry tnameserv keytool kinit klist ktab policytool orbd servertool javaws javacpl jabswitch java-rmi jjs jp2launcher unpack200 )
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.exe 
 
-set FILE_LIST=(jfxwebkit awt msvcr100 msvcr120 msvcp120 javafx_font_t2k splashscreen javafx_iio)
+rem need at least one of (not sure) msvcr100 msvcr120 msvcp120 for 32-bit java to work in 64-bit OS
+set FILE_LIST=(jfxwebkit awt javafx_font_t2k splashscreen javafx_iio)
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.dll 
 
 CALL :DELETE_DIR  "%app_dir%dist\%app_name%\runtime\jre"\bin\client
