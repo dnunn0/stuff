@@ -34,8 +34,8 @@ public class Main {
         new BeforeAll(spark());
         new DosFilter(spark());
         new AllianceSectorNavController(spark(), spec);
-        new AfterAll(spark());
         new StopController(spark());
+        new AfterAll(spark());
     }
 
     private AllianceNavDeckSpecification getSpecForSpecName(final String specName) throws IllegalAccessException, NoSuchFieldException {
@@ -45,7 +45,6 @@ public class Main {
     public Service spark() {
         return spark.spark();
     }
-
     public static void main(String args[]) throws Exception {
         new Main(args);
     }
