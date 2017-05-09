@@ -73,6 +73,10 @@
 	  updateElement(target, false, result);
 	  updateRequestId(xhttp, true);
 	}
+	
+	function updateHistory(lastCard) {
+		updateElement("history", false, "<li>"+lastCard+"</li>" + document.getElementById("history").innerHTML);
+	}
 
 	function displayNavCard(xhttp, target) {
 	  var card = JSON.parse(xhttp.responseText);
@@ -86,15 +90,14 @@
 	  }
 	  updateElement(target, false, newHtml);
 	  updateRequestId(xhttp, true);
-	  
-	  
+	  updateHistory(card.action);
 	}
 
 	function updateDeckStatus(xhttp, target) {
 	  var stat = JSON.parse(xhttp.responseText);
-	  var result = "Cards: " + stat.cardCount;
-	  result += "<br>Discards: " + stat.discardsCount;
-	  result += "<br>Is Locked: " + stat.isLocked;
+	  var result = "Cards Left: " + stat.cardCount;
+	  result += "&emsp;Discards: " + stat.discardsCount;
+	  result += "&emsp;Is Locked: " + stat.isLocked;
 	  //  result += "<br>" + xhttp.responseText
 	  //result += "<\p>";
 	  updateElement(target, false, result);
@@ -156,9 +159,12 @@
 <button id="lock" type="button" onclick="post(allianceNavLockPath)">lock</button>
 <button id="unlock" type="button" onclick="del(allianceNavLockPath)">unlock</button>
 
-<p>Result: <span id="requestResult"></span><br></p>
-<p><span id="status"></span><br></p>
-<p>Request id: <span id="requestId"></span><br></p>
+<p><span id="requestResult"/><br></p>
+<p><span id="status"/><br></p>
+<p>History
+<ol style="margin-top:-10px;"><span id="history"/></ol>
+</p>
+<p>Request id: <span id="requestId"/><br></p>
 
 
 </body>
