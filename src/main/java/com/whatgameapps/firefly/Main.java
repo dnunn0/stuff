@@ -40,7 +40,7 @@ public class Main {
     }
 
     private AllianceNavDeckSpecification getSpecForSpecName(final String specName) throws IllegalAccessException, NoSuchFieldException {
-        return (AllianceNavDeckSpecification) AllianceNavDeckSpecification.class.getField(specName).get(null);
+        return (AllianceNavDeckSpecification) AllianceNavDeckSpecification.class.getField(specName.toUpperCase()).get(null);
     }
 
     public Service spark() {

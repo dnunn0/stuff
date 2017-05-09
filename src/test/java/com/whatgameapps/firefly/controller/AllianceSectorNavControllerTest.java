@@ -1,6 +1,6 @@
 package com.whatgameapps.firefly.controller;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMultimap;
 import com.whatgameapps.firefly.AllianceNavDeckSpecification;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
 import com.whatgameapps.firefly.rest.AllianceNavCard;
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class AllianceSectorNavControllerTest {
-    private final static AllianceNavDeckSpecification noReshuffleCardSpec = new AllianceNavDeckSpecification(3, ImmutableMap.<AllianceNavCard, Integer>builder()
+    private final static AllianceNavDeckSpecification noReshuffleCardSpec = new AllianceNavDeckSpecification(3, ImmutableMultimap.<AllianceNavCard, Integer>builder()
             .build());
     private final TestUtils testUtils = new TestUtils();
     private final Request req = new SparkRequestStub();

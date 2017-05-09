@@ -34,7 +34,9 @@ public class AllianceNavDeckTest {
 
     @Test
     public void deckContainsRightNumberOfCardsKalidasaDeck() {
-        createAndCheckDeck(AllianceNavDeckSpecification.KALIDASA);
+        AllianceNavDeckSpecification spec = AllianceNavDeckSpecification.KALIDASA;
+        final AllianceNavDeck sut = new AllianceNavDeck(spec);
+        assertEquals(spec.count, sut.size());
     }
 
     @Test
