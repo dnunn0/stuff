@@ -75,23 +75,17 @@
 	}
 	
 	function updateHistory(card) {
-		var item = card.action;
-		if (card.hasPic) {
-			item = "<a href='"+getUrl(cardPicName(card))+"' target='_blank'>"+ card.action + "</a>";
-		}
+		var item = "<a href='"+getUrl(cardPicName(card))+"' target='_blank'>"+ card.action + "</a>";
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
 
 	function displayNavCard(xhttp, target) {
 	  var card = JSON.parse(xhttp.responseText);
-	  var newHtml = card.action;
-	  if (card.hasPic) {
-		  var picName = cardPicName(card);
-		  newHtml = "<br><img src='" + getUrl(picName) 
+	  var picName = cardPicName(card);
+	  var newHtml = "<br><img src='" + getUrl(picName) 
 				+ "' alt='"+card.action+"'"
 				+ " height='320' width='220'"
 				+"/>";
-	  }
 	  updateElement(target, false, newHtml);
 	  updateRequestId(xhttp, true);
 	  updateHistory(card);
