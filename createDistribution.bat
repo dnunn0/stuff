@@ -14,12 +14,12 @@ IF %ERRORLEVEL% GTR %ROBOCOPY_OK% goto done
 
 del "%app_dir%dist\%app_name%\runtime\jre"\Welcome.html
 
-set FILE_LIST=(charsets deploy jce resources jfr jfswt plugin management-agent )
+set FILE_LIST=(charsets deploy jce resources jfr jfxswt plugin management-agent )
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\lib\%%i.jar 
 CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\ext
-CALL :DELETE_DIR del /s/q "%app_dir%dist\%app_name%\runtime\jre"\lib\management
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\management
 
-set FILE_LIST=(rmid rmiregistry tnameserv keytool kinit klist ktab policytool orbd servertool javaws javacpl jabswitch java-rmi jjs jplauncher unpack200 )
+set FILE_LIST=(rmid rmiregistry tnameserv keytool kinit klist ktab policytool orbd servertool javaws javacpl jabswitch java-rmi jjs jp2launcher unpack200 )
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.exe 
 
 set FILE_LIST=(jfxwebkit awt msvcr100 msvcr120 msvcp120 javafx_font_t2k splashscreen javafx_iio)
@@ -36,7 +36,8 @@ IF %ERRORLEVEL% GTR %ROBOCOPY_OK% goto done
 pushd %app_dir%dist\%app_name%\app 
 "C:\Program Files (x86)\7-Zip\7z" x %archive_name%.zip 
 robocopy "%archive_name%\bin" bin 
-robocopy "%archive_name%\lib" lib && popd
+robocopy "%archive_name%\lib" lib
+popd
 CALL :DELETE_DIR  %archive_name%
 rm *.zip
 rm *.tar
