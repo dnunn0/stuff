@@ -25,7 +25,7 @@
 	}
 
 	function updateElement(target, addEmphasis, newHtml) {
-	  if (addEmphasis) newHtml = "<font color='red'>" + unemphasizedHtml + "</font>";
+	  if (addEmphasis) newHtml = "<font color='red'>" + newHtml + "</font>";
 	  document.getElementById(target).innerHTML = newHtml;
 	}
 
@@ -82,8 +82,8 @@
 	function displayNavCard(xhttp, target) {
 	  var card = JSON.parse(xhttp.responseText);
 	  var picName = cardPicName(card);
-	  var newHtml = "<br><img src='" + getUrl(picName) 
-				+ "' alt='"+card.action+"'"
+	  var newHtml = "<br><img src='" + getUrl(picName) +"'"
+				+ " alt=\""+card.action+"\""
 				+ " height='320' width='220'"
 				+"/>";
 	  updateElement(target, false, newHtml);
