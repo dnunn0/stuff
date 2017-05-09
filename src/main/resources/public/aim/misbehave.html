@@ -6,7 +6,6 @@
             background: url(path-to-file);
             -moz-force-broken-image-icon: 1;
         }
-
     </style>
     <title>Firefly</title>
     <script>
@@ -27,7 +26,7 @@
 
 	function getUrl(path) {
 		if (!path.startsWith("/")) path = "/" + path;
-	  return "http://"+hostPort+ path
+	    return "http://"+hostPort+ path
 	}
 
 	function updateElement(target, addEmphasis, newHtml) {
@@ -98,7 +97,7 @@
 	}
 	
 	function cardPicName(card) {
-		return card.action.replace(/[^a-zA-Z]/g, "")+".png";
+		return card.action.replace(/[^a-zA-Z]/g, "")+".jpg";
 	}
 
 	function updateDeckStatus(xhttp, target) {
