@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+        .external {
+            background: url(path-to-file);
+            -moz-force-broken-image-icon: 1;
+        }
 
+    </style>
     <title>Firefly</title>
     <script>
 	var allianceNavPath = "/alliance/nav";
@@ -82,7 +88,7 @@
 	function displayNavCard(xhttp, target) {
 	  var card = JSON.parse(xhttp.responseText);
 	  var picName = cardPicName(card);
-	  var newHtml = "<br><img src='" + getUrl(picName) +"'"
+	  var newHtml = "<br><img class='external' src='" + getUrl(picName) +"'"
 				+ " alt=\""+card.action+"\""
 				+ " height='320' width='220'"
 				+"/>";
@@ -146,10 +152,17 @@
 		updateElement("history", false, "");
 	}
 
+    function getPageUrl() {
+    if (typeof this.href === "undefined")
+        return document.location.toString().toLowerCase();
+
+    return this.href.toString().toLowerCase();
+    }
+
 	window.onload = function(e) {
-		hostPort="35.166.255.19:24680";
-//		hostPort="192.168.1.86:4567";
-	  hostPort = prompt("Please enter the host:port", hostPort);
+      var url = getPageUrl();
+      var parts = url.split("/");
+      hostPort = parts[2];
 	  updateStatus();
 
 	};
