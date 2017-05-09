@@ -2,29 +2,36 @@ package com.whatgameapps.firefly.rest;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.http.annotation.Immutable;
 
 @Immutable
 public class  AllianceNavCard {
-    public static final AllianceNavCard RESHUFFLE = new AllianceNavCard("Alliance Cruiser Contact - Reshuffle", "");
-    public static final AllianceNavCard UNKNOWN = new AllianceNavCard("Alliance Huh", "");
-    public static final AllianceNavCard KEEP_FLYING = new AllianceNavCard("Alliance: The Big Black", "");
-    public static final AllianceNavCard ALLIANCE_CRUISER = new AllianceNavCard("Alliance Cruiser", "");
-    public static final AllianceNavCard CUSTOMS_INSPECTION = new AllianceNavCard("Alliance Customs Inspection", "");
-    public static final AllianceNavCard CORVETTE_CONTACT = new AllianceNavCard("Alliance Corvette Contact", "");
-    public static final AllianceNavCard BREAKDOWN = new AllianceNavCard("Alliance Breakdown", "");
-    public static final AllianceNavCard SALVAGE_OPS = new AllianceNavCard("Alliance Salvage Ops", "");
-    public static final AllianceNavCard SALVAGE_OPS_ABANDONED = new AllianceNavCard("Alliance Salvage Ops-Abandoned", "");
-    public static final AllianceNavCard FAMILY_DINNER = new AllianceNavCard("Alliance Family Dinner", "");
-    public static final AllianceNavCard DISTRESS_SIGNAL = new AllianceNavCard("Alliance Distress Signal", "");
-    public static final AllianceNavCard FREIGHTER_CONVOY = new AllianceNavCard("Alliance Freighter Convey", "");
+    public static final AllianceNavCard RESHUFFLE = new AllianceNavCard("Alliance Cruiser Contact - Reshuffle");
+    public static final AllianceNavCard UNKNOWN = new AllianceNavCard("Alliance Huh");
+    public static final AllianceNavCard KEEP_FLYING = new AllianceNavCard("The Big Black", true);
+    public static final AllianceNavCard ALLIANCE_CRUISER = new AllianceNavCard("Alliance Cruiser");
+    public static final AllianceNavCard CUSTOMS_INSPECTION = new AllianceNavCard("Alliance Customs Inspection");
+    public static final AllianceNavCard CORVETTE_CONTACT = new AllianceNavCard("Alliance Corvette Contact");
+    public static final AllianceNavCard BREAKDOWN = new AllianceNavCard("Alliance Breakdown");
+    public static final AllianceNavCard WHATS_GOING_ON = new AllianceNavCard("What's Going On In The Engine Room?", true);
+    public static final AllianceNavCard SALVAGE_OPS = new AllianceNavCard("Alliance Salvage Ops");
+    public static final AllianceNavCard SALVAGE_OPS_ABANDONED = new AllianceNavCard("Alliance Salvage Ops-Abandoned");
+    public static final AllianceNavCard FAMILY_DINNER = new AllianceNavCard("Alliance Family Dinner");
+    public static final AllianceNavCard DISTRESS_SIGNAL = new AllianceNavCard("Alliance Distress Signal");
+    public static final AllianceNavCard FREIGHTER_CONVOY = new AllianceNavCard("Alliance Freighter Convey");
 
     public final String action;
-    public final String text;
+    private final boolean hasPic;
 
-    AllianceNavCard(final String action, final String text) {
+    AllianceNavCard(final String action) {
+        this(action, false);
+    }
+
+    AllianceNavCard(final String action, boolean hasPic) {
         this.action = action;
-        this.text = text;
+        this.hasPic = hasPic;
     }
 
     @Override
@@ -37,12 +44,13 @@ public class  AllianceNavCard {
         return EqualsBuilder.reflectionEquals(this, o);
     }
 
+    @Override
     public AllianceNavCard clone() {
-        return new AllianceNavCard(this.action, this.text);
+        return new AllianceNavCard(this.action, this.hasPic);
     }
 
     @Override
     public String toString() {
-        return this.action + "\n" + this.text;
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 }

@@ -31,6 +31,7 @@ public class Main {
     }
 
     private void addEndpoints() throws Exception {
+        spark().staticFiles.location("/public");
         new BeforeAll(spark());
         new DosFilter(spark());
         new AllianceSectorNavController(spark(), spec);

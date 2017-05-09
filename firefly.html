@@ -20,12 +20,13 @@
 	}
 
 	function getUrl(path) {
+		if (!path.startsWith("/")) path = "/" + path;
 	  return "http://"+hostPort+ path
 	}
 
-	function updateElement(target, addEmphasis, newInner) {
-	  if (addEmphasis) var result = "<font color='red'>" + newInner + "</font>";
-	  document.getElementById(target).innerHTML = result;
+	function updateElement(target, addEmphasis, newHtml) {
+	  if (addEmphasis) newHtml = "<font color='red'>" + unemphasizedHtml + "</font>";
+	  document.getElementById(target).innerHTML = newHtml;
 	}
 
 	function processActionResponse(xhttp, target, successCallback) {
@@ -42,17 +43,11 @@
 		  default:
 			displayUnexpectedError(xhttp, target);
 		}
-		//need to get status in here after the action has completed
-		//  because DELETE first sends an OPTION, and then the next GET for *status*,
-		//  and only then after that does it send the DELETE. 
 		updateStatus();
 
 	}
 
 	function processStatusResponse(xhttp, target) {
-	  if (xhttp.readyState == 4) {
-	    var result = "none";
-	    var addEmphasis = true;
 	    switch (xhttp.status) {
 	      case 200:
 	        return updateDeckStatus(xhttp, target);
@@ -60,29 +55,39 @@
 	      default:
 	        displayUnexpectedError(xhttp, target);
 	    }
-	  }
 	}
 	
 	function displayUnexpectedError(xhttp, target, ev) {
 		var result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
 	    updateElement(target, true, result);
-
 	}
 	
-	function updateRequestId(xhttp) {
-			  document.getElementById("requestId").innerHTML = xhttp.getResponseHeader("id");
+	function updateRequestId(xhttp, shouldOverride) {
+		var target = "requestId";
+		if (shouldOverride || "" == document.getElementById(target).innerHTML)
+			updateElement(target, false, xhttp.getResponseHeader("id"));
 	}
 
 	function justDisplayResponse(xhttp, target) {
 	  var result = xhttp.responseText;
-	  document.getElementById(target).innerHTML = result;
-	  updateRequestId(xhttp);
+	  updateElement(target, false, result);
+	  updateRequestId(xhttp, true);
 	}
 
 	function displayNavCard(xhttp, target) {
-	  var result = JSON.parse(xhttp.responseText).action;
-	  document.getElementById(target).innerHTML = result;
-	  updateRequestId(xhttp);
+	  var card = JSON.parse(xhttp.responseText);
+	  var newHtml = card.action;
+	  if (card.hasPic) {
+		  var picName = card.action.replace(/[^a-zA-Z]/g, "");
+		  newHtml = "<br><img src='" + getUrl(picName + ".png") 
+				+ "' alt='"+card.action+"'"
+				+ " height='320' width='220'"
+				+"/>";
+	  }
+	  updateElement(target, false, newHtml);
+	  updateRequestId(xhttp, true);
+	  
+	  
 	}
 
 	function updateDeckStatus(xhttp, target) {
@@ -92,7 +97,10 @@
 	  result += "<br>Is Locked: " + stat.isLocked;
 	  //  result += "<br>" + xhttp.responseText
 	  //result += "<\p>";
-	  document.getElementById(target).innerHTML = result;
+	  updateElement(target, false, result);
+	  updateRequestId(xhttp, false);
+	  if ("" == document.getElementById("requestResult").innerHTML) updateElement("requestResult", false, "-");
+
 
 	  var hasCards = stat.cardCount > 0;
 	  var isLocked = stat.isLocked;
@@ -130,7 +138,9 @@
 	}
 
 	window.onload = function(e) {
-	  hostPort = prompt("Please enter the host:port", "35.166.255.19:24680");
+		hostPort="35.166.255.19:24680";
+		hostPort="192.168.1.86:4567";
+	  hostPort = prompt("Please enter the host:port", hostPort);
 	  updateStatus();
 
 	};
