@@ -2,6 +2,8 @@ package com.whatgameapps.firefly;
 
 import com.whatgameapps.firefly.controller.AfterAll;
 import com.whatgameapps.firefly.controller.AllianceSectorNavController;
+import com.whatgameapps.firefly.controller.BeforeAll;
+import com.whatgameapps.firefly.controller.DosFilter;
 import com.whatgameapps.firefly.controller.StopController;
 import spark.Service;
 
@@ -29,6 +31,8 @@ public class Main {
     }
 
     private void addEndpoints() throws Exception {
+        new BeforeAll(spark());
+        new DosFilter(spark());
         new AllianceSectorNavController(spark(), spec);
         new AfterAll(spark());
         new StopController(spark());
