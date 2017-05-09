@@ -67,7 +67,6 @@ Echo pushd "%%app_dir%%" >> %batchfile%
 ECHO Set JAVA_EXE=%%app_dir%%runtime\jre\bin\java.exe>> %batchfile%
 ECHO set PATH=>> %batchfile%
 ECHO Set CLASSPATH="%%app_dir%%app\resources";"%%app_dir%%app\lib\*">> %batchfile%
-rem ECHO "%%JAVA_EXE%%" -server -Xmx8m -cp %%CLASSPATH%% com.whatgameapps.firefly.Main %%*>> %batchfile%
 ECHO "%%JAVA_EXE%%" -server -Xmx8m -cp %%CLASSPATH%% %1 %%*>> %batchfile%
 
 
