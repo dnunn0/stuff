@@ -1,4 +1,6 @@
 setlocal
+
+
 if not "%JAVA_HOME%"=="" goto JRE_SET
 Echo JAVA_HOME not set
 goto :eof
@@ -6,6 +8,8 @@ goto :eof
 
 Set app_dir=%~dp0
 for %%* in (.) do set app_name=%%~nx*
+
+if "%1"=="" goto NEED_MAIN_CLASS_NAME
 
 Set ROBOCOPY_OK=3
 CALL :DELETE_DIR %app_dir%dist
@@ -50,7 +54,7 @@ CALL :DELETE_DIR  %archive_name%
 CALL :DELETE_DIR  bin
 rm *.zip
 rm *.tar
-robocopy %app_dir%build\resources\main\public resources\public
+rem robocopy %app_dir%build\resources\main\public resources\public
 IF %ERRORLEVEL% GTR %ROBOCOPY_OK% goto done
 popd
 
@@ -63,7 +67,8 @@ Echo pushd "%%app_dir%%" >> %batchfile%
 ECHO Set JAVA_EXE=%%app_dir%%runtime\jre\bin\java.exe>> %batchfile%
 ECHO set PATH=>> %batchfile%
 ECHO Set CLASSPATH="%%app_dir%%app\resources";"%%app_dir%%app\lib\*">> %batchfile%
-ECHO "%%JAVA_EXE%%" -server -Xmx8m -cp %%CLASSPATH%% com.whatgameapps.firefly.Main %%*>> %batchfile%
+rem ECHO "%%JAVA_EXE%%" -server -Xmx8m -cp %%CLASSPATH%% com.whatgameapps.firefly.Main %%*>> %batchfile%
+ECHO "%%JAVA_EXE%%" -server -Xmx8m -cp %%CLASSPATH%% %1 %%*>> %batchfile%
 
 
 set batchfile= dist\%app_name%\run
@@ -87,5 +92,6 @@ goto :done
 del /s/q %1 && rmdir /s/q %1
 exit /b
 
-
+:NEED_MAIN_CLASS_NAME
+Echo this script requires the main class name, e.g., %~n0 com.huh.%app_name%.Main
 :done

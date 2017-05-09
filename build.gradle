@@ -24,10 +24,17 @@ dependencies {
     testCompile 'com.jayway.restassured:rest-assured:2.4.0'
 }
 
+mainClassName = 'com.whatgameapps.firefly.Main'
+
+jar {
+    manifest {
+        attributes 'Main-Class': "$mainClassName"
+    }
+}
+
 task createDistribution(type: Exec, dependsOn: assembleDist) {
-    commandLine = ['cmd', '/c', 'createDistribution.bat']
+    commandLine = ['cmd', '/c', 'createDistribution.bat', "$mainClassName"]
 }
 
 
-mainClassName = 'com.whatgameapps.firefly.Main'
 
