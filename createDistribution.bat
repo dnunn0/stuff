@@ -47,6 +47,7 @@ pushd %app_dir%dist\%app_name%\app
 robocopy "%archive_name%\bin" bin 
 robocopy "%archive_name%\lib" lib
 CALL :DELETE_DIR  %archive_name%
+CALL :DELETE_DIR  bin
 rm *.zip
 rm *.tar
 robocopy %app_dir%build\resources\main\public resources\public

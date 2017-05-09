@@ -11,7 +11,6 @@ public class AfterAll {
             System.out.format("\t%s - Status %d. ResponseText: [%s]\n", res.raw().getHeader(AllianceSectorNavController.ID_HEADER), res.status(), res.body());
 
             res.type(ContentType.APPLICATION_JSON.toString());
-                    res.header("Cache-Control", "no-cache");
                     res.header("Access-Control-Allow-Origin", "*");
                     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
             res.header("Access-Control-Allow-Headers", "Content-Type, Authorize");
