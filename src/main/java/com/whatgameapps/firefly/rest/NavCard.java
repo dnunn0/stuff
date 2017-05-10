@@ -7,13 +7,13 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.http.annotation.Immutable;
 
 @Immutable
-public class  AllianceNavCard {
+public class NavCard {
     public static final String RESHUFFLE = "RESHUFFLE";
     public static final String UNKNOWN = "Missed one (or more)";
 
     public final String action;
 
-    public AllianceNavCard(final String action) {
+    public NavCard(final String action) {
         this.action = action;
     }
 
@@ -28,8 +28,8 @@ public class  AllianceNavCard {
     }
 
     @Override
-    public AllianceNavCard clone() {
-        return new AllianceNavCard(this.action);
+    public NavCard clone() {
+        return new NavCard(this.action);
     }
 
     @Override
@@ -38,6 +38,6 @@ public class  AllianceNavCard {
     }
 
     public boolean isReshuffle() {
-        return this.action.toUpperCase().contains(AllianceNavCard.RESHUFFLE.toUpperCase());
+        return this.action.toUpperCase().contains(NavCard.RESHUFFLE.toUpperCase());
     }
 }

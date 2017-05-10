@@ -102,7 +102,7 @@
 
 	function updateDeckStatus(xhttp, target) {
 	  var stat = JSON.parse(xhttp.responseText);
-	  var result = "Cards Left: " + stat.cardCount;
+	  var result = "Cards Left: " + stat.remainingCardsCount;
 	  result += "&emsp;Discards: " + stat.discardsCount;
 	  result += "&emsp;Is Locked: " + stat.isLocked;
 	  //  result += "<br>" + xhttp.responseText
@@ -112,11 +112,11 @@
 	  if ("" == document.getElementById("requestResult").innerHTML) updateElement("requestResult", false, "-");
 
 
-	  var hasCards = stat.cardCount > 0;
+	  var hasCards = stat.remainingCardsCount > 0;
 	  var isLocked = stat.isLocked;
-	  document.getElementById("draw").disabled = !hasCards || isLocked;
-	  document.getElementById("shuffle").disabled = isLocked;
-	  document.getElementById("unlock").disabled = !isLocked;
+	  document.getElementById("drawBtn").disabled = !hasCards || isLocked;
+	  document.getElementById("shuffleBtn").disabled = isLocked;
+	  document.getElementById("unlockBtn").disabled = !isLocked;
 	}
 
 	function processActionResponseFun(xhttp, successCallback) {
@@ -172,11 +172,11 @@
 <body>
 
 
-<button id="draw" type="button" onclick="get(allianceNavPath)">Request nav card</button>
-<button id="shuffle" type="button" onclick="post(allianceNavPath)">Shuffle</button>
-<button id="lock" type="button" onclick="post(allianceNavLockPath)">Lock Deck</button>
-<button id="unlock" type="button" onclick="del(allianceNavLockPath)">Unlock Deck</button>
-<button id="unlock" type="button" onclick="clearHistory()">Clear History</button>
+<button id="drawBtn" type="button" onclick="get(allianceNavPath)">Request nav card</button>
+<button id="shuffleBtn" type="button" onclick="post(allianceNavPath)">Shuffle</button>
+<button id="lockBtn" type="button" onclick="post(allianceNavLockPath)">Lock Deck</button>
+<button id="unlockBtn" type="button" onclick="del(allianceNavLockPath)">Unlock Deck</button>
+<button id="historyBtn" type="button" onclick="clearHistory()">Clear History</button>
 
 <p><span id="requestResult"/><br></p>
 <p><span id="status"/><br></p>

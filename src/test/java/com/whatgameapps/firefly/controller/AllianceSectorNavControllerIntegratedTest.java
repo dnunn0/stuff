@@ -5,10 +5,10 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.builder.ResponseSpecBuilder;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.ResponseSpecification;
-import com.whatgameapps.firefly.AllianceNavDeck;
 import com.whatgameapps.firefly.AllianceNavDeckSpecification;
+import com.whatgameapps.firefly.NavDeck;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
-import com.whatgameapps.firefly.rest.AllianceNavCard;
+import com.whatgameapps.firefly.rest.NavCard;
 import org.eclipse.jetty.http.HttpStatus;
 import org.hamcrest.CoreMatchers;
 import org.junit.After;
@@ -63,8 +63,8 @@ public class AllianceSectorNavControllerIntegratedTest {
     }
 
     private String getTopCardAsJson() {
-        AllianceNavDeck deck = new AllianceNavDeck(AllianceNavDeckSpecification.RESHUFFLE);
-        final AllianceNavCard card = deck.take().get();
+        NavDeck deck = new NavDeck(AllianceNavDeckSpecification.RESHUFFLE);
+        final NavCard card = deck.take().get();
         return gson.toJson(card);
     }
 

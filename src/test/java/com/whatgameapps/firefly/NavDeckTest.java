@@ -1,7 +1,7 @@
 package com.whatgameapps.firefly;
 
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
-import com.whatgameapps.firefly.rest.AllianceNavCard;
+import com.whatgameapps.firefly.rest.NavCard;
 import org.junit.After;
 import org.junit.Test;
 
@@ -12,9 +12,9 @@ import java.util.stream.IntStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class AllianceNavDeckTest {
+public class NavDeckTest {
     private final TestUtils testUtils = new TestUtils();
-    private final AllianceNavDeck sut = createDeck();
+    private final NavDeck sut = createDeck();
 
     @After
     public void restoreStdout() {
@@ -27,7 +27,7 @@ public class AllianceNavDeckTest {
     }
 
     private void createAndCheckDeck(final AllianceNavDeckSpecification expectedDeck) {
-        final AllianceNavDeck sut = new AllianceNavDeck(expectedDeck);
+        final NavDeck sut = new NavDeck(expectedDeck);
         expectedDeck.entrySet().forEach((spec) ->
                 assertEquals(spec.getKey(), (int) spec.getValue(), sut.countCards(spec.getKey())));
     }
@@ -35,7 +35,7 @@ public class AllianceNavDeckTest {
     @Test
     public void deckContainsRightNumberOfCardsKalidasaDeck() {
         AllianceNavDeckSpecification spec = AllianceNavDeckSpecification.KALIDASA;
-        final AllianceNavDeck sut = new AllianceNavDeck(spec);
+        final NavDeck sut = new NavDeck(spec);
         assertEquals(spec.count, sut.size());
     }
 
@@ -52,18 +52,18 @@ public class AllianceNavDeckTest {
                 .filter(cardToFind::equals)
                 .count();
 
-        AllianceNavDeck stdDeck = createDeck();
+        NavDeck stdDeck = createDeck();
         assertEquals(((double) stdDeck.countCards(cardToFind)) / stdDeck.size(), ((double) count) / deckCount, 0.02);
     }
 
-    private AllianceNavDeck createDeck() {
-        return new AllianceNavDeck(AllianceNavDeckSpecification.BASIC);
+    private NavDeck createDeck() {
+        return new NavDeck(AllianceNavDeckSpecification.BASIC);
     }
 
     @Test
     public void takingACardDiscardsIt() {
         final int originalDiscardCount = sut.discards().size();
-        final Optional<AllianceNavCard> card = sut.take();
+        final Optional<NavCard> card = sut.take();
         assertEquals(originalDiscardCount + 1, sut.discards().size());
         assertEquals(card.get(), sut.discards().peek());
     }
@@ -88,7 +88,7 @@ public class AllianceNavDeckTest {
     }
 
     private void drainCards() {
-        Optional<AllianceNavCard> card;
+        Optional<NavCard> card;
         do {
             card = sut.take();
         } while (!card.get().isReshuffle());
@@ -98,7 +98,7 @@ public class AllianceNavDeckTest {
     public void cantTakeCardsAftePulledAll() {
         IntStream.rangeClosed(1, sut.spec.count)
                 .forEach(i -> sut.take());
-        final Optional<AllianceNavCard> card = sut.take();
+        final Optional<NavCard> card = sut.take();
         assertTrue(!card.isPresent());
     }
 

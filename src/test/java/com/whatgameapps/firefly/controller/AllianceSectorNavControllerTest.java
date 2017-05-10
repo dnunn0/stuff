@@ -3,8 +3,8 @@ package com.whatgameapps.firefly.controller;
 import com.google.common.collect.ImmutableMultimap;
 import com.whatgameapps.firefly.AllianceNavDeckSpecification;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
-import com.whatgameapps.firefly.rest.AllianceNavCard;
-import com.whatgameapps.firefly.rest.AllianceNavDeckStatus;
+import com.whatgameapps.firefly.rest.NavCard;
+import com.whatgameapps.firefly.rest.NavDeckStatus;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.After;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class AllianceSectorNavControllerTest {
 
     @Test
     public void shouldReplyWithCard() throws Exception {
-        final AllianceNavCard card = sut.drawCard(req, res);
+        final NavCard card = sut.drawCard(req, res);
         assertNotNull(card);
 
     }
@@ -74,7 +74,7 @@ public class AllianceSectorNavControllerTest {
     @Test
     public void shouldNotBeAbleToGetCardWhenLocked() {
         sut.lock(req, res);
-        AllianceNavCard card = sut.drawCard(req, res);
+        NavCard card = sut.drawCard(req, res);
         assertNull(card);
         assertEquals(AllianceSectorNavController.LOCK_ERROR, res.status());
     }
@@ -83,7 +83,7 @@ public class AllianceSectorNavControllerTest {
     public void shouldBeAbleToGetCardAfterUnlocked() {
         sut.lock(req, res);
         sut.unlock(req, res);
-        AllianceNavCard card = sut.drawCard(req, res);
+        NavCard card = sut.drawCard(req, res);
         assertNotNull(card);
         assertEquals(HttpStatus.OK_200, res.status());
     }
@@ -100,8 +100,8 @@ public class AllianceSectorNavControllerTest {
         checkStatus(sut.deck.spec.count, 0, false, sut.status(req, res));
     }
 
-    private void checkStatus(int expectedCardCount, int expectedDiscardCount, boolean expectedIsLocked, AllianceNavDeckStatus status) {
-        assertEquals("card count", expectedCardCount, status.cardCount);
+    private void checkStatus(int expectedCardCount, int expectedDiscardCount, boolean expectedIsLocked, NavDeckStatus status) {
+        assertEquals("card count", expectedCardCount, status.remainingCardsCount);
         assertEquals("discard count", expectedDiscardCount, status.discardsCount);
         assertEquals("lock state", expectedIsLocked, status.isLocked);
     }

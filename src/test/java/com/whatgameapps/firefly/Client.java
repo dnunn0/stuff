@@ -1,7 +1,7 @@
 package com.whatgameapps.firefly;
 
 import com.google.gson.Gson;
-import com.whatgameapps.firefly.rest.AllianceNavCard;
+import com.whatgameapps.firefly.rest.NavCard;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -122,7 +122,7 @@ public class Client {
     private void displayCard(HttpResponse response) {
         try {
             String jsonCard = EntityUtils.toString(response.getEntity());
-            AllianceNavCard card = gson.fromJson(jsonCard, AllianceNavCard.class);
+            NavCard card = gson.fromJson(jsonCard, NavCard.class);
             System.out.println(card);
         } catch (IOException e) {
             e.printStackTrace();

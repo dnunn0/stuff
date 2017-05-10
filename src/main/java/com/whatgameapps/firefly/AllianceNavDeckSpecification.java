@@ -1,15 +1,10 @@
 package com.whatgameapps.firefly;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import org.apache.http.annotation.Immutable;
 
-import java.util.Map;
-
 @Immutable
-public class AllianceNavDeckSpecification {
+public class AllianceNavDeckSpecification extends NavDeckSpecification {
     public static final AllianceNavDeckSpecification RESHUFFLE = new AllianceNavDeckSpecification(1, ImmutableMultimap.<String, Integer>builder()
             .put("Alliance Cruiser - Reshuffle", 1)
             .build());
@@ -26,7 +21,6 @@ public class AllianceNavDeckSpecification {
             .put("If'n the Coil Busts We're Driftin'", 1)
             .put("Minor Technical Difficulty", 1)
             .put("What's Going on in The Engine Room?", 1)
-
             .build()
     );
 
@@ -49,26 +43,12 @@ public class AllianceNavDeckSpecification {
             .build()
     );
 
-    public final int count;
-    public final ImmutableMultimap<String, Integer> deckSpec;
-
     public AllianceNavDeckSpecification(int count, ImmutableMultimap<String, Integer> deckSpec) {
-        this.count = count;
-        this.deckSpec = deckSpec;
+        super(count, deckSpec);
     }
 
     public AllianceNavDeckSpecification(final AllianceNavDeckSpecification basis, final int cumulativeCardCount, final ImmutableMultimap<String, Integer> addedCards) {
-        Multimap<String, Integer> cards = ArrayListMultimap.create(basis.deckSpec);
-        cards.putAll(addedCards);
-        this.deckSpec = ImmutableMultimap.copyOf(cards);
-        this.count = cumulativeCardCount;
+        super(basis, cumulativeCardCount, addedCards);
     }
 
-    public ImmutableCollection<Map.Entry<String, Integer>> entrySet() {
-        return this.deckSpec.entries();
-    }
-
-    public String toString() {
-        return "Deck with " + this.count + " cards";
-    }
 }

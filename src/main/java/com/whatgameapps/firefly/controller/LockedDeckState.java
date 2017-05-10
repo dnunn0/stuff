@@ -1,6 +1,6 @@
 package com.whatgameapps.firefly.controller;
 
-import com.whatgameapps.firefly.rest.AllianceNavCard;
+import com.whatgameapps.firefly.rest.NavCard;
 import org.eclipse.jetty.http.HttpStatus;
 import spark.Response;
 
@@ -13,7 +13,7 @@ public class LockedDeckState implements DeckState {
     }
 
     @Override
-    public AllianceNavCard drawCard(AllianceSectorNavController controller, Response res) {
+    public NavCard drawCard(AllianceSectorNavController controller, Response res) {
         res.status(AllianceSectorNavController.LOCK_ERROR);
         return null;
     }

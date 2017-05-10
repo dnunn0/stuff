@@ -1,6 +1,6 @@
 package com.whatgameapps.firefly.controller;
 
-import com.whatgameapps.firefly.rest.AllianceNavCard;
+import com.whatgameapps.firefly.rest.NavCard;
 import org.eclipse.jetty.http.HttpStatus;
 import spark.Response;
 
@@ -16,11 +16,11 @@ public class UnlockedDeckState implements DeckState {
     }
 
     @Override
-    public AllianceNavCard drawCard(AllianceSectorNavController controller, Response res) {
-        Optional<AllianceNavCard> card = controller.deck.take();
+    public NavCard drawCard(AllianceSectorNavController controller, Response res) {
+        Optional<NavCard> card = controller.deck.take();
 
         int status = AllianceSectorNavController.NOT_FOUND_ERROR;
-        AllianceNavCard reply = null;
+        NavCard reply = null;
 
         if (card.isPresent()) {
             reply = card.get();

@@ -1,9 +1,9 @@
 package com.whatgameapps.firefly.controller;
 
-import com.whatgameapps.firefly.AllianceNavDeck;
 import com.whatgameapps.firefly.AllianceNavDeckSpecification;
-import com.whatgameapps.firefly.rest.AllianceNavCard;
-import com.whatgameapps.firefly.rest.AllianceNavDeckStatus;
+import com.whatgameapps.firefly.NavDeck;
+import com.whatgameapps.firefly.rest.NavCard;
+import com.whatgameapps.firefly.rest.NavDeckStatus;
 import org.eclipse.jetty.http.HttpStatus;
 import spark.Request;
 import spark.Response;
@@ -17,7 +17,7 @@ public class AllianceSectorNavController {
 
     public static final int NOT_FOUND_ERROR = HttpStatus.NOT_FOUND_404;
     public static final int LOCK_ERROR = HttpStatus.CONFLICT_409;
-    final AllianceNavDeck deck;
+    final NavDeck deck;
     volatile DeckState deckState;
 
     public AllianceSectorNavController(Service spark, AllianceNavDeckSpecification spec) {
@@ -33,7 +33,7 @@ public class AllianceSectorNavController {
     }
 
     AllianceSectorNavController(AllianceNavDeckSpecification spec) {
-        this.deck = new AllianceNavDeck(spec);
+        this.deck = new NavDeck(spec);
         this.deckState = new UnlockedDeckState();
     }
 
@@ -48,8 +48,8 @@ public class AllianceSectorNavController {
         return reply;
     }
 
-    AllianceNavCard drawCard(Request req, Response res) {
-        AllianceNavCard reply = this.deckState.drawCard(this, res);
+    NavCard drawCard(Request req, Response res) {
+        NavCard reply = this.deckState.drawCard(this, res);
         return reply;
     }
 
@@ -63,11 +63,11 @@ public class AllianceSectorNavController {
         return reply;
     }
 
-    AllianceNavDeckStatus status(Request req, Response res) {
+    NavDeckStatus status(Request req, Response res) {
         int cardCount = this.deck.size();
         int discardsCount = this.deck.discards().size();
         boolean isLocked = this.deckState.isLocked();
-        AllianceNavDeckStatus status = new AllianceNavDeckStatus(cardCount, discardsCount, isLocked);
+        NavDeckStatus status = new NavDeckStatus(cardCount, discardsCount, isLocked);
         return status;
     }
 }

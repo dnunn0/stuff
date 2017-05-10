@@ -1,6 +1,6 @@
 package com.whatgameapps.firefly;
 
-import com.whatgameapps.firefly.rest.AllianceNavCard;
+import com.whatgameapps.firefly.rest.NavCard;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -9,34 +9,34 @@ import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
-public class AllianceNavDeck {
+public class NavDeck {
 
     public final AllianceNavDeckSpecification spec;
-    private final Stack<AllianceNavCard> cards = new Stack<>();
-    private final Stack<AllianceNavCard> discards = new Stack<>();
+    private final Stack<NavCard> cards = new Stack<>();
+    private final Stack<NavCard> discards = new Stack<>();
 
-    public AllianceNavDeck(AllianceNavDeckSpecification deckSpec) {
+    public NavDeck(AllianceNavDeckSpecification deckSpec) {
         this.spec = deckSpec;
         createDeck(deckSpec);
     }
 
     private void createDeck(final AllianceNavDeckSpecification deckSpec) {
 
-        List<AllianceNavCard> cardList = deckSpec.entrySet().stream()
+        List<NavCard> cardList = deckSpec.entrySet().stream()
                 .map(cardsSpec -> createCards(cardsSpec.getKey(), cardsSpec.getValue()))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
         this.cards.addAll(cardList);
-        this.cards.addAll(createCards(AllianceNavCard.UNKNOWN, deckSpec.count - cards.size()));
+        this.cards.addAll(createCards(NavCard.UNKNOWN, deckSpec.count - cards.size()));
 
         shuffle();
     }
 
-    private List<AllianceNavCard> createCards(String cardTitle, final Integer count) {
+    private List<NavCard> createCards(String cardTitle, final Integer count) {
         if (count <= 0) return Collections.emptyList();
 
-        final AllianceNavCard prototype = new AllianceNavCard(cardTitle);
+        final NavCard prototype = new NavCard(cardTitle);
         return Collections.nCopies(count, prototype);
     }
 
@@ -45,7 +45,7 @@ public class AllianceNavDeck {
         Collections.shuffle(cards);
     }
 
-    private void moveCardsToOtherPile(final Stack<AllianceNavCard> source, final Stack<AllianceNavCard> destination) {
+    private void moveCardsToOtherPile(final Stack<NavCard> source, final Stack<NavCard> destination) {
         destination.addAll(source);
         source.clear();
     }
@@ -63,10 +63,10 @@ public class AllianceNavDeck {
         return (int) cards.stream().map(c -> c.action).filter(s -> s.equals(target)).count();
     }
 
-    public Optional<AllianceNavCard> take() {
+    public Optional<NavCard> take() {
         if (cards.empty()) return Optional.empty();
 
-        AllianceNavCard card = cards.pop();
+        NavCard card = cards.pop();
         discards.push(card);
         if (card.isReshuffle())
             moveCardsToOtherPile(cards, discards);
@@ -74,7 +74,7 @@ public class AllianceNavDeck {
         return Optional.of(card);
     }
 
-    public Stack<AllianceNavCard> discards() {
+    public Stack<NavCard> discards() {
         return this.discards;
     }
 }
