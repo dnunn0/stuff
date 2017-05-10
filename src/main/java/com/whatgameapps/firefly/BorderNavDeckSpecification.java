@@ -1,0 +1,50 @@
+package com.whatgameapps.firefly;
+
+import com.google.common.collect.ImmutableMultimap;
+import org.apache.http.annotation.Immutable;
+
+@Immutable
+public class BorderNavDeckSpecification extends NavDeckSpecification {
+    public static final BorderNavDeckSpecification RESHUFFLE = new BorderNavDeckSpecification(1, ImmutableMultimap.<String, Integer>builder()
+            .put("Reaver Cutter - Reshuffle", 1)
+            .build());
+
+    public static final BorderNavDeckSpecification KALIDASA = new BorderNavDeckSpecification(RESHUFFLE, 60, ImmutableMultimap.<String, Integer>builder()
+            .put("The Big Black ", 21)
+            .put("A Rogue Trader", 1)
+            .put("An Adrift Transport", 1)
+            .put("Dangerous Salvage", 1)
+            .put("Derelict Ship", 2)
+            .put("Enhanced Enforcement", 2)
+            .put("\"Family\" Dinner", 1)
+            .put("Ghost Ship", 1)
+            .put("He'll Come At You Sideways", 1)
+            .put("Hollowed Out Space Liner", 1)
+            .put("Leave No Ground To Go To", 1)
+            .put("Nav Hazard Asteroid", 1)
+            .put("Nav Hazard Debris Field", 1)
+            .put("Patience's Posse", 1)
+            .put("Persistent Pursuit", 4)
+            .put("Punctured Fuel Lines", 1)
+            .put("Reaver Bait", 1)
+            .put("Reavers Dead Ahead", 3)
+            .put("Reavers On The Hunt", 5)
+            .put("Ruttin' Drive Core's Blown", 1)
+            .put("Scrapper Ambush", 1)
+            .put("She's Tore Up Plenty", 1)
+            .put("Ship Graveyard", 1)
+            .put("Space Pox!", 1)
+            .put("Storm's Getting' Worse", 1)
+            .put("What's That Noise?", 1)
+            .build()
+    );
+
+    public BorderNavDeckSpecification(int count, ImmutableMultimap<String, Integer> deckSpec) {
+        super(count, deckSpec);
+    }
+
+    public BorderNavDeckSpecification(final BorderNavDeckSpecification basis, final int cumulativeCardCount, final ImmutableMultimap<String, Integer> addedCards) {
+        super(basis, cumulativeCardCount, addedCards);
+    }
+
+}

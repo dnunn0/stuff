@@ -4,9 +4,11 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import org.apache.http.annotation.Immutable;
 
 import java.util.Map;
 
+@Immutable
 public class NavDeckSpecification {
     public final int count;
     public final ImmutableMultimap<String, Integer> deckSpec;

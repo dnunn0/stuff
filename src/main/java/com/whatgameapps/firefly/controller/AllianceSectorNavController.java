@@ -1,7 +1,7 @@
 package com.whatgameapps.firefly.controller;
 
-import com.whatgameapps.firefly.AllianceNavDeckSpecification;
 import com.whatgameapps.firefly.NavDeck;
+import com.whatgameapps.firefly.NavDeckSpecification;
 import com.whatgameapps.firefly.rest.NavCard;
 import com.whatgameapps.firefly.rest.NavDeckStatus;
 import org.eclipse.jetty.http.HttpStatus;
@@ -20,7 +20,7 @@ public class AllianceSectorNavController {
     final NavDeck deck;
     volatile DeckState deckState;
 
-    public AllianceSectorNavController(Service spark, AllianceNavDeckSpecification spec) {
+    public AllianceSectorNavController(Service spark, NavDeckSpecification spec) {
         this(spec);
         spark.post(LOCK_PATH, this::lock);
         spark.delete(LOCK_PATH, this::unlock);
@@ -32,7 +32,7 @@ public class AllianceSectorNavController {
         spark.options(PATH, this::allowCors);
     }
 
-    AllianceSectorNavController(AllianceNavDeckSpecification spec) {
+    AllianceSectorNavController(NavDeckSpecification spec) {
         this.deck = new NavDeck(spec);
         this.deckState = new UnlockedDeckState();
     }

@@ -11,16 +11,16 @@ import java.util.stream.Collectors;
 
 public class NavDeck {
 
-    public final AllianceNavDeckSpecification spec;
+    public final NavDeckSpecification spec;
     private final Stack<NavCard> cards = new Stack<>();
     private final Stack<NavCard> discards = new Stack<>();
 
-    public NavDeck(AllianceNavDeckSpecification deckSpec) {
+    public NavDeck(NavDeckSpecification deckSpec) {
         this.spec = deckSpec;
         createDeck(deckSpec);
     }
 
-    private void createDeck(final AllianceNavDeckSpecification deckSpec) {
+    private void createDeck(final NavDeckSpecification deckSpec) {
 
         List<NavCard> cardList = deckSpec.entrySet().stream()
                 .map(cardsSpec -> createCards(cardsSpec.getKey(), cardsSpec.getValue()))

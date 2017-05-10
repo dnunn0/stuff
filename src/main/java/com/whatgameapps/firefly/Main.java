@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class Main {
     private SparkWrapper spark;
     private int port = 4567;
-    private AllianceNavDeckSpecification spec;
+    private NavDeckSpecification spec;
 
     public Main(String[] args) throws Exception {
         processCommandLine(args);
@@ -27,7 +27,7 @@ public class Main {
             System.exit(-1);
         }
         port = Integer.parseInt(args[0]);
-        spec = getSpecForSpecName(args[1]);
+        spec = getSpecForSpecName(AllianceNavDeckSpecification.class, args[1]);
     }
 
     private void addEndpoints() throws Exception {
@@ -39,8 +39,8 @@ public class Main {
         new AfterAll(spark());
     }
 
-    private AllianceNavDeckSpecification getSpecForSpecName(final String specName) throws IllegalAccessException, NoSuchFieldException {
-        return (AllianceNavDeckSpecification) AllianceNavDeckSpecification.class.getField(specName.toUpperCase()).get(null);
+    private NavDeckSpecification getSpecForSpecName(Class clazz, String specName) throws IllegalAccessException, NoSuchFieldException {
+        return (NavDeckSpecification) clazz.getField(specName.toUpperCase()).get(null);
     }
 
     public Service spark() {
