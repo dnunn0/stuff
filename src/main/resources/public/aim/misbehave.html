@@ -84,11 +84,18 @@
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
 
+	function quoteMarkFor(text) {
+	    var qm = '"';
+	    if (text.includes(qm)) qm = "'";
+	    return qm;
+	 }
+
 	function displayNavCard(xhttp, target) {
 	  var card = JSON.parse(xhttp.responseText);
 	  var picName = cardPicName(card);
+	  var qm = quoteMarkFor(card.action);
 	  var newHtml = "<br><img class='external' src='" + getUrl(picName) +"'"
-				+ " alt=\""+card.action+"\""
+				+ " alt="+qm+card.action+qm
 				+ " height='320' width='220'"
 				+"/>";
 	  updateElement(target, false, newHtml);
