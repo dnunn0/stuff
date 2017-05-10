@@ -28,6 +28,11 @@
 	    return "http://"+hostPort+ deck + path;
 	}
 
+	function getCardUrl(deck, path) {
+	    if ((path) && (!path.startsWith("/"))) path ="/"+path;
+	    return "http://"+hostPort+ deck + "Card" + path;
+	}
+
 	function updateElement(target, addEmphasis, newHtml) {
 	  if (addEmphasis) newHtml = "<font color='red'>" + newHtml + "</font>";
 	  document.getElementById(target).innerHTML = newHtml;
@@ -87,7 +92,7 @@
 	    anchorText = anchorText.replace("/nav", "");
 	    anchorText = capitalizeFirstLetter(anchorText);
 	    anchorText += "-"+card.action;
-		var item = "<a href='"+getUrl(deck, cardPicName(card))+"' target='_blank'>"+ anchorText + "</a>";
+		var item = "<a href='"+getCardUrl(deck, cardPicName(card))+"' target='_blank'>"+ anchorText + "</a>";
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
 
@@ -99,9 +104,8 @@
 
 	function displayNavCard(xhttp, deck, target) {
 	  var card = JSON.parse(xhttp.responseText);
-	  var picName = cardPicName(card);
 	  var qm = quoteMarkFor(card.action);
-	  var newHtml = "<br><img class='external' src='" + getUrl(deck, picName) +"'"
+	  var newHtml = "<br><img class='external' src='" + getCardUrl(deck, cardPicName(card)) +"'"
 				+ " alt="+qm+card.action+qm
 				+ " height='320' width='220'"
 				+"/>";
