@@ -17,7 +17,8 @@ import org.junit.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.StringContains.containsString;
 
-public class AllianceSectorNavControllerIntegratedTest {
+public class AllianceSpaceNavControllerIntegratedTest {
+    private static final String NAV_PATH = AllianceSpaceNavController.DECK_PATH + NavController.NAV;
     private static Gson gson = new Gson();
     private TestUtils testUtils = new TestUtils(8888, "RESHUFFLE");
 
@@ -36,11 +37,11 @@ public class AllianceSectorNavControllerIntegratedTest {
         testUtils.redirectStdout();
         fly(getSpecBuilder().build());
         String result = testUtils.outStream.toString();
-        assertThat(result, CoreMatchers.containsString(AllianceSectorNavController.PATH));
+        assertThat(result, CoreMatchers.containsString(NAV_PATH));
     }
 
     private Response fly(ResponseSpecification spec) {
-        Response response = RestAssured.when().get(AllianceSectorNavController.PATH).andReturn();
+        Response response = RestAssured.when().get(NAV_PATH).andReturn();
         response.then().spec(spec);
         return response;
     }
@@ -71,13 +72,13 @@ public class AllianceSectorNavControllerIntegratedTest {
     @Test
     public void flyingPastReshuffleGivesError() {
         fly(getSpecBuilder().build());
-        fly(testUtils.getSpecBuilder(AllianceSectorNavController.NOT_FOUND_ERROR).build());
+        fly(testUtils.getSpecBuilder(NavController.NOT_FOUND_ERROR).build());
     }
 
     @Test
     public void postingReshufflesDeck() {
         fly(getSpecBuilder().build());
-        RestAssured.when().post(AllianceSectorNavController.PATH).then().statusCode(HttpStatus.OK_200);
+        RestAssured.when().post(NAV_PATH).then().statusCode(HttpStatus.OK_200);
         fly(getSpecBuilder().build());
     }
 

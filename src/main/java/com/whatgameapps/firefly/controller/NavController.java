@@ -9,35 +9,48 @@ import spark.Request;
 import spark.Response;
 import spark.Service;
 
-public class AllianceSectorNavController {
-    public static final String PATH = "/alliance/nav";
-    public static final String LOCK_PATH = PATH + "/lock";
-    public static final String STATUS_PATH = PATH + "/status";
+public abstract class NavController {
     public static final String ID_HEADER = "id";
-
     public static final int NOT_FOUND_ERROR = HttpStatus.NOT_FOUND_404;
     public static final int LOCK_ERROR = HttpStatus.CONFLICT_409;
+    public static final String NAV = "/nav";
+    public static final String LOCK = "/lock";
+    public static final String STATUS = "/status";
     final NavDeck deck;
     volatile DeckState deckState;
 
-    public AllianceSectorNavController(Service spark, NavDeckSpecification spec) {
+    public NavController(Service spark, NavDeckSpecification spec) {
         this(spec);
-        spark.post(LOCK_PATH, this::lock);
-        spark.delete(LOCK_PATH, this::unlock);
-        spark.options(LOCK_PATH, this::allowCors);
-        spark.get(STATUS_PATH, this::status, JsonTransformer.getInstance());
-        spark.options(STATUS_PATH, this::allowCors);
-        spark.get(PATH, this::drawCard, JsonTransformer.getInstance());
-        spark.post(PATH, this::reset);
-        spark.options(PATH, this::allowCors);
+        spark.post(getLockPath(), this::lock);
+        spark.delete(getLockPath(), this::unlock);
+        spark.options(getLockPath(), this::allowCors);
+        spark.get(getStatusPath(), this::status, JsonTransformer.getInstance());
+        spark.options(getStatusPath(), this::allowCors);
+        spark.get(getNavPath(), this::drawCard, JsonTransformer.getInstance());
+        spark.post(getNavPath(), this::reset);
+        spark.options(getNavPath(), this::allowCors);
     }
 
-    AllianceSectorNavController(NavDeckSpecification spec) {
+    public NavController(NavDeckSpecification spec) {
         this.deck = new NavDeck(spec);
         this.deckState = new UnlockedDeckState();
     }
 
-    private String allowCors(Request request, Response response) {
+    public abstract String getSpaceSectorPath();
+
+    public String getNavPath() {
+        return getSpaceSectorPath() + NAV;
+    }
+
+    public String getLockPath() {
+        return getNavPath() + LOCK;
+    }
+
+    public String getStatusPath() {
+        return getNavPath() + STATUS;
+    }
+
+    protected String allowCors(Request request, Response response) {
         //apparently needed for cross site request for chrome. AfterAll takes care of headers
         //http://stackoverflow.com/questions/33297190/response-for-preflight-has-invalid-http-status-code-404-angular-js
         return "OK";

@@ -7,25 +7,25 @@ import spark.Response;
 public class LockedDeckState implements DeckState {
 
     @Override
-    public String shuffle(AllianceSectorNavController controller, Response res) {
-        res.status(AllianceSectorNavController.LOCK_ERROR);
+    public String shuffle(NavController controller, Response res) {
+        res.status(NavController.LOCK_ERROR);
         return "";
     }
 
     @Override
-    public NavCard drawCard(AllianceSectorNavController controller, Response res) {
-        res.status(AllianceSectorNavController.LOCK_ERROR);
+    public NavCard drawCard(NavController controller, Response res) {
+        res.status(NavController.LOCK_ERROR);
         return null;
     }
 
     @Override
-    public String lock(final AllianceSectorNavController controller, Response res) {
+    public String lock(NavController controller, Response res) {
         res.status(HttpStatus.OK_200);
         return "OK";
     }
 
     @Override
-    public String unlock(AllianceSectorNavController controller, Response res) {
+    public String unlock(NavController controller, Response res) {
         controller.deckState = new UnlockedDeckState();
         return controller.deckState.unlock(controller, res);
     }

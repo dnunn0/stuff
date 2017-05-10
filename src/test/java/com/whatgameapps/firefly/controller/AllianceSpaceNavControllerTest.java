@@ -20,13 +20,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class AllianceSectorNavControllerTest {
+public class AllianceSpaceNavControllerTest {
     private final static AllianceNavDeckSpecification noReshuffleCardSpec = new AllianceNavDeckSpecification(3, ImmutableMultimap.<String, Integer>builder()
             .build());
     private final TestUtils testUtils = new TestUtils();
     private final Request req = new SparkRequestStub();
     private final spark.Response res = new SparkResponseWrapper();
-    private AllianceSectorNavController sut = new AllianceSectorNavController(AllianceNavDeckSpecification.BASIC);
+    private AllianceSpaceNavController sut = new AllianceSpaceNavController(AllianceNavDeckSpecification.BASIC);
 
     @After
     public void restoreStdout() {
@@ -53,7 +53,7 @@ public class AllianceSectorNavControllerTest {
                     sut.drawCard(req, res);
                     return res.status();
                 })
-                .anyMatch(c -> AllianceSectorNavController.NOT_FOUND_ERROR == c);
+                .anyMatch(c -> NavController.NOT_FOUND_ERROR == c);
 
         assertTrue(foundMatch);
     }
@@ -62,7 +62,7 @@ public class AllianceSectorNavControllerTest {
     public void shouldNotBeAbleTShuffledWhenLocked() {
         sut.lock(req, res);
         sut.reset(req, res);
-        assertEquals(AllianceSectorNavController.LOCK_ERROR, res.status());
+        assertEquals(NavController.LOCK_ERROR, res.status());
     }
 
     @Test
@@ -76,7 +76,7 @@ public class AllianceSectorNavControllerTest {
         sut.lock(req, res);
         NavCard card = sut.drawCard(req, res);
         assertNull(card);
-        assertEquals(AllianceSectorNavController.LOCK_ERROR, res.status());
+        assertEquals(NavController.LOCK_ERROR, res.status());
     }
 
     @Test
@@ -92,7 +92,7 @@ public class AllianceSectorNavControllerTest {
     public void shouldBeAbleTShuffledAfterUnlocked() {
         sut.lock(req, res);
         sut.reset(req, res);
-        assertEquals(AllianceSectorNavController.LOCK_ERROR, res.status());
+        assertEquals(NavController.LOCK_ERROR, res.status());
     }
 
     @Test
@@ -108,21 +108,21 @@ public class AllianceSectorNavControllerTest {
 
     @Test
     public void statusAfterDrawingOneCardShouldBeRight() {
-        sut = new AllianceSectorNavController(noReshuffleCardSpec);
+        sut = new AllianceSpaceNavController(noReshuffleCardSpec);
         sut.drawCard(req, res);
         checkStatus(sut.deck.spec.count - 1, 1, false, sut.status(req, res));
     }
 
     @Test
     public void statusAfterDrawingAllCardsShouldBeRight() {
-        sut = new AllianceSectorNavController(noReshuffleCardSpec);
+        sut = new AllianceSpaceNavController(noReshuffleCardSpec);
         IntStream.range(0, noReshuffleCardSpec.count).forEachOrdered(i -> sut.drawCard(req, res));
         checkStatus(0, sut.deck.spec.count, false, sut.status(req, res));
     }
 
     @Test
     public void statusAfterLockingShouldBeRight() {
-        sut = new AllianceSectorNavController(noReshuffleCardSpec);
+        sut = new AllianceSpaceNavController(noReshuffleCardSpec);
         IntStream.range(0, noReshuffleCardSpec.count).forEachOrdered(i -> sut.drawCard(req, res));
         sut.lock(req, res);
         checkStatus(0, sut.deck.spec.count, true, sut.status(req, res));
@@ -130,7 +130,7 @@ public class AllianceSectorNavControllerTest {
 
     @Test
     public void statusAfterUnLockingShouldBeRight() {
-        sut = new AllianceSectorNavController(noReshuffleCardSpec);
+        sut = new AllianceSpaceNavController(noReshuffleCardSpec);
         sut.lock(req, res);
         sut.unlock(req, res);
         checkStatus(sut.deck.spec.count, 0, false, sut.status(req, res));

@@ -3,30 +3,29 @@
 <head>
     <style>
         .external {
-            background: url(path-to-file);
             -moz-force-broken-image-icon: 1;
         }
     </style>
     <title>Firefly</title>
     <script>
-	var allianceNavPath = "/alliance/nav";
-	var allianceNavStatusPath = allianceNavPath + "/status";
-	var allianceNavLockPath = allianceNavPath + "/lock";
+    var allianceNavDeck = "/alliance/nav";
+	var navStatusPath = "/status";
+	var navLockPath = "/lock";
 	var hostPort = "host:port";
 
-	function sendRequest(method, path, callbackProcess, successCallback) {
+	function sendRequest(method, deck, path, callbackProcess, successCallback) {
 	  var xhttp = new XMLHttpRequest();
-	  xhttp.addEventListener("load", function(ev){callbackProcess(xhttp, successCallback); });
-	  xhttp.addEventListener("error", function(ev){updateElement("requestResult", true, "Request probably didn't get to server.");});
+	  xhttp.addEventListener("load", function(ev){callbackProcess(xhttp, deck, successCallback); });
+	  xhttp.addEventListener("error", function(ev){updateElement(deck +"/"+"requestResult", true, "Request probably didn't get to server.");});
 
-	  xhttp.open(method, getUrl(path), true);
-	  xhttp.setRequestHeader("Authorize", "dm9yZGVsOnZvcmRlbA==");
+	  xhttp.open(method, getUrl(deck, path), true);
+//	  xhttp.setRequestHeader("Authorize", "dm9yZGVsOnZvcmRlbA==");
 	  xhttp.send();
 	}
 
-	function getUrl(path) {
-		if (!path.startsWith("/")) path = "/" + path;
-	    return "http://"+hostPort+ path
+	function getUrl(deck, path) {
+	    if ((path) && (!path.startsWith("/"))) path ="/"+path;
+	    return "http://"+hostPort+ deck + path;
 	}
 
 	function updateElement(target, addEmphasis, newHtml) {
@@ -34,53 +33,61 @@
 	  document.getElementById(target).innerHTML = newHtml;
 	}
 
-	function processActionResponse(xhttp, target, successCallback) {
+	function processActionResponse(xhttp, deck, target, successCallback) {
 		switch (xhttp.status) {
 		  case 200:
-			successCallback(xhttp, target)
+			successCallback(xhttp, deck, target)
 			break;
 		  case 404:
-			updateElement(target, true, "Needs shuffling!");
+			updateElement(deck +"/"+target, true, "Needs shuffling!");
 			break;
 		  case 409:
-			updateElement(target, true, "Locked!");
+			updateElement(deck +"/"+target, true, "Locked!");
 			break;
 		  default:
-			displayUnexpectedError(xhttp, target);
+			displayUnexpectedError(xhttp, deck, target);
 		}
-		updateStatus();
+		updateStatus(deck);
 
 	}
 
-	function processStatusResponse(xhttp, target) {
+	function processStatusResponse(xhttp, deck, target) {
 	    switch (xhttp.status) {
 	      case 200:
-	        return updateDeckStatus(xhttp, target);
+	        return updateDeckStatus(xhttp,deck, target);
 	        break;
 	      default:
-	        displayUnexpectedError(xhttp, target);
+	        displayUnexpectedError(xhttp, deck, target);
 	    }
 	}
 	
-	function displayUnexpectedError(xhttp, target, ev) {
+	function displayUnexpectedError(xhttp, deck, target) {
 		var result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
-	    updateElement(target, true, result);
+	    updateElement(deck +"/"+target, true, result);
 	}
 	
-	function updateRequestId(xhttp, shouldOverride) {
+	function updateRequestId(xhttp, deck, shouldOverride) {
 		var target = "requestId";
 		if (shouldOverride || "" == document.getElementById(target).innerHTML)
 			updateElement(target, false, xhttp.getResponseHeader("id"));
 	}
 
-	function justDisplayResponse(xhttp, target) {
+	function justDisplayResponse(xhttp, deck, target) {
 	  var result = xhttp.responseText;
-	  updateElement(target, false, result);
-	  updateRequestId(xhttp, true);
+	  updateElement(deck +"/"+target, false, result);
+	  updateRequestId(xhttp, deck, true);
 	}
+
+	function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
 	
-	function updateHistory(card) {
-		var item = "<a href='"+getUrl(cardPicName(card))+"' target='_blank'>"+ card.action + "</a>";
+	function updateHistory(deck, card) {
+	    var anchorText = deck.replace("/","");
+	    anchorText = anchorText.replace("/nav", "");
+	    anchorText = capitalizeFirstLetter(anchorText);
+	    anchorText += "-"+card.action;
+		var item = "<a href='"+getUrl(deck, cardPicName(card))+"' target='_blank'>"+ anchorText + "</a>";
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
 
@@ -90,68 +97,66 @@
 	    return qm;
 	 }
 
-	function displayNavCard(xhttp, target) {
+	function displayNavCard(xhttp, deck, target) {
 	  var card = JSON.parse(xhttp.responseText);
 	  var picName = cardPicName(card);
 	  var qm = quoteMarkFor(card.action);
-	  var newHtml = "<br><img class='external' src='" + getUrl(picName) +"'"
+	  var newHtml = "<br><img class='external' src='" + getUrl(deck, picName) +"'"
 				+ " alt="+qm+card.action+qm
 				+ " height='320' width='220'"
 				+"/>";
-	  updateElement(target, false, newHtml);
-	  updateRequestId(xhttp, true);
-	  updateHistory(card);
+	  updateElement(deck +"/"+target, false, newHtml);
+	  updateRequestId(xhttp, deck, true);
+	  updateHistory(deck, card);
 	}
 	
 	function cardPicName(card) {
 		return card.action.replace(/[^a-zA-Z]/g, "")+".jpg";
 	}
 
-	function updateDeckStatus(xhttp, target) {
+	function updateDeckStatus(xhttp, deck, target) {
 	  var stat = JSON.parse(xhttp.responseText);
 	  var result = "Cards Left: " + stat.remainingCardsCount;
 	  result += "&emsp;Discards: " + stat.discardsCount;
 	  result += "&emsp;Is Locked: " + stat.isLocked;
 	  //  result += "<br>" + xhttp.responseText
 	  //result += "<\p>";
-	  updateElement(target, false, result);
-	  updateRequestId(xhttp, false);
-	  if ("" == document.getElementById("requestResult").innerHTML) updateElement("requestResult", false, "-");
-
+	  updateElement(deck +"/"+target, false, result);
+	  updateRequestId(xhttp, deck, false);
 
 	  var hasCards = stat.remainingCardsCount > 0;
 	  var isLocked = stat.isLocked;
-	  document.getElementById("drawBtn").disabled = !hasCards || isLocked;
-	  document.getElementById("shuffleBtn").disabled = isLocked;
-	  document.getElementById("unlockBtn").disabled = !isLocked;
+	  document.getElementById(deck + "/drawBtn").disabled = !hasCards || isLocked;
+	  document.getElementById(deck + "/shuffleBtn").disabled = isLocked;
+	  document.getElementById(deck + "/unlockBtn").disabled = !isLocked;
 	}
 
-	function processActionResponseFun(xhttp, successCallback) {
-	  return processActionResponse(xhttp, "requestResult", successCallback);
+	function processActionResponseFun(xhttp, deck, successCallback) {
+	  return processActionResponse(xhttp, deck, "requestResult", successCallback);
 	}
 
-	function processStatusResponseFun(xhttp) {
-	  return processStatusResponse(xhttp, "status");
+	function processStatusResponseFun(xhttp, deck) {
+	  return processStatusResponse(xhttp, deck,  "status");
 	}
 
-	function justDisplayResponseFun(xhttp, target) {
-	  return justDisplayResponse(xhttp, target);
+	function justDisplayResponseFun(xhttp,deck, target) {
+	  return justDisplayResponse(xhttp, deck, target);
 	}
 
-	function updateStatus() {
-	  sendRequest("GET", allianceNavStatusPath, processStatusResponseFun);
+	function updateStatus(deck) {
+	  sendRequest("GET", deck, navStatusPath, processStatusResponseFun);
 	}
 
-	function get(path) {
-	  sendRequest("GET", path, processActionResponseFun, displayNavCard);
+	function get(deck, path) {
+	  sendRequest("GET", deck, path, processActionResponseFun, displayNavCard);
 	}
 
-	function post(path) {
-	  sendRequest("POST", path, processActionResponseFun, justDisplayResponse);
+	function post(deck, path) {
+	  sendRequest("POST", deck, path, processActionResponseFun, justDisplayResponse);
 	}
 
-	function del(path) {
-	  sendRequest("DELETE", path, processActionResponseFun, justDisplayResponse);
+	function del(deck, path) {
+	  sendRequest("DELETE", deck, path, processActionResponseFun, justDisplayResponse);
 	}
 	
 	function clearHistory() {
@@ -159,17 +164,17 @@
 	}
 
     function getPageUrl() {
-    if (typeof this.href === "undefined")
-        return document.location.toString().toLowerCase();
+        if (typeof this.href === "undefined")
+            return document.location.toString().toLowerCase();
 
-    return this.href.toString().toLowerCase();
+        return this.href.toString().toLowerCase();
     }
 
 	window.onload = function(e) {
       var url = getPageUrl();
       var parts = url.split("/");
       hostPort = parts[2];
-	  updateStatus();
+	  updateStatus(allianceNavDeck);
 
 	};
 
@@ -179,14 +184,32 @@
 <body>
 
 
-<button id="drawBtn" type="button" onclick="get(allianceNavPath)">Request nav card</button>
-<button id="shuffleBtn" type="button" onclick="post(allianceNavPath)">Shuffle</button>
-<button id="lockBtn" type="button" onclick="post(allianceNavLockPath)">Lock Deck</button>
-<button id="unlockBtn" type="button" onclick="del(allianceNavLockPath)">Unlock Deck</button>
-<button id="historyBtn" type="button" onclick="clearHistory()">Clear History</button>
+<button id="/alliance/nav/drawBtn" type="button" onclick="get(allianceNavDeck, '')">Request Alliance Nav card</button>
+<button id="/alliance/nav/shuffleBtn" type="button" onclick="post(allianceNavDeck, '')">Shuffle</button>
+<button id="/alliance/nav/lockBtn" type="button" onclick="post(allianceNavDeck, navLockPath)">Lock Deck</button>
+<button id="/alliance/nav/unlockBtn" type="button" onclick="del(allianceNavDeck, navLockPath)">Unlock Deck</button>
 
-<p><span id="requestResult"/><br></p>
-<p><span id="status"/><br></p>
+<p><span id="/alliance/nav/requestResult"/><br></p>
+<p><span id="/alliance/nav/status"/><br></p>
+
+<button id="/border/nav/drawBtn" type="button" onclick="get('/border/nav', '')">Request Border Nav card</button>
+<button id="/border/nav/shuffleBtn" type="button" onclick="post('/border/nav', '')">Shuffle</button>
+<button id="/border/nav/lockBtn" type="button" onclick="post('/border/nav', navLockPath)">Lock Deck</button>
+<button id="/border/nav/unlockBtn" type="button" onclick="del('/border/nav', navLockPath)">Unlock Deck</button>
+
+<p><span id="/border/nav/requestResult"/><br></p>
+<p><span id="/border/nav/status"/><br></p>
+
+<button id="/rim/nav/drawBtn" type="button" onclick="get('/rim/nav', '')">Request Border Nav card</button>
+<button id="/rim/nav/shuffleBtn" type="button" onclick="post('/rim/nav', '')">Shuffle</button>
+<button id="/rim/nav/lockBtn" type="button" onclick="post('/rim/nav', navLockPath)">Lock Deck</button>
+<button id="/rim/nav/unlockBtn" type="button" onclick="del('/rim/nav', navLockPath)">Unlock Deck</button>
+
+<p><span id="/rim/nav/requestResult"/><br></p>
+<p><span id="/rim/nav/status"/><br></p>
+
+
+<button id="historyBtn" type="button" onclick="clearHistory()">Clear History</button>
 <p>History
 <ol style="margin-top:-10px;"><span id="history"/></ol>
 </p>

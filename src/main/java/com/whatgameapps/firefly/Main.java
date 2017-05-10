@@ -1,9 +1,11 @@
 package com.whatgameapps.firefly;
 
 import com.whatgameapps.firefly.controller.AfterAll;
-import com.whatgameapps.firefly.controller.AllianceSectorNavController;
+import com.whatgameapps.firefly.controller.AllianceSpaceNavController;
 import com.whatgameapps.firefly.controller.BeforeAll;
+import com.whatgameapps.firefly.controller.BorderSpaceNavController;
 import com.whatgameapps.firefly.controller.DosFilter;
+import com.whatgameapps.firefly.controller.RimSpaceNavController;
 import com.whatgameapps.firefly.controller.StopController;
 import spark.Service;
 
@@ -12,7 +14,7 @@ import java.util.Arrays;
 public class Main {
     private SparkWrapper spark;
     private int port = 4567;
-    private NavDeckSpecification spec;
+    private String spec;
 
     public Main(String[] args) throws Exception {
         processCommandLine(args);
@@ -27,25 +29,28 @@ public class Main {
             System.exit(-1);
         }
         port = Integer.parseInt(args[0]);
-        spec = getSpecForSpecName(AllianceNavDeckSpecification.class, args[1]);
+        spec = args[1];
     }
 
     private void addEndpoints() throws Exception {
         spark().staticFiles.location("/public");
         new BeforeAll(spark());
         new DosFilter(spark());
-        new AllianceSectorNavController(spark(), spec);
+        new AllianceSpaceNavController(spark(), getSpecForSpecName(AllianceNavDeckSpecification.class, spec));
+        new BorderSpaceNavController(spark(), getSpecForSpecName(BorderNavDeckSpecification.class, spec));
+        new RimSpaceNavController(spark(), getSpecForSpecName(RimNavDeckSpecification.class, spec));
         new StopController(spark());
         new AfterAll(spark());
+    }
+
+    public Service spark() {
+        return spark.spark();
     }
 
     private NavDeckSpecification getSpecForSpecName(Class clazz, String specName) throws IllegalAccessException, NoSuchFieldException {
         return (NavDeckSpecification) clazz.getField(specName.toUpperCase()).get(null);
     }
 
-    public Service spark() {
-        return spark.spark();
-    }
     public static void main(String args[]) throws Exception {
         new Main(args);
     }
