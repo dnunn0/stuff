@@ -17,10 +17,10 @@ public class AllianceNavDeckSpecification extends NavDeckSpecification {
             .put("Abandoned Ship", 1)
             .put("Distress Signal", 1)
             .put("\"Family\" Dinner", 1)
-            .put("Freighter Convey", 1)
-            .put("If'n the Coil Busts We're Driftin'", 1)
+            .put("Freighter Convoy", 1)
+            .put("If'n The Coil Busts We're Driftin'", 1)
             .put("Minor Technical Difficulty", 1)
-            .put("What's Going on in The Engine Room?", 1)
+            .put("What's Going On In The Engine Room?", 1)
             .build()
     );
 
@@ -33,7 +33,7 @@ public class AllianceNavDeckSpecification extends NavDeckSpecification {
             .put("Broken Down Shuttle", 1)
             .put("Cruiser Patrol", 1)//guessing this is here?
             .put("Enhanced Enforcement", 1)
-            .put("Fire in the Engine Room", 1)
+            .put("Fire In The Engine Room", 1)
             .put("He'll Come at You Sideways", 1)
             .put("Leave No Ground To Go To", 1)
             .put("Outbound Colonists", 1)
