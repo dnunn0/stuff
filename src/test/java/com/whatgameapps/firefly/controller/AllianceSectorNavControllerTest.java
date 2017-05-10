@@ -21,7 +21,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class AllianceSectorNavControllerTest {
-    private final static AllianceNavDeckSpecification noReshuffleCardSpec = new AllianceNavDeckSpecification(3, ImmutableMultimap.<AllianceNavCard, Integer>builder()
+    private final static AllianceNavDeckSpecification noReshuffleCardSpec = new AllianceNavDeckSpecification(3, ImmutableMultimap.<String, Integer>builder()
             .build());
     private final TestUtils testUtils = new TestUtils();
     private final Request req = new SparkRequestStub();

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 
 public class AllianceNavDeckTest {
     private final TestUtils testUtils = new TestUtils();
-    private final AllianceNavDeck sut = new AllianceNavDeck(AllianceNavDeckSpecification.BASIC);
+    private final AllianceNavDeck sut = createDeck();
 
     @After
     public void restoreStdout() {
@@ -29,7 +29,7 @@ public class AllianceNavDeckTest {
     private void createAndCheckDeck(final AllianceNavDeckSpecification expectedDeck) {
         final AllianceNavDeck sut = new AllianceNavDeck(expectedDeck);
         expectedDeck.entrySet().forEach((spec) ->
-                assertEquals(spec.getKey().action, (int) spec.getValue(), sut.countCards(spec.getKey())));
+                assertEquals(spec.getKey(), (int) spec.getValue(), sut.countCards(spec.getKey())));
     }
 
     @Test
@@ -43,15 +43,21 @@ public class AllianceNavDeckTest {
     public void deckShuffledAfterCreation() {
         testUtils.redirectStdout();
         int deckCount = 20000;
+        String cardToFind = sut.take().get().action;
         long count = Collections.nCopies(deckCount, 1)
                 .stream()
-                .map(i -> new AllianceNavDeck(AllianceNavDeckSpecification.BASIC))
+                .map(i -> createDeck())
                 .map(deck -> deck.take().get())
-                .filter(AllianceNavCard.KEEP_FLYING::equals)
+                .map(c -> c.action)
+                .filter(cardToFind::equals)
                 .count();
 
-        AllianceNavDeck stdDeck = new AllianceNavDeck(AllianceNavDeckSpecification.BASIC);
-        assertEquals(((double) stdDeck.countCards(AllianceNavCard.KEEP_FLYING)) / stdDeck.size(), ((double) count) / deckCount, 0.02);
+        AllianceNavDeck stdDeck = createDeck();
+        assertEquals(((double) stdDeck.countCards(cardToFind)) / stdDeck.size(), ((double) count) / deckCount, 0.02);
+    }
+
+    private AllianceNavDeck createDeck() {
+        return new AllianceNavDeck(AllianceNavDeckSpecification.BASIC);
     }
 
     @Test
@@ -85,7 +91,7 @@ public class AllianceNavDeckTest {
         Optional<AllianceNavCard> card;
         do {
             card = sut.take();
-        } while (!AllianceNavCard.RESHUFFLE.equals(card.get()));
+        } while (!card.get().isReshuffle());
     }
 
     @Test

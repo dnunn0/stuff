@@ -33,8 +33,10 @@ public class AllianceNavDeck {
         shuffle();
     }
 
-    private List<AllianceNavCard> createCards(final AllianceNavCard prototype, final Integer count) {
+    private List<AllianceNavCard> createCards(String cardTitle, final Integer count) {
         if (count <= 0) return Collections.emptyList();
+
+        final AllianceNavCard prototype = new AllianceNavCard(cardTitle);
         return Collections.nCopies(count, prototype);
     }
 
@@ -57,8 +59,8 @@ public class AllianceNavDeck {
         return cards.size();
     }
 
-    public int countCards(final AllianceNavCard target) {
-        return (int) cards.stream().filter(c -> c.equals(target)).count();
+    public int countCards(String target) {
+        return (int) cards.stream().map(c -> c.action).filter(s -> s.equals(target)).count();
     }
 
     public Optional<AllianceNavCard> take() {
@@ -66,7 +68,7 @@ public class AllianceNavDeck {
 
         AllianceNavCard card = cards.pop();
         discards.push(card);
-        if (AllianceNavCard.RESHUFFLE.equals(card))
+        if (card.isReshuffle())
             moveCardsToOtherPile(cards, discards);
 
         return Optional.of(card);
