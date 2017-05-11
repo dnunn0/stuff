@@ -1,0 +1,1 @@
+firefly\run 24680 KALIDASA >logs\firefly.log 2>&1
