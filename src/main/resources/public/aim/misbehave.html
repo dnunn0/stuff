@@ -11,7 +11,13 @@
     var allianceNavDeck = "/alliance/nav";
 	var navStatusPath = "/status";
 	var navLockPath = "/lock";
-	var hostPort = "host:port";
+	var hostPort = location.hostname + ":" + location.port;
+
+var statusUrl="ws://" + hostPort + "/status";
+console.log(statusUrl);
+      var webSocket = new WebSocket(statusUrl);
+webSocket.onmessage = function (msg) { updateAllStatus(msg); };
+webSocket.onclose = function () { alert("WebSocket connection closed") }
 
 	function sendRequest(method, deck, path, callbackProcess, successCallback) {
 	  var xhttp = new XMLHttpRequest();
@@ -152,6 +158,8 @@
 	}
 
 	function get(deck, path) {
+	webSocket.send("hi from me");
+
 	  sendRequest("GET", deck, path, processActionResponseFun, displayNavCard);
 	}
 
@@ -168,19 +176,29 @@
 	}
 
     function getPageUrl() {
-        if (typeof this.href === "undefined")
-            return document.location.toString().toLowerCase();
-
-        return this.href.toString().toLowerCase();
+        return document.location.toString();
     }
 
+    function updateAllStatus(msg) {
+ //   var data = JSON.parse(msg.data);
+ //   insert("chat", data.userMessage);
+ //   id("userlist").innerHTML = "";
+ //   data.userlist.forEach(function (user) {
+ //       insert("userlist", "<li>" + user + "</li>");
+ //   });
+
+    updateElement("status", false, msg);
+
+}
+
+
 	window.onload = function(e) {
-      var url = getPageUrl();
-      var parts = url.split("/");
-      hostPort = parts[2];
+
 	  updateStatus(allianceNavDeck);
 
 	};
+
+	;
 
     </script>
 </head>
@@ -193,6 +211,7 @@
 <button id="/alliance/nav/lockBtn" type="button" onclick="post(allianceNavDeck, navLockPath)">Lock Deck</button>
 <button id="/alliance/nav/unlockBtn" type="button" onclick="del(allianceNavDeck, navLockPath)">Unlock Deck</button>
 
+<p><span id="status"/>here's the status area<br></p>
 <p><span id="/alliance/nav/requestResult"/><br></p>
 <p><span id="/alliance/nav/status"/><br></p>
 

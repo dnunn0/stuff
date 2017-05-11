@@ -6,10 +6,16 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class SparkWrapper {
-    public Service spark;
+    public final Service spark;
+    public final int port;
 
     public SparkWrapper(int port) {
-        spark = Service.ignite().port(port).threadPool(10);
+        this.port = port;
+        spark = Service.ignite();
+    }
+
+    public void ignite() {
+        Service.ignite().port(port).threadPool(10);
     }
 
     public String url() {
@@ -33,9 +39,5 @@ public class SparkWrapper {
 
     public void stop() {
         spark.stop();
-    }
-
-    public int port() {
-        return spark.port();
     }
 }

@@ -6,6 +6,7 @@ import com.whatgameapps.firefly.controller.BeforeAll;
 import com.whatgameapps.firefly.controller.BorderSpaceNavController;
 import com.whatgameapps.firefly.controller.DosFilter;
 import com.whatgameapps.firefly.controller.RimSpaceNavController;
+import com.whatgameapps.firefly.controller.StatusServer;
 import com.whatgameapps.firefly.controller.StopController;
 import spark.Service;
 
@@ -19,6 +20,7 @@ public class Main {
     public Main(String[] args) throws Exception {
         processCommandLine(args);
         spark = new SparkWrapper(port);
+        spark.ignite();
         addEndpoints();
         System.out.println(String.format("Listening on: %s with %s", spark.url(), this.spec));
     }
@@ -34,6 +36,8 @@ public class Main {
 
     private void addEndpoints() throws Exception {
         spark().staticFiles.location("/public");
+        spark().staticFiles.expireTime(600);
+        spark().webSocket("/status", StatusServer.class);
         new BeforeAll(spark());
         new DosFilter(spark());
         new AllianceSpaceNavController(spark(), getSpecForSpecName(AllianceNavDeckSpecification.class, spec));
