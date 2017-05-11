@@ -78,6 +78,7 @@ del /s/q %1 && rmdir /s/q %1
 exit /b
 
 :SHRINK_JRE
+rem see http://www.oracle.com/technetwork/java/javase/jre-8-readme-2095710.html
 del "%app_dir%dist\%app_name%\runtime\jre"\Welcome.html
 
 set FILE_LIST=(charsets deploy jce resources javaws jfr jfxswt plugin management-agent )
