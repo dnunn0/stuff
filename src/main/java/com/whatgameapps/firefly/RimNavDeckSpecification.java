@@ -9,7 +9,7 @@ public class RimNavDeckSpecification extends NavDeckSpecification {
             .put("Reaver Cutter - Reshuffle", 1)
             .build());
 
-    public static final RimNavDeckSpecification KALIDASA = new RimNavDeckSpecification(RESHUFFLE, 60, ImmutableMultimap.<String, Integer>builder()
+    public static final RimNavDeckSpecification KALIDASA = new RimNavDeckSpecification(RESHUFFLE, 61, ImmutableMultimap.<String, Integer>builder()
             .put("The Big Black", 20)
             .put("Abandoned Tanker", 1)
             .put("Alliance Spy Satellite", 1)
@@ -19,9 +19,9 @@ public class RimNavDeckSpecification extends NavDeckSpecification {
             .put("Failure To Communicate", 1)
             .put("First Come, First Serve", 1)
             .put("First Rule of Flying", 1)
-            .put("Fly By Night Casino Ship", 1)
+            .put("Fly-By-Night Casino Ship", 1)
             .put("Fuel Coupling Failure", 1)
-            .put("Grav Well Maneuver", 1)
+            .put("Grav-Well Maneuver", 1)
             .put("He'll Come At You Sideways", 1)
             .put("Horowitz's Trading Scow", 1)
             .put("Leave No Ground To Go TO", 1)
@@ -34,7 +34,6 @@ public class RimNavDeckSpecification extends NavDeckSpecification {
             .put("Persistent Pursuit", 4)
             .put("Ravaged Transport", 1)
             .put("Reaver Booby Trap", 1)
-            .put("Reavers Dead Ahead", 1)
             .put("Reavers In Orbit", 3)
             .put("Reavers On The Hunt", 9)
             .put("She's Tore Up Plenty", 1)

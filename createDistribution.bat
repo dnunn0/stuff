@@ -1,6 +1,5 @@
 setlocal
 
-
 if not "%JAVA_HOME%"=="" goto JAVA_HOME_SET
     Echo JAVA_HOME not set
     goto :eof
@@ -104,15 +103,19 @@ CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\management
 
 set FILE_LIST=(rmid rmiregistry tnameserv keytool kinit klist ktab policytool orbd pack200)
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.exe 
-set FILE_LIST=(servertool ssvagent javaws javacpl jabswitch java-rmi jjs jp2launcher unpack200 )
+set FILE_LIST=(servertool ssvagent javaw javaws javacpl jabswitch java-rmi jjs jp2launcher unpack200 )
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.exe 
 
 rem need at least one of (not sure) msvcr100 msvcr120 msvcp120 for 32-bit java to work in 64-bit OS
 set FILE_LIST=(awt decora_sse fxplugins glass glib-lite gstreamer-lite hprof hprof javafx_font javafx_font_t2k )
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.dll 
-
 set FILE_LIST=(javafx_iio jfxwebkit prism_common prism_d3d prism_sw splashscreen WindowsAccessBridge-32)
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.dll 
+set FILE_LIST=(fontmanager instrument j2pcsc j2pkcs11 java_crw_demo JavaAccessBridge-32 javacpl jawt JAWTAccessBridge-32 )
+for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.dll 
+set FILE_LIST=(jfr jfxmedia jp2iexp jp2native jp2ssv jsound jsoundds management mlib_image sunmscapi w2k_lsa_auth )
+for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.dll 
+
 
 CALL :DELETE_DIR  "%app_dir%dist\%app_name%\runtime\jre"\bin\client
 CALL :DELETE_DIR  "%app_dir%dist\%app_name%\runtime\jre"\bin\dtplugin
