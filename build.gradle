@@ -33,7 +33,7 @@ jar {
 }
 
 task createDistribution(type: Exec, dependsOn: assembleDist) {
-    commandLine = ['cmd', '/c', 'createDistribution.bat', "$mainClassName"]
+    commandLine = ['cmd', '/c', 'createDistribution.bat']
 }
 
 

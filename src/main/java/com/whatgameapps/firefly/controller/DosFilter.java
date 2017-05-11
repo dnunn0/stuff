@@ -27,7 +27,7 @@ public class DosFilter {
                 long currentDuration = currentTime - history.getFirst();
                 history.removeFirst();
                 if (currentDuration <= DURATION_MS) {
-                    System.out.println("Too many requests in too short a time.");
+                    System.out.format("FATAL: Too many requests in too short a time: %d in %ds\n", history.size(), currentDuration / 1000);
                     spark.stop();
                 }
             }
