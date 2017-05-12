@@ -48,25 +48,9 @@ CALL :DELETE_DIR META-INF
 rem robocopy %app_dir%build\resources\main\public resources\public
 popd
 
+call createCmdRunScript.bat %mainClassName%
 
-set batchfile= dist\%app_name%\run.bat
-
-Echo setlocal> %batchfile%
-Echo Set app_dir=%%~dp0>> %batchfile%
-ECHO Set JAVA_EXE=%%app_dir%%runtime\jre\bin\java.exe>> %batchfile%
-ECHO set PATH=>> %batchfile%
-ECHO Set CLASSPATH="%%app_dir%%app\resources";"%%app_dir%%app";"%%app_dir%%app\lib\*">> %batchfile%
-ECHO "%%JAVA_EXE%%" -server -Xmx8m -cp %%CLASSPATH%% %mainClassName% %%*>> %batchfile%
-
-
-set batchfile= dist\%app_name%\run
-
-Echo #!/bin/bash>> %batchfile%
-Echo app_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )">> %batchfile%
-Echo JAVA_BIN=${app_dir}/runtime/jre/bin>> %batchfile%
-Echo PATH=${JAVA_BIN}:/usr/bin:/bin>> %batchfile%
-ECHO CLASSPATH=${app_dir}/app/resources:${app_dir}/app:${app_dir}/app/lib/*>> %batchfile%
-Echo %JAVA_BIN/java -server -Xmx8m -cp $CLASSPATH %mainClassName% %%*>> %batchfile%
+call createBashRunScript.bat %mainClassName%
 
 pushd dist && "C:\Program Files (x86)\7-Zip\7z" a -tzip -mx7 %app_name% && popd
 
