@@ -4,7 +4,31 @@
     <style>
         .external {
             -moz-force-broken-image-icon: 1;
-        }
+            <!-- put this here in the hopes of stopping flicker to no avail
+            height: 100%;
+            width: 13%;-->
+            height: 250px;width: 140px;
+                    }
+         .button_image {
+           -moz-force-broken-image-icon: 1;
+        <!--    height: 100%;
+            width: 75%;-->
+            }
+        .button_with_image {
+            padding: 0;
+            border: none;
+            background: none;
+         }
+         .button_with_text {
+            margin: 5% 0% 0% 0%;
+            font-size: 5vw;
+         }
+         p {font-size: 4vw;}
+         a {font-size: 4vw;}
+         ol {font-size: 4vw;}
+         td {text-align: center;}
+         table {width:100%;margin: 3% 0% 0% 0%;}
+         .less_on_top {margin-top: -10px;}
     </style>
     <title>Firefly</title>
     <script>
@@ -110,9 +134,8 @@
 	  var target = cardArea;
 	  var card = JSON.parse(xhttp.responseText);
 	  var qm = quoteMarkFor(card.action);
-	  var newHtml = "<br><img class='external' src='" + getCardUrl(deck, cardPicName(card)) +"'"
+	  var newHtml = "<img class='external' src='" + getCardUrl(deck, cardPicName(card)) +"'"
 				+ " alt="+qm+card.action+qm
-				+ " height='320' width='220'"
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
 	  updateRequestId(xhttp, deck, true);
@@ -151,9 +174,9 @@
       //console.log("got update " + msg.data);
 	  var stat = JSON.parse(msg.data);
 	  var deck = stat.source;
-	  var result = "Cards Left: " + stat.remainingCardsCount;
-	  result += "&emsp;Discards: " + stat.discardsCount;
-	  result += "&emsp;Is Locked: " + stat.isLocked;
+	  var result = stat.remainingCardsCount +"/" + (stat.remainingCardsCount+stat.discardsCount);
+	  result += "&nbsp;(" + stat.discardsCount +")";
+//	  result += "&emsp;Is Locked: " + stat.isLocked;
 	  updateElement(deck +"/status", false, result);
 
 	  var hasCards = stat.remainingCardsCount > 0;
@@ -173,31 +196,104 @@
 </head>
 
 <body>
-<span id="/nav/card"></span><br>
+<table>
+    <tr>
+        <td><span id="/nav/card"><img src="/alliance/navCard/back.png" class='external'></span><br></td>
+    </tr>
+</table>
 
-<button id="/alliance/nav/drawBtn" type="button" onclick="get('/alliance/nav', '')">Request Alliance Nav card</button>
-<button id="/alliance/nav/shuffleBtn" type="button" onclick="post('/alliance/nav', '')">Shuffle</button>
-<button id="/alliance/nav/lockBtn" type="button" onclick="post('/alliance/nav', navLockPath)">Lock Deck</button>
-<button id="/alliance/nav/unlockBtn" type="button" onclick="del('/alliance/nav', navLockPath)">Unlock Deck</button> &emsp;<span id="/alliance/nav/requestResult"></span><br>
+<table>
+    <tr>
+        <td>
+            <button class="button_with_image" id="/alliance/nav/drawBtn" type="button"
+                    onclick="get('/alliance/nav', '')">
+                <img src="/alliance/navCard/xback.png" -alt='Request Alliance Nav card' class="button_image"/>
+            </button>
+        </td>
+        <td>
+            <button class="button_with_image" id="/border/nav/drawBtn" type="button" onclick="get('/border/nav', '')">
+                <img src="/border/navCard/back.png" -alt='Request Border Nav card' class="button_image"/>
+            </button>
+        </td>
+        <td>
+            <button class="button_with_image" id="/rim/nav/drawBtn" type="button" onclick="get('/rim/nav', '')">
+                <img src="/rim/navCard/back.png" -alt='Request Rim Nav card' class="button_image"/>
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p class="less_on_top"><span id="/alliance/nav/status"></span></p>
+        </td>
+        <td>
+            <p class="less_on_top"><span id="/border/nav/status"></span></p>
+        </td>
+        <td>
+            <p class="less_on_top"><span id="/rim/nav/status"></span></p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button id="/alliance/nav/lockBtn" class="button_with_text" type="button"
+                    onclick="post('/alliance/nav', navLockPath)">Lock Deck
+            </button>
+            <button id="/alliance/nav/unlockBtn" class="button_with_text" type="button"
+                    onclick="del('/alliance/nav', navLockPath)">Unlock Deck
+            </button>
+        </td>
+        <td>
+            <button id="/border/nav/lockBtn" class="button_with_text" type="button"
+                    onclick="post('/border/nav', navLockPath)">Lock Deck
+            </button>
+            <button id="/border/nav/unlockBtn" class="button_with_text" type="button"
+                    onclick="del('/border/nav', navLockPath)">Unlock Deck
+            </button>
+        </td>
+        <td>
+            <button id="/rim/nav/lockBtn" class="button_with_text" type="button"
+                    onclick="post('/rim/nav', navLockPath)">Lock Deck
+            </button>
+            <button id="/rim/nav/unlockBtn" class="button_with_text" type="button"
+                    onclick="del('/rim/nav', navLockPath)">Unlock Deck
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button id="/alliance/nav/shuffleBtn" class="button_with_text" type="button"
+                    onclick="post('/alliance/nav', '')">Shuffle
+            </button>
+        </td>
+        <td>
+            <button id="/border/nav/shuffleBtn" class="button_with_text" type="button"
+                    onclick="post('/border/nav', '')">Shuffle
+            </button>
+        </td>
+        <td>
+            <button id="/rim/nav/shuffleBtn" class="button_with_text" type="button" onclick="post('/rim/nav', '')">
+                Shuffle
+            </button>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p><span id="/alliance/nav/requestResult"></span></p>
+        </td>
+        <td>
+            <p><span id="/border/nav/requestResult"></span></p>
+        </td>
+        <td>
+            <p><span id="/rim/nav/requestResult"></span></p>
+        </td>
+    </tr>
+</table>
 
-<p><span id="/alliance/nav/status"></span><br></p>
-
-<button id="/border/nav/drawBtn" type="button" onclick="get('/border/nav', '')">Request Border Nav card</button>
-<button id="/border/nav/shuffleBtn" type="button" onclick="post('/border/nav', '')">Shuffle</button>
-<button id="/border/nav/lockBtn" type="button" onclick="post('/border/nav', navLockPath)">Lock Deck</button>
-<button id="/border/nav/unlockBtn" type="button" onclick="del('/border/nav', navLockPath)">Unlock Deck</button> &emsp;<span id="/border/nav/requestResult"></span><br>
-<p><span id="/border/nav/status"></span><br></p>
-
-<button id="/rim/nav/drawBtn" type="button" onclick="get('/rim/nav', '')">Request Border Nav card</button>
-<button id="/rim/nav/shuffleBtn" type="button" onclick="post('/rim/nav', '')">Shuffle</button>
-<button id="/rim/nav/lockBtn" type="button" onclick="post('/rim/nav', navLockPath)">Lock Deck</button>
-<button id="/rim/nav/unlockBtn" type="button" onclick="del('/rim/nav', navLockPath)">Unlock Deck</button> &emsp;<span id="/rim/nav/requestResult"></span><br>
-<p><span id="/rim/nav/status"></span><br></p>
+<br>
 
 
-<button id="historyBtn" type="button" onclick="clearHistory()">Clear History</button>
+<button id="historyBtn" class="button_with_text" type="button" onclick="clearHistory()">Clear History</button>
 <p>History
-<ol style="margin-top:-10px;"><span id="history"/></ol>
+<ol class="less_on_top"><span id="history"></span></ol>
 </p>
 <p>Request id: <span id="requestId"/><br></p>
 
