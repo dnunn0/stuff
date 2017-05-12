@@ -67,9 +67,9 @@
 	    return "http://"+hostPort+ deck + path;
 	}
 
-	function getCardUrl(deck, path) {
-	    path = startWithSlash(path);
-	    return "http://"+hostPort+ deck + "Card" + path;
+	function getCardUrl(deck, cardName) {
+	    cardName = startWithSlash(cardName);
+	    return "http://"+hostPort+ deck + "Card" + cardName;
 	}
 
 	function updateElement(target, addEmphasis, newHtml) {
@@ -120,7 +120,7 @@
 	    anchorText = anchorText.replace("/nav", "");
 	    anchorText = capitalizeFirstLetter(anchorText);
 	    anchorText += "-"+card.action;
-		var item = "<a href='"+getCardUrl(deck, cardPicName(card))+"' target='_blank'>"+ anchorText + "</a>";
+		var item = "<a href='"+getCardUrl(deck, cardPicName(card.action))+"' target='_blank'>"+ anchorText + "</a>";
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
 
@@ -130,20 +130,30 @@
 	    return qm;
 	 }
 
+	 function preloadImage(url, callback)
+    {
+        var img=new Image();
+        img.src=url;
+        img.onload = callback;
+    }
+
 	function displayNavCard(xhttp, deck, cardArea, responseStatusArea) {
 	  var target = cardArea;
 	  var card = JSON.parse(xhttp.responseText);
-	  var qm = quoteMarkFor(card.action);
-	  var newHtml = "<img class='external' src='" + getCardUrl(deck, cardPicName(card)) +"'"
-				+ " alt="+qm+card.action+qm
-				+"/>";
-	  updateElement("/nav/card", false, newHtml);
+	  var cardUrl = getCardUrl(deck, cardPicName(card.action));
+      var qm = quoteMarkFor(card.action);
+      var newHtml = "<img class='external' src='" + cardUrl +"'"
+                + " alt="+qm+card.action+qm
+                +"/>";
+	  preloadImage(cardUrl, function() {
+          updateElement("/nav/card", false, newHtml);
+      });
 	  updateRequestId(xhttp, deck, true);
 	  updateHistory(deck, card);
 	}
-	
-	function cardPicName(card) {
-		return card.action.replace(/[^a-zA-Z]/g, "")+".png";
+
+	function cardPicName(cardName) {
+		return cardName.replace(/[^a-zA-Z]/g, "")+".png";
 	}
 
 	function processActionResponseFun(xhttp, deck, successCallback) {
@@ -151,6 +161,10 @@
 	}
 
 	function get(deck, path) {
+	  var newHtml = "<img class='external' src='" + getCardUrl(deck, cardPicName("back")) +"'"
+				+ " alt='"+(deck.replace(/[^a-zA-Z]/g, " "))+"'"
+				+"/>";
+	  updateElement("/nav/card", false, newHtml);
 	  sendRequest("GET", deck, path, processActionResponseFun, displayNavCard);
 	}
 
@@ -207,7 +221,7 @@
         <td>
             <button class="button_with_image" id="/alliance/nav/drawBtn" type="button"
                     onclick="get('/alliance/nav', '')">
-                <img src="/alliance/navCard/xback.png" -alt='Request Alliance Nav card' class="button_image"/>
+                <img src="/alliance/navCard/back.png" -alt='Request Alliance Nav card' class="button_image"/>
             </button>
         </td>
         <td>
