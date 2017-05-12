@@ -26,7 +26,7 @@ public class AllianceSpaceNavControllerTest {
     private final TestUtils testUtils = new TestUtils();
     private final Request req = new SparkRequestStub();
     private final spark.Response res = new SparkResponseWrapper();
-    private final NewsSources middleman = new NewsSources(new SpyStatusBroadcaster());
+    private final StatusBroadcaster middleman = new StatusBroadcaster();
     private AllianceSpaceNavController sut = new AllianceSpaceNavController(AllianceNavDeckSpecification.BASIC, middleman);
 
     @After

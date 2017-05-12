@@ -7,11 +7,11 @@ public class AllianceSpaceNavController extends NavController {
 
     public static final String DECK_PATH = "/alliance";
 
-    public AllianceSpaceNavController(Service spark, NavDeckSpecification spec, NewsSources listeners) {
+    public AllianceSpaceNavController(Service spark, NavDeckSpecification spec, StatusBroadcaster listeners) {
         super(spark, spec, listeners);
     }
 
-    AllianceSpaceNavController(NavDeckSpecification spec, NewsSources listeners) {
+    AllianceSpaceNavController(NavDeckSpecification spec, StatusBroadcaster listeners) {
         super(spec, listeners);
     }
 

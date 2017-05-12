@@ -8,17 +8,17 @@
     </style>
     <title>Firefly</title>
     <script>
-    var allianceNavDeck = "/alliance/nav";
-	var navStatusPath = "/status";
-	var navLockPath = "/lock";
-	var hostPort = location.hostname + ":" + location.port;
+        var allianceNavDeck = "/alliance/nav";
+        var navStatusPath = "/status";
+        var navLockPath = "/lock";
+        var hostPort = location.hostname + ":" + location.port;
 
-    var statusUrl="ws://" + hostPort + "/status";
-    console.log(statusUrl);
-    var webSocket = new WebSocket(statusUrl);
-    webSocket.onmessage = function (msg) { updateStatus(msg); };
-    webSocket.onclose = function () { console.log("WebSocket connection closed") }
-    webSocket.onopen = function(e) {
+        var statusUrl="ws://" + hostPort + "/status";
+        console.log(statusUrl);
+        var webSocket = new WebSocket(statusUrl);
+        webSocket.onmessage = function (msg) { updateStatus(msg); };
+        webSocket.onclose = function () { console.log("WebSocket connection closed") }
+        webSocket.onopen = function(e) {
         console.log("Connection established!");
         webSocket.send('update status');
     };
@@ -146,7 +146,7 @@
     }
 
     function updateStatus(msg) {
-    console.log("got update " + msg);
+      //console.log("got update " + msg.data);
 	  var stat = JSON.parse(msg.data);
 	  var deck = stat.source;
 	  var result = "Cards Left: " + stat.remainingCardsCount;
@@ -173,10 +173,10 @@
 <body>
 
 
-<button id="/alliance/nav/drawBtn" type="button" onclick="get(allianceNavDeck, '')">Request Alliance Nav card</button>
-<button id="/alliance/nav/shuffleBtn" type="button" onclick="post(allianceNavDeck, '')">Shuffle</button>
-<button id="/alliance/nav/lockBtn" type="button" onclick="post(allianceNavDeck, navLockPath)">Lock Deck</button>
-<button id="/alliance/nav/unlockBtn" type="button" onclick="del(allianceNavDeck, navLockPath)">Unlock Deck</button>
+<button id="/alliance/nav/drawBtn" type="button" onclick="get('/alliance/nav', '')">Request Alliance Nav card</button>
+<button id="/alliance/nav/shuffleBtn" type="button" onclick="post('/alliance/nav', '')">Shuffle</button>
+<button id="/alliance/nav/lockBtn" type="button" onclick="post('/alliance/nav', navLockPath)">Lock Deck</button>
+<button id="/alliance/nav/unlockBtn" type="button" onclick="del('/alliance/nav', navLockPath)">Unlock Deck</button>
 
 <p><span id="/alliance/nav/requestResult"/><br></p>
 <p><span id="/alliance/nav/status"/><br></p>

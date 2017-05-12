@@ -1,39 +1,51 @@
 package com.whatgameapps.firefly.controller;
 
-import com.google.gson.Gson;
 import com.whatgameapps.firefly.rest.NavDeckStatus;
 import org.eclipse.jetty.websocket.api.Session;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class StatusBroadcaster {
-    private static final Gson gson = new Gson();
-    public final NewsSources sources = new NewsSources(this);
-    private final Map<Session, String> subscribers = new ConcurrentHashMap<>();
+    private final Set<Session> subscribers = new HashSet();
+    private final Set<NavController> sources = new HashSet();
 
-    public synchronized void broadcast(NavDeckStatus status) {
-        String statusJson = gson.toJson(status);
+    synchronized void addSubscriber(Session user) {
+        subscribers.add(user);
+    }
 
-        subscribers.keySet().stream()
+    synchronized void removeSubscriber(Session user) {
+        subscribers.add(user);
+    }
+
+    public synchronized void addSource(NavController source) {
+        this.sources.add(source);
+    }
+
+    void informListeners(NavDeckStatus status) {
+        String statusJson = toJson(status);
+        this.broadcast(statusJson);
+    }
+
+    private String toJson(NavDeckStatus status) {
+        return JsonRenderer.getInstance().render(status);
+    }
+
+    public synchronized void broadcast(String message) {
+        subscribers.stream()
                 .filter(Session::isOpen)
-                .forEach(session -> send(session, statusJson));
+                .forEach(session -> send(session, message));
     }
 
     public void send(Session user, String message) {
         user.getRemote().sendStringByFuture(message);
     }
 
-    synchronized void addSubscriber(Session user) {
-        subscribers.put(user, "string");
-    }
-
-    synchronized void removeSubscriber(Session user) {
-        subscribers.put(user, "string");
-
-    }
-
     public void update(Session user) {
-        sources.update(user);
+        sources.stream()
+                .map(nc -> nc.status())
+                .map(statusObject -> toJson(statusObject))
+                .forEach(status -> this.send(user, status));
     }
+
 }

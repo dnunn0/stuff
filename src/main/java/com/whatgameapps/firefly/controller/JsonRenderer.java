@@ -3,16 +3,16 @@ package com.whatgameapps.firefly.controller;
 import com.google.gson.Gson;
 import spark.ResponseTransformer;
 
-public class JsonTransformer implements ResponseTransformer {
-    private static JsonTransformer INSTANCE = new JsonTransformer();
+public class JsonRenderer implements ResponseTransformer {
+    private static JsonRenderer INSTANCE = new JsonRenderer();
     private static Gson gson = new Gson();
 
-    public static JsonTransformer getInstance() {
+    public static JsonRenderer getInstance() {
         return INSTANCE;
     }
 
     @Override
-    public String render(Object model) throws Exception {
+    public String render(Object model) {
 //        System.out.println("rendering " + model);
         return gson.toJson(model);
     }

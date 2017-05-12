@@ -40,9 +40,9 @@ public class Main {
         spark().webSocket("/status", statusServer);
         new BeforeAll(spark());
         new DosFilter(spark());
-        new AllianceSpaceNavController(spark(), getSpecForSpecName(AllianceNavDeckSpecification.class, spec), statusServer.broadcaster.sources);
-        new BorderSpaceNavController(spark(), getSpecForSpecName(BorderNavDeckSpecification.class, spec), statusServer.broadcaster.sources);
-        new RimSpaceNavController(spark(), getSpecForSpecName(RimNavDeckSpecification.class, spec), statusServer.broadcaster.sources);
+        new AllianceSpaceNavController(spark(), getSpecForSpecName(AllianceNavDeckSpecification.class, spec), statusServer.broadcaster);
+        new BorderSpaceNavController(spark(), getSpecForSpecName(BorderNavDeckSpecification.class, spec), statusServer.broadcaster);
+        new RimSpaceNavController(spark(), getSpecForSpecName(RimNavDeckSpecification.class, spec), statusServer.broadcaster);
         new StopController(spark());
         new AfterAll(spark());
     }
