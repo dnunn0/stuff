@@ -114,7 +114,7 @@
 				+ " alt="+qm+card.action+qm
 				+ " height='320' width='220'"
 				+"/>";
-	  updateElement(deck +"/"+target, false, newHtml);
+	  updateElement("/nav/card", false, newHtml);
 	  updateRequestId(xhttp, deck, true);
 	  updateHistory(deck, card);
 	}
@@ -159,7 +159,7 @@
 	  var hasCards = stat.remainingCardsCount > 0;
 	  var isLocked = stat.isLocked;
 	  document.getElementById(deck + "/drawBtn").disabled = !hasCards || isLocked;
-	  document.getElementById(deck + "/shuffleBtn").disabled = isLocked;
+	  document.getElementById(deck + "/shuffleBtn").disabled = hasCards || isLocked;
 	  document.getElementById(deck + "/unlockBtn").disabled = !isLocked;
     }
 
@@ -173,27 +173,25 @@
 </head>
 
 <body>
-
+<span id="/nav/card"></span><br>
 
 <button id="/alliance/nav/drawBtn" type="button" onclick="get('/alliance/nav', '')">Request Alliance Nav card</button>
 <button id="/alliance/nav/shuffleBtn" type="button" onclick="post('/alliance/nav', '')">Shuffle</button>
 <button id="/alliance/nav/lockBtn" type="button" onclick="post('/alliance/nav', navLockPath)">Lock Deck</button>
 <button id="/alliance/nav/unlockBtn" type="button" onclick="del('/alliance/nav', navLockPath)">Unlock Deck</button> &emsp;<span id="/alliance/nav/requestResult"></span><br>
-<span id="/alliance/nav/card"></span>
+
 <p><span id="/alliance/nav/status"></span><br></p>
 
 <button id="/border/nav/drawBtn" type="button" onclick="get('/border/nav', '')">Request Border Nav card</button>
 <button id="/border/nav/shuffleBtn" type="button" onclick="post('/border/nav', '')">Shuffle</button>
 <button id="/border/nav/lockBtn" type="button" onclick="post('/border/nav', navLockPath)">Lock Deck</button>
 <button id="/border/nav/unlockBtn" type="button" onclick="del('/border/nav', navLockPath)">Unlock Deck</button> &emsp;<span id="/border/nav/requestResult"></span><br>
-<span id="/border/nav/card"></span>
 <p><span id="/border/nav/status"></span><br></p>
 
 <button id="/rim/nav/drawBtn" type="button" onclick="get('/rim/nav', '')">Request Border Nav card</button>
 <button id="/rim/nav/shuffleBtn" type="button" onclick="post('/rim/nav', '')">Shuffle</button>
 <button id="/rim/nav/lockBtn" type="button" onclick="post('/rim/nav', navLockPath)">Lock Deck</button>
 <button id="/rim/nav/unlockBtn" type="button" onclick="del('/rim/nav', navLockPath)">Unlock Deck</button> &emsp;<span id="/rim/nav/requestResult"></span><br>
-<span id="/rim/nav/card"></span>
 <p><span id="/rim/nav/status"></span><br></p>
 
 
