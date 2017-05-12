@@ -9,19 +9,23 @@ import spark.Request;
 import spark.Response;
 import spark.Service;
 
-public abstract class NavController {
+public class NavController {
     public static final String ID_HEADER = "id";
     public static final int NOT_FOUND_ERROR = HttpStatus.NOT_FOUND_404;
     public static final int LOCK_ERROR = HttpStatus.CONFLICT_409;
     public static final String NAV = "/nav";
     public static final String LOCK = "/lock";
     public static final String STATUS = "/status";
+    public static String ALLIANCE_SPACE = "/alliance";
+    public static String RIM_SPACE = "/rim";
+    public static String BORDER_SPACE = "/border";
+    final String spaceSectorPath;
     final NavDeck deck;
     final StatusBroadcaster listeners;
     volatile DeckState deckState;
 
-    public NavController(Service spark, NavDeckSpecification spec, StatusBroadcaster listeners) {
-        this(spec, listeners);
+    public NavController(Service spark, String spaceSectorPath, NavDeckSpecification spec, StatusBroadcaster listeners) {
+        this(spaceSectorPath, spec, listeners);
         spark.post(getLockPath(), this::lock);
         spark.delete(getLockPath(), this::unlock);
         spark.options(getLockPath(), this::allowCors);
@@ -32,7 +36,8 @@ public abstract class NavController {
         spark.options(getNavPath(), this::allowCors);
     }
 
-    public NavController(NavDeckSpecification spec, StatusBroadcaster listeners) {
+    public NavController(String spaceSectorPath, NavDeckSpecification spec, StatusBroadcaster listeners) {
+        this.spaceSectorPath = spaceSectorPath;
         this.deck = new NavDeck(spec);
         this.listeners = listeners;
         this.listeners.addSource(this);
@@ -75,7 +80,9 @@ public abstract class NavController {
         return getSpaceSectorPath() + NAV;
     }
 
-    public abstract String getSpaceSectorPath();
+    public String getSpaceSectorPath() {
+        return this.spaceSectorPath;
+    }
 
     NavCard drawCard(Request req, Response res) {
         NavCard reply = this.deckState.drawCard(this, res);
