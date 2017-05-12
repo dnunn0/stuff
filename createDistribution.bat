@@ -1,4 +1,7 @@
 setlocal
+echo ====================================================================
+echo ====================================================================
+echo ====================================================================
 
 if not "%JAVA_HOME%"=="" goto JAVA_HOME_SET
     Echo JAVA_HOME not set
@@ -9,11 +12,13 @@ Set app_dir=%~dp0
 for %%* in (.) do set app_name=%%~nx*
 
 Set ROBOCOPY_OK=3
-CALL :DELETE_DIR %app_dir%dist
+CALL :DELETE_DIR %app_dir%dist || Exit /b 1
+
+
 robocopy "%JAVA_HOME%\jre" "%app_dir%dist\%app_name%\runtime\jre" /E /PURGE /COPY:DAT /DCOPY:T /NS /NC /NFL /NDL /NP
 IF %ERRORLEVEL% GTR %ROBOCOPY_OK% goto done
 
-CALL :SHRINK_JRE
+CALL :SHRINK_JRE   || Exit /b 1
 
 Set archive_name=%app_name%-1.0-SNAPSHOT
 robocopy "%app_dir%build\distributions" "%app_dir%dist\%app_name%\app" /E /PURGE /COPY:DAT /DCOPY:T /NS /NC /NFL /NDL /NP
@@ -25,8 +30,8 @@ robocopy "%archive_name%\bin" bin
 IF %ERRORLEVEL% GTR %ROBOCOPY_OK% goto done
 robocopy "%archive_name%\lib" lib
 IF %ERRORLEVEL% GTR %ROBOCOPY_OK% goto done
-CALL :DELETE_DIR  %archive_name%
-CALL :DELETE_DIR  bin
+CALL :DELETE_DIR  %archive_name%  || Exit /b 1
+CALL :DELETE_DIR  bin || Exit /b 1
 rm *.zip
 rm *.tar
 rem now extract app out of app jar, since executable jar is useless when there's other jars required
@@ -43,14 +48,14 @@ if NOT "%mainClassName%"=="" goto HAS_MAIN
 Goto :eof
 
 :HAS_MAIN
-CALL :DELETE_DIR META-INF
+CALL :DELETE_DIR META-INF || Exit /b 1
 
 rem robocopy %app_dir%build\resources\main\public resources\public
 popd
 
-call createCmdRunScript.bat %mainClassName%
+call createCmdRunScript.bat %mainClassName%  || Exit /b 1
 
-call createBashRunScript.bat %mainClassName%
+call createBashRunScript.bat %mainClassName%  || Exit /b 1
 
 pushd dist && "C:\Program Files (x86)\7-Zip\7z" a -tzip -mx7 %app_name% && popd
 
@@ -58,7 +63,12 @@ goto :done
 
 :DELETE_DIR
 del /s/q %1 && rmdir /s/q %1
-exit /b
+if not exist %1 exit /b
+dir %1
+set errorlevel=1
+exit /b %errorlevel%
+
+
 
 :SHRINK_JRE
 rem see http://www.oracle.com/technetwork/java/javase/jre-8-readme-2095710.html
@@ -77,13 +87,13 @@ del "%app_dir%dist\%app_name%\runtime\jre"\lib\deploy\messages_*.properties
 del "%app_dir%dist\%app_name%\runtime\jre"\lib\deploy\splash*.gif
 del "%app_dir%dist\%app_name%\runtime\jre"\lib\deploy\*.zip
 
-CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\applet
-CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\cmm
-CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\ext
-CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\fonts
-CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\images
-CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\jfr
-CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\management
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\applet  || Exit /b 1
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\cmm || Exit /b 1
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\ext || Exit /b 1
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\fonts || Exit /b 1
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\images || Exit /b 1
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\jfr || Exit /b 1
+CALL :DELETE_DIR "%app_dir%dist\%app_name%\runtime\jre"\lib\management || Exit /b 1
 
 set FILE_LIST=(rmid rmiregistry tnameserv keytool kinit klist ktab policytool orbd pack200)
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.exe 
@@ -101,11 +111,11 @@ set FILE_LIST=(jfr jfxmedia jp2iexp jp2native jp2ssv jsound jsoundds management 
 for %%i in %FILE_LIST% do del "%app_dir%dist\%app_name%\runtime\jre"\bin\%%i.dll 
 
 
-CALL :DELETE_DIR  "%app_dir%dist\%app_name%\runtime\jre"\bin\client
-CALL :DELETE_DIR  "%app_dir%dist\%app_name%\runtime\jre"\bin\dtplugin
-CALL :DELETE_DIR  "%app_dir%dist\%app_name%\runtime\jre"\bin\plugin2
+CALL :DELETE_DIR  "%app_dir%dist\%app_name%\runtime\jre"\bin\client || Exit /b 1
+CALL :DELETE_DIR  "%app_dir%dist\%app_name%\runtime\jre"\bin\dtplugin || Exit /b 1
+CALL :DELETE_DIR  "%app_dir%dist\%app_name%\runtime\jre"\bin\plugin2 || Exit /b 1
 exit /b
 
 
 :done
-exit %errorlevel%
+exit /b %errorlevel%
