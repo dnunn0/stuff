@@ -32,7 +32,7 @@ jar {
     }
 }
 
-task createDistribution(type: Exec, dependsOn: assembleDist) {
+tasks.create(name: 'createDistribution.bat',type: Exec, dependsOn: assembleDist) {
     commandLine = ['cmd', '/c', 'createDistribution.bat']
 }
 
