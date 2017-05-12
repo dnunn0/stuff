@@ -20,7 +20,6 @@ public class Main {
     public Main(String[] args) throws Exception {
         processCommandLine(args);
         spark = new SparkWrapper(port);
-        spark.ignite();
         addEndpoints();
         System.out.println(String.format("Listening on: %s with %s", spark.url(), this.spec));
     }
@@ -37,12 +36,13 @@ public class Main {
     private void addEndpoints() throws Exception {
         spark().staticFiles.location("/public");
         spark().staticFiles.expireTime(600);
-        spark().webSocket("/status", StatusServer.class);
+        final StatusServer statusServer = new StatusServer();
+        spark().webSocket("/status", statusServer);
         new BeforeAll(spark());
         new DosFilter(spark());
-        new AllianceSpaceNavController(spark(), getSpecForSpecName(AllianceNavDeckSpecification.class, spec));
-        new BorderSpaceNavController(spark(), getSpecForSpecName(BorderNavDeckSpecification.class, spec));
-        new RimSpaceNavController(spark(), getSpecForSpecName(RimNavDeckSpecification.class, spec));
+        new AllianceSpaceNavController(spark(), getSpecForSpecName(AllianceNavDeckSpecification.class, spec), statusServer.broadcaster.sources);
+        new BorderSpaceNavController(spark(), getSpecForSpecName(BorderNavDeckSpecification.class, spec), statusServer.broadcaster.sources);
+        new RimSpaceNavController(spark(), getSpecForSpecName(RimNavDeckSpecification.class, spec), statusServer.broadcaster.sources);
         new StopController(spark());
         new AfterAll(spark());
     }

@@ -7,12 +7,12 @@ public class BorderSpaceNavController extends NavController {
 
     public static final String DECK_PATH = "/border";
 
-    public BorderSpaceNavController(Service spark, NavDeckSpecification spec) {
-        super(spark, spec);
+    public BorderSpaceNavController(Service spark, NavDeckSpecification spec, NewsSources listeners) {
+        super(spark, spec, listeners);
     }
 
-    BorderSpaceNavController(NavDeckSpecification spec) {
-        super(spec);
+    BorderSpaceNavController(NavDeckSpecification spec, NewsSources listeners) {
+        super(spec, listeners);
     }
 
     @Override

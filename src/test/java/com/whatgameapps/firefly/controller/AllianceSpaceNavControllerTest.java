@@ -26,7 +26,8 @@ public class AllianceSpaceNavControllerTest {
     private final TestUtils testUtils = new TestUtils();
     private final Request req = new SparkRequestStub();
     private final spark.Response res = new SparkResponseWrapper();
-    private AllianceSpaceNavController sut = new AllianceSpaceNavController(AllianceNavDeckSpecification.BASIC);
+    private final NewsSources middleman = new NewsSources(new SpyStatusBroadcaster());
+    private AllianceSpaceNavController sut = new AllianceSpaceNavController(AllianceNavDeckSpecification.BASIC, middleman);
 
     @After
     public void restoreStdout() {
@@ -108,21 +109,21 @@ public class AllianceSpaceNavControllerTest {
 
     @Test
     public void statusAfterDrawingOneCardShouldBeRight() {
-        sut = new AllianceSpaceNavController(noReshuffleCardSpec);
+        sut = new AllianceSpaceNavController(noReshuffleCardSpec, middleman);
         sut.drawCard(req, res);
         checkStatus(sut.deck.spec.count - 1, 1, false, sut.status(req, res));
     }
 
     @Test
     public void statusAfterDrawingAllCardsShouldBeRight() {
-        sut = new AllianceSpaceNavController(noReshuffleCardSpec);
+        sut = new AllianceSpaceNavController(noReshuffleCardSpec, middleman);
         IntStream.range(0, noReshuffleCardSpec.count).forEachOrdered(i -> sut.drawCard(req, res));
         checkStatus(0, sut.deck.spec.count, false, sut.status(req, res));
     }
 
     @Test
     public void statusAfterLockingShouldBeRight() {
-        sut = new AllianceSpaceNavController(noReshuffleCardSpec);
+        sut = new AllianceSpaceNavController(noReshuffleCardSpec, middleman);
         IntStream.range(0, noReshuffleCardSpec.count).forEachOrdered(i -> sut.drawCard(req, res));
         sut.lock(req, res);
         checkStatus(0, sut.deck.spec.count, true, sut.status(req, res));
@@ -130,7 +131,7 @@ public class AllianceSpaceNavControllerTest {
 
     @Test
     public void statusAfterUnLockingShouldBeRight() {
-        sut = new AllianceSpaceNavController(noReshuffleCardSpec);
+        sut = new AllianceSpaceNavController(noReshuffleCardSpec, middleman);
         sut.lock(req, res);
         sut.unlock(req, res);
         checkStatus(sut.deck.spec.count, 0, false, sut.status(req, res));

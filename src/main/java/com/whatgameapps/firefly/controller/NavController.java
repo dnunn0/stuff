@@ -17,10 +17,11 @@ public abstract class NavController {
     public static final String LOCK = "/lock";
     public static final String STATUS = "/status";
     final NavDeck deck;
+    final NewsSources listeners;
     volatile DeckState deckState;
 
-    public NavController(Service spark, NavDeckSpecification spec) {
-        this(spec);
+    public NavController(Service spark, NavDeckSpecification spec, NewsSources listeners) {
+        this(spec, listeners);
         spark.post(getLockPath(), this::lock);
         spark.delete(getLockPath(), this::unlock);
         spark.options(getLockPath(), this::allowCors);
@@ -31,15 +32,11 @@ public abstract class NavController {
         spark.options(getNavPath(), this::allowCors);
     }
 
-    public NavController(NavDeckSpecification spec) {
+    public NavController(NavDeckSpecification spec, NewsSources listeners) {
         this.deck = new NavDeck(spec);
+        this.listeners = listeners;
+        this.listeners.addSource(this);
         this.deckState = new UnlockedDeckState();
-    }
-
-    public abstract String getSpaceSectorPath();
-
-    public String getNavPath() {
-        return getSpaceSectorPath() + NAV;
     }
 
     public String getLockPath() {
@@ -58,29 +55,48 @@ public abstract class NavController {
 
     String reset(Request req, Response res) {
         String reply = this.deckState.shuffle(this, res);
+        informListeners();
         return reply;
     }
 
+    void informListeners() {
+        this.listeners.informListeners(this.status());
+    }
+
+    public NavDeckStatus status() {
+        int cardCount = this.deck.size();
+        int discardsCount = this.deck.discards().size();
+        boolean isLocked = this.deckState.isLocked();
+        NavDeckStatus status = new NavDeckStatus(this.getNavPath(), cardCount, discardsCount, isLocked);
+        return status;
+    }
+
+    public String getNavPath() {
+        return getSpaceSectorPath() + NAV;
+    }
+
+    public abstract String getSpaceSectorPath();
+
     NavCard drawCard(Request req, Response res) {
         NavCard reply = this.deckState.drawCard(this, res);
+        informListeners();
         return reply;
     }
 
     String lock(Request req, Response res) {
         String reply = this.deckState.lock(this, res);
+        informListeners();
         return reply;
     }
 
     String unlock(Request req, Response res) {
         String reply = this.deckState.unlock(this, res);
+        informListeners();
         return reply;
     }
 
     NavDeckStatus status(Request req, Response res) {
-        int cardCount = this.deck.size();
-        int discardsCount = this.deck.discards().size();
-        boolean isLocked = this.deckState.isLocked();
-        NavDeckStatus status = new NavDeckStatus(cardCount, discardsCount, isLocked);
-        return status;
+        return status();
     }
+
 }

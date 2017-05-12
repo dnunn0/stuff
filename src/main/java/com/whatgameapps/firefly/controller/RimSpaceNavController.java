@@ -7,12 +7,12 @@ public class RimSpaceNavController extends NavController {
 
     public static final String DECK_PATH = "/rim";
 
-    public RimSpaceNavController(Service spark, NavDeckSpecification spec) {
-        super(spark, spec);
+    public RimSpaceNavController(Service spark, NavDeckSpecification spec, NewsSources listeners) {
+        super(spark, spec, listeners);
     }
 
-    RimSpaceNavController(NavDeckSpecification spec) {
-        super(spec);
+    RimSpaceNavController(NavDeckSpecification spec, NewsSources listeners) {
+        super(spec, listeners);
     }
 
     @Override

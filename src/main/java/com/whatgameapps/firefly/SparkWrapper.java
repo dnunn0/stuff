@@ -11,11 +11,7 @@ public class SparkWrapper {
 
     public SparkWrapper(int port) {
         this.port = port;
-        spark = Service.ignite();
-    }
-
-    public void ignite() {
-        Service.ignite().port(port).threadPool(10);
+        spark = Service.ignite().port(port).threadPool(10);
     }
 
     public String url() {

@@ -13,11 +13,15 @@
 	var navLockPath = "/lock";
 	var hostPort = location.hostname + ":" + location.port;
 
-var statusUrl="ws://" + hostPort + "/status";
-console.log(statusUrl);
-      var webSocket = new WebSocket(statusUrl);
-webSocket.onmessage = function (msg) { updateAllStatus(msg); };
-webSocket.onclose = function () { alert("WebSocket connection closed") }
+    var statusUrl="ws://" + hostPort + "/status";
+    console.log(statusUrl);
+    var webSocket = new WebSocket(statusUrl);
+    webSocket.onmessage = function (msg) { updateStatus(msg); };
+    webSocket.onclose = function () { console.log("WebSocket connection closed") }
+    webSocket.onopen = function(e) {
+        console.log("Connection established!");
+        webSocket.send('update status');
+    };
 
 	function sendRequest(method, deck, path, callbackProcess, successCallback) {
 	  var xhttp = new XMLHttpRequest();
@@ -29,13 +33,18 @@ webSocket.onclose = function () { alert("WebSocket connection closed") }
 	  xhttp.send();
 	}
 
+    function startWithSlash(text) {
+      if ((text) && (!text.startsWith("/"))) text ="/"+text;
+      return text;
+    }
+
 	function getUrl(deck, path) {
-	    if ((path) && (!path.startsWith("/"))) path ="/"+path;
+	    path = startWithSlash(path);
 	    return "http://"+hostPort+ deck + path;
 	}
 
 	function getCardUrl(deck, path) {
-	    if ((path) && (!path.startsWith("/"))) path ="/"+path;
+	    path = startWithSlash(path);
 	    return "http://"+hostPort+ deck + "Card" + path;
 	}
 
@@ -58,20 +67,8 @@ webSocket.onclose = function () { alert("WebSocket connection closed") }
 		  default:
 			displayUnexpectedError(xhttp, deck, target);
 		}
-		updateStatus(deck);
-
 	}
 
-	function processStatusResponse(xhttp, deck, target) {
-	    switch (xhttp.status) {
-	      case 200:
-	        return updateDeckStatus(xhttp,deck, target);
-	        break;
-	      default:
-	        displayUnexpectedError(xhttp, deck, target);
-	    }
-	}
-	
 	function displayUnexpectedError(xhttp, deck, target) {
 		var result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
 	    updateElement(deck +"/"+target, true, result);
@@ -124,42 +121,11 @@ webSocket.onclose = function () { alert("WebSocket connection closed") }
 		return card.action.replace(/[^a-zA-Z]/g, "")+".png";
 	}
 
-	function updateDeckStatus(xhttp, deck, target) {
-	  var stat = JSON.parse(xhttp.responseText);
-	  var result = "Cards Left: " + stat.remainingCardsCount;
-	  result += "&emsp;Discards: " + stat.discardsCount;
-	  result += "&emsp;Is Locked: " + stat.isLocked;
-	  //  result += "<br>" + xhttp.responseText
-	  //result += "<\p>";
-	  updateElement(deck +"/"+target, false, result);
-	  updateRequestId(xhttp, deck, false);
-
-	  var hasCards = stat.remainingCardsCount > 0;
-	  var isLocked = stat.isLocked;
-	  document.getElementById(deck + "/drawBtn").disabled = !hasCards || isLocked;
-	  document.getElementById(deck + "/shuffleBtn").disabled = isLocked;
-	  document.getElementById(deck + "/unlockBtn").disabled = !isLocked;
-	}
-
 	function processActionResponseFun(xhttp, deck, successCallback) {
 	  return processActionResponse(xhttp, deck, "requestResult", successCallback);
 	}
 
-	function processStatusResponseFun(xhttp, deck) {
-	  return processStatusResponse(xhttp, deck,  "status");
-	}
-
-	function justDisplayResponseFun(xhttp,deck, target) {
-	  return justDisplayResponse(xhttp, deck, target);
-	}
-
-	function updateStatus(deck) {
-	  sendRequest("GET", deck, navStatusPath, processStatusResponseFun);
-	}
-
 	function get(deck, path) {
-	webSocket.send("hi from me");
-
 	  sendRequest("GET", deck, path, processActionResponseFun, displayNavCard);
 	}
 
@@ -179,23 +145,24 @@ webSocket.onclose = function () { alert("WebSocket connection closed") }
         return document.location.toString();
     }
 
-    function updateAllStatus(msg) {
- //   var data = JSON.parse(msg.data);
- //   insert("chat", data.userMessage);
- //   id("userlist").innerHTML = "";
- //   data.userlist.forEach(function (user) {
- //       insert("userlist", "<li>" + user + "</li>");
- //   });
+    function updateStatus(msg) {
+    console.log("got update " + msg);
+	  var stat = JSON.parse(msg.data);
+	  var deck = stat.source;
+	  var result = "Cards Left: " + stat.remainingCardsCount;
+	  result += "&emsp;Discards: " + stat.discardsCount;
+	  result += "&emsp;Is Locked: " + stat.isLocked;
+	  updateElement(deck +"/status", false, result);
 
-    updateElement("status", false, msg);
-
-}
+	  var hasCards = stat.remainingCardsCount > 0;
+	  var isLocked = stat.isLocked;
+	  document.getElementById(deck + "/drawBtn").disabled = !hasCards || isLocked;
+	  document.getElementById(deck + "/shuffleBtn").disabled = isLocked;
+	  document.getElementById(deck + "/unlockBtn").disabled = !isLocked;
+    }
 
 
 	window.onload = function(e) {
-
-	  updateStatus(allianceNavDeck);
-
 	};
 
 	;
@@ -211,7 +178,6 @@ webSocket.onclose = function () { alert("WebSocket connection closed") }
 <button id="/alliance/nav/lockBtn" type="button" onclick="post(allianceNavDeck, navLockPath)">Lock Deck</button>
 <button id="/alliance/nav/unlockBtn" type="button" onclick="del(allianceNavDeck, navLockPath)">Unlock Deck</button>
 
-<p><span id="status"/>here's the status area<br></p>
 <p><span id="/alliance/nav/requestResult"/><br></p>
 <p><span id="/alliance/nav/status"/><br></p>
 
