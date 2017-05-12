@@ -3,19 +3,21 @@
 <head>
     <style>
         .external {
-            -moz-force-broken-image-icon: 1;
+           -moz-force-broken-image-icon: 1;
            height: 1040px;width: 715px;
                     }
          .button_image {
            -moz-force-broken-image-icon: 1;
-           <!-- height: 100%;
-            width: 75%;-->
-             height: 320px;width: 220px;
+            height: 100%;
+            width: 75%;
             }
         .button_with_image {
             padding: 0;
             border: none;
             background: none;
+         }
+         .button_with_text_no_top_margin {
+            font-size: 2.5rem;
          }
          .button_with_text {
             margin: 2.5rem 0rem 0rem 0rem;
@@ -30,23 +32,29 @@
     </style>
     <title>Firefly</title>
     <script>
-        var allianceNavDeck = "/alliance/nav";
-        var navStatusPath = "/status";
-        var navLockPath = "/lock";
-        var hostPort = location.hostname + ":" + location.port;
+        let navLockPath = "/lock";
+        let hostPort = location.hostname + ":" + location.port;
+        let isDrawing=false;
+        let decks = ["/alliance/nav", "/border/nav", "/rim/nav"];
+        let nextDrawDisabledStatus= new Map();
+        for(let i = 0, len = decks.length; i< len; ++i) {
+            nextDrawDisabledStatus.set(decks[i], false);
+        }
+        setupStatus();
 
-        var statusUrl="ws://" + hostPort + "/status";
-        console.log(statusUrl);
-        var webSocket = new WebSocket(statusUrl);
+    function setupStatus() {
+        let statusUrl="ws://" + hostPort + "/status";
+        let webSocket = new WebSocket(statusUrl);
         webSocket.onmessage = function (msg) { updateStatus(msg); };
-        webSocket.onclose = function () { console.log("WebSocket connection closed") }
+        webSocket.onclose = function () { console.log("WebSocket connection closed ") }
         webSocket.onopen = function(e) {
-        console.log("Connection established!");
-        webSocket.send('update status');
-    };
+            console.log("WebSocket connection open. Asking for status update. ");
+            webSocket.send('update status');
+        };
+    }
 
 	function sendRequest(method, deck, path, callbackProcess, successCallback) {
-	  var xhttp = new XMLHttpRequest();
+	  let  xhttp = new XMLHttpRequest();
 	  xhttp.addEventListener("load", function(ev){callbackProcess(xhttp, deck, successCallback); });
 	  xhttp.addEventListener("error", function(ev){updateElement(deck +"/"+"requestResult", true, "Request probably didn't get to server.");});
 
@@ -92,71 +100,94 @@
 	}
 
 	function displayUnexpectedError(xhttp, deck, target) {
-		var result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
+		let  result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
 	    updateElement(deck +"/"+target, true, result);
 	}
-	
-	function updateRequestId(xhttp, deck, shouldOverride) {
-		var target = "requestId";
+
+	function updateRequestId(id, deck, shouldOverride) {
+		let  target = "requestId";
 		if (shouldOverride || "" == document.getElementById(target).innerHTML)
-			updateElement(target, false, xhttp.getResponseHeader("id"));
+			updateElement(target, false, id);
 	}
 
 	function justDisplayResponse(xhttp, deck, cardArea, responseStatusArea) {
-	  var target = responseStatusArea;
-	  var result = xhttp.responseText;
-	  updateElement(deck +"/"+target, false, result);
-	  updateRequestId(xhttp, deck, true);
+	  let  result = xhttp.responseText;
+	  let  target = responseStatusArea;
+	  updateResponse(result, deck, responseStatusArea);
+	  updateRequestId(xhttp.getResponseHeader("id"), deck, true);
+	}
+
+    function updateResponse(response, deck, responseStatusArea) {
+	  let  target = responseStatusArea;
+	  updateElement(deck +"/"+target, false, response);
 	}
 
 	function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
-	
+
 	function updateHistory(deck, card) {
-	    var anchorText = deck.replace("/","");
+	    let  anchorText = deck.replace("/","");
 	    anchorText = anchorText.replace("/nav", "");
 	    anchorText = capitalizeFirstLetter(anchorText);
 	    anchorText += "-"+card.action;
-		var item = "<a href='"+getCardUrl(deck, cardPicName(card.action))+"' target='_blank'>"+ anchorText + "</a>";
+		let  item = "<a href='"+getCardUrl(deck, cardPicName(card.action))+"' target='_blank'>"+ anchorText + "</a>";
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
 
 	function quoteMarkFor(text) {
-	    var qm = '"';
+	    let  qm = '"';
 	    if (text.includes(qm)) qm = "'";
 	    return qm;
 	 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+    function sleep(timeToSleepMs) {
+       return new Promise(resolve => setTimeout(resolve, timeToSleepMs));
+   }
 
-	async function preloadImage(url, callback)
+	function preloadImage(url, callback)
     {
-        var img=new Image();
+        let  img=new Image();
         img.src=url;
         img.onload = callback;
     }
 
+    function disableDrawButtons() {
+        for(let i=0, len=decks.length; i < len; i++) {
+            let control = document.getElementById(decks[i]+"/drawBtn");
+            control.disabled = true;
+        }
+    }
+
+    function restoreDrawButtons() {
+        for(let i=0, len=decks.length; i < len; i++) {
+            let control = document.getElementById(decks[i]+"/drawBtn");
+            control.disabled = nextDrawDisabledStatus.get(decks[i]);
+        }
+    }
+
 	function displayNavCard(xhttp, deck, cardArea, responseStatusArea) {
-	  var target = cardArea;
-	  var card = JSON.parse(xhttp.responseText);
-	  var cardUrl = getCardUrl(deck, cardPicName(card.action));
-      var qm = quoteMarkFor(card.action);
-      var newHtml = "<img class='external' src='" + cardUrl +"'"
+	  let  target = cardArea;
+	  let  card = JSON.parse(xhttp.responseText);
+	  let  cardUrl = getCardUrl(deck, cardPicName(card.action));
+      let  qm = quoteMarkFor(card.action);
+      let  newHtml = "<img class='external' src='" + cardUrl +"'"
                 + " alt="+qm+card.action+qm
                 +"/>";
-      var startOfWait = (new Date()).getTime();
+      let  startOfWait = (new Date()).getTime();
 	  preloadImage(cardUrl, async function() {
-	      var teaseTime = 500;
-	      var endOfWait = (new Date()).getTime();
-	      var timeToSleep = Math.max(1, teaseTime - (endOfWait - startOfWait));
+	      let  teaseTime = 500;
+	      let  endOfWait = (new Date()).getTime();
+	      let  timeToSleep = Math.max(1, teaseTime - (endOfWait - startOfWait));
 	      await sleep(timeToSleep);
 
           updateElement("/nav/card", false, newHtml);
+          await sleep(150);
+          restoreDrawButtons();
+          isDrawing=false;
       });
-	  updateRequestId(xhttp, deck, true);
+      updateResponse("&nbsp;", deck, responseStatusArea);
+	  updateRequestId(xhttp.getResponseHeader("id"), deck, true);
 	  updateHistory(deck, card);
 	}
 
@@ -169,7 +200,9 @@ function sleep(ms) {
 	}
 
 	function get(deck, path) {
-	  var newHtml = "<img class='external' src='" + getCardUrl(deck, cardPicName("back")) +"'"
+	   isDrawing=true;
+       disableDrawButtons();
+	  let  newHtml = "<img class='external' src='" + getCardUrl(deck, cardPicName("back")) +"'"
 				+ " alt='"+(deck.replace(/[^a-zA-Z]/g, " "))+"'"
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
@@ -183,7 +216,7 @@ function sleep(ms) {
 	function del(deck, path) {
 	  sendRequest("DELETE", deck, path, processActionResponseFun, justDisplayResponse);
 	}
-	
+
 	function clearHistory() {
 		updateElement("history", false, "");
 	}
@@ -193,17 +226,18 @@ function sleep(ms) {
     }
 
     function updateStatus(msg) {
-      //console.log("got update " + msg.data);
-	  var stat = JSON.parse(msg.data);
-	  var deck = stat.source;
-	  var result = stat.remainingCardsCount +"/" + (stat.remainingCardsCount+stat.discardsCount);
+	  let  stat = JSON.parse(msg.data);
+	  let  deck = stat.source;
+	  let  result = stat.remainingCardsCount +"/" + (stat.remainingCardsCount+stat.discardsCount);
 	  result += "&nbsp;(" + stat.discardsCount +")";
-//	  result += "&emsp;Is Locked: " + stat.isLocked;
 	  updateElement(deck +"/status", false, result);
 
-	  var hasCards = stat.remainingCardsCount > 0;
-	  var isLocked = stat.isLocked;
-	  document.getElementById(deck + "/drawBtn").disabled = !hasCards || isLocked;
+	  let  hasCards = stat.remainingCardsCount > 0;
+	  let  isLocked = stat.isLocked;
+	  nextDrawDisabledStatus.set(deck, !hasCards || isLocked);
+	  if(!isDrawing) {
+	      document.getElementById(deck + "/drawBtn").disabled = nextDrawDisabledStatus.get(deck);
+	  }
 	  document.getElementById(deck + "/shuffleBtn").disabled = hasCards || isLocked;
 	  document.getElementById(deck + "/unlockBtn").disabled = !isLocked;
     }
@@ -225,7 +259,7 @@ function sleep(ms) {
 </table>
 
 <table>
-    <tr>
+    <tr id="drawActions">
         <td>
             <button class="button_with_image" id="/alliance/nav/drawBtn" type="button"
                     onclick="get('/alliance/nav', '')">
@@ -256,7 +290,18 @@ function sleep(ms) {
     </tr>
     <tr>
         <td>
-            <button id="/alliance/nav/lockBtn" class="button_with_text" type="button"
+            <p><span id="/alliance/nav/requestResult">&nbsp;</span></p>
+        </td>
+        <td>
+            <p><span id="/border/nav/requestResult">&nbsp;</span></p>
+        </td>
+        <td>
+            <p><span id="/rim/nav/requestResult">&nbsp;</span></p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button id="/alliance/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
                     onclick="post('/alliance/nav', navLockPath)">Lock Deck
             </button>
             <button id="/alliance/nav/unlockBtn" class="button_with_text" type="button"
@@ -264,7 +309,7 @@ function sleep(ms) {
             </button>
         </td>
         <td>
-            <button id="/border/nav/lockBtn" class="button_with_text" type="button"
+            <button id="/border/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
                     onclick="post('/border/nav', navLockPath)">Lock Deck
             </button>
             <button id="/border/nav/unlockBtn" class="button_with_text" type="button"
@@ -272,7 +317,7 @@ function sleep(ms) {
             </button>
         </td>
         <td>
-            <button id="/rim/nav/lockBtn" class="button_with_text" type="button"
+            <button id="/rim/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
                     onclick="post('/rim/nav', navLockPath)">Lock Deck
             </button>
             <button id="/rim/nav/unlockBtn" class="button_with_text" type="button"
@@ -297,17 +342,7 @@ function sleep(ms) {
             </button>
         </td>
     </tr>
-    <tr>
-        <td>
-            <p><span id="/alliance/nav/requestResult"></span></p>
-        </td>
-        <td>
-            <p><span id="/border/nav/requestResult"></span></p>
-        </td>
-        <td>
-            <p><span id="/rim/nav/requestResult"></span></p>
-        </td>
-    </tr>
+
 </table>
 
 <br>
