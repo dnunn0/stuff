@@ -53,19 +53,19 @@
 	  document.getElementById(target).innerHTML = newHtml;
 	}
 
-	function processActionResponse(xhttp, deck, target, successCallback) {
+	function processActionResponse(xhttp, deck, cardArea, responseStatusArea, successCallback) {
 		switch (xhttp.status) {
 		  case 200:
-			successCallback(xhttp, deck, target)
+			successCallback(xhttp, deck, cardArea, responseStatusArea)
 			break;
 		  case 404:
-			updateElement(deck +"/"+target, true, "Needs shuffling!");
+			updateElement(deck +"/"+responseStatusArea, true, "Needs shuffling!");
 			break;
 		  case 409:
-			updateElement(deck +"/"+target, true, "Locked!");
+			updateElement(deck +"/"+responseStatusArea, true, "Locked!");
 			break;
 		  default:
-			displayUnexpectedError(xhttp, deck, target);
+			displayUnexpectedError(xhttp, deck, responseStatusArea);
 		}
 	}
 
@@ -80,7 +80,8 @@
 			updateElement(target, false, xhttp.getResponseHeader("id"));
 	}
 
-	function justDisplayResponse(xhttp, deck, target) {
+	function justDisplayResponse(xhttp, deck, cardArea, responseStatusArea) {
+	  var target = responseStatusArea;
 	  var result = xhttp.responseText;
 	  updateElement(deck +"/"+target, false, result);
 	  updateRequestId(xhttp, deck, true);
@@ -105,7 +106,8 @@
 	    return qm;
 	 }
 
-	function displayNavCard(xhttp, deck, target) {
+	function displayNavCard(xhttp, deck, cardArea, responseStatusArea) {
+	  var target = cardArea;
 	  var card = JSON.parse(xhttp.responseText);
 	  var qm = quoteMarkFor(card.action);
 	  var newHtml = "<br><img class='external' src='" + getCardUrl(deck, cardPicName(card)) +"'"
@@ -122,7 +124,7 @@
 	}
 
 	function processActionResponseFun(xhttp, deck, successCallback) {
-	  return processActionResponse(xhttp, deck, "requestResult", successCallback);
+	  return processActionResponse(xhttp, deck, "card", "requestResult", successCallback);
 	}
 
 	function get(deck, path) {
@@ -176,26 +178,23 @@
 <button id="/alliance/nav/drawBtn" type="button" onclick="get('/alliance/nav', '')">Request Alliance Nav card</button>
 <button id="/alliance/nav/shuffleBtn" type="button" onclick="post('/alliance/nav', '')">Shuffle</button>
 <button id="/alliance/nav/lockBtn" type="button" onclick="post('/alliance/nav', navLockPath)">Lock Deck</button>
-<button id="/alliance/nav/unlockBtn" type="button" onclick="del('/alliance/nav', navLockPath)">Unlock Deck</button>
-
-<p><span id="/alliance/nav/requestResult"/><br></p>
-<p><span id="/alliance/nav/status"/><br></p>
+<button id="/alliance/nav/unlockBtn" type="button" onclick="del('/alliance/nav', navLockPath)">Unlock Deck</button> &emsp;<span id="/alliance/nav/requestResult"></span><br>
+<span id="/alliance/nav/card"></span>
+<p><span id="/alliance/nav/status"></span><br></p>
 
 <button id="/border/nav/drawBtn" type="button" onclick="get('/border/nav', '')">Request Border Nav card</button>
 <button id="/border/nav/shuffleBtn" type="button" onclick="post('/border/nav', '')">Shuffle</button>
 <button id="/border/nav/lockBtn" type="button" onclick="post('/border/nav', navLockPath)">Lock Deck</button>
-<button id="/border/nav/unlockBtn" type="button" onclick="del('/border/nav', navLockPath)">Unlock Deck</button>
-
-<p><span id="/border/nav/requestResult"/><br></p>
-<p><span id="/border/nav/status"/><br></p>
+<button id="/border/nav/unlockBtn" type="button" onclick="del('/border/nav', navLockPath)">Unlock Deck</button> &emsp;<span id="/border/nav/requestResult"></span><br>
+<span id="/border/nav/card"></span>
+<p><span id="/border/nav/status"></span><br></p>
 
 <button id="/rim/nav/drawBtn" type="button" onclick="get('/rim/nav', '')">Request Border Nav card</button>
 <button id="/rim/nav/shuffleBtn" type="button" onclick="post('/rim/nav', '')">Shuffle</button>
 <button id="/rim/nav/lockBtn" type="button" onclick="post('/rim/nav', navLockPath)">Lock Deck</button>
-<button id="/rim/nav/unlockBtn" type="button" onclick="del('/rim/nav', navLockPath)">Unlock Deck</button>
-
-<p><span id="/rim/nav/requestResult"/><br></p>
-<p><span id="/rim/nav/status"/><br></p>
+<button id="/rim/nav/unlockBtn" type="button" onclick="del('/rim/nav', navLockPath)">Unlock Deck</button> &emsp;<span id="/rim/nav/requestResult"></span><br>
+<span id="/rim/nav/card"></span>
+<p><span id="/rim/nav/status"></span><br></p>
 
 
 <button id="historyBtn" type="button" onclick="clearHistory()">Clear History</button>
