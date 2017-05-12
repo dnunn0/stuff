@@ -130,7 +130,11 @@
 	    return qm;
 	 }
 
-	 function preloadImage(url, callback)
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+	async function preloadImage(url, callback)
     {
         var img=new Image();
         img.src=url;
@@ -145,7 +149,13 @@
       var newHtml = "<img class='external' src='" + cardUrl +"'"
                 + " alt="+qm+card.action+qm
                 +"/>";
-	  preloadImage(cardUrl, function() {
+      var startOfWait = (new Date()).getTime();
+	  preloadImage(cardUrl, async function() {
+	      var teaseTime = 1000;
+	      var endOfWait = (new Date()).getTime();
+	      var timeToSleep = Math.max(1, teaseTime - (endOfWait - startOfWait));
+	      await sleep(timeToSleep);
+
           updateElement("/nav/card", false, newHtml);
       });
 	  updateRequestId(xhttp, deck, true);
