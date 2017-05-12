@@ -108,3 +108,4 @@ exit /b
 
 
 :done
+exit %errorlevel%
