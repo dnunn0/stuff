@@ -72,7 +72,7 @@
 
     function Deck(navPath) {
        this.navPath=navPath;
-       this.navLockPath="/lock";
+       this.navLockPath=navPath+"/lock";
        this.nextDrawDisabledStatus=false;
     }
     Deck.prototype.getCardUrl = function (cardAction) {
@@ -97,7 +97,7 @@
 	  xhttp.addEventListener("load", function(ev){callbackProcess(xhttp, deck, successCallback); });
 	  xhttp.addEventListener("error", function(ev){updateElement(deck +"/"+"requestResult", true, "Request probably didn't get to server.");});
 
-	  xhttp.open(method, getUrl(deck, path), true);
+	  xhttp.open(method, getUrl(path), true);
 //	  xhttp.setRequestHeader("Authorize", "dm9yZGVsOnZvcmRlbA==");
 	  xhttp.send();
 	}
@@ -107,9 +107,9 @@
       return text;
     }
 
-	function getUrl(deck, path) {
+	function getUrl(path) {
 	    path = startWithSlash(path);
-	    return "http://"+hostPort+ deck + path;
+	    return "http://"+hostPort+ path;
 	}
 
 	function updateElement(target, addEmphasis, newHtml) {
@@ -240,15 +240,15 @@
 	}
 
 	function drawCard(decko) {
-	   isDrawing=true;
-       disableDrawButtons();
-       	  let cardUrl=decko.getCardUrl("back");
-
+	  isDrawing=true;
+      disableDrawButtons();
+      let cardUrl=decko.getCardUrl("back");
+      let altText=(decko.navPath.replace(/[^a-zA-Z]/g, " "));
 	  let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
-				+ " alt='"+(decko.navPath.replace(/[^a-zA-Z]/g, " "))+"'"
+				+ " alt='"+altText+"'"
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
-	  get(decko.navPath, '', processActionResponseFun, displayNavCard);
+	  get(decko.navPath, decko.navPath, processActionResponseFun, displayNavCard);
 	}
 
 	function lock(decko) {
@@ -261,7 +261,7 @@
 
 	function shuffle(decko) {
 	  if(confirm("Are you sure?")==true)
-	     post(decko.navPath, '', processActionResponseFun, justDisplayResponse);
+	     post(decko.navPath, decko.navPath, processActionResponseFun, justDisplayResponse);
 	}
 
 
