@@ -2,7 +2,18 @@
 <html>
 <head>
     <style>
-        .external {
+
+         h1 {font-size: 3.5rem;}
+         p {font-size: 3rem;}
+         a {font-size: 3rem;}
+         ol {font-size: 3rem;margin-bottom: 0.5rem;}
+         td {text-align: center;}
+         /* table {width:100%;margin: 2.5rem 0% 0% 0%;border: 1px solid black;} */
+          table {width:1000px;margin: 2.5rem 0% 0% 0%;}
+         .short_table {width:1500px;margin: 2.5rem 0% 0% 0%;}
+
+         .less_on_top {margin-top: -10px;}
+         .external {
            -moz-force-broken-image-icon: 1;
            height: 1040px;width: 715px;
                     }
@@ -16,6 +27,9 @@
             border: none;
             background: none;
          }
+         button.button_with_image:disabled {
+              opacity: 0.3;
+        }
          .button_with_text_no_top_margin {
             font-size: 2.5rem;
          }
@@ -23,12 +37,6 @@
             margin: 2.5rem 0rem 0rem 0rem;
             font-size: 2.5rem;
          }
-         p {font-size: 3rem;}
-         a {font-size: 3rem;}
-         ol {font-size: 3rem;margin-bottom: 0.5rem;}
-         td {text-align: center;}
-         table {width:100%;margin: 2.5rem 0% 0% 0%;}
-         .less_on_top {margin-top: -10px;}
 
 
     </style>
@@ -312,13 +320,13 @@
     </tr>
     <tr>
         <td>
-            <p><span id="/alliance/nav/requestResult">&nbsp;</span></p>
+            <p class="less_on_top"><span id="/alliance/nav/requestResult">&nbsp;</span></p>
         </td>
         <td>
-            <p><span id="/border/nav/requestResult">&nbsp;</span></p>
+            <p class="less_on_top"><span id="/border/nav/requestResult">&nbsp;</span></p>
         </td>
         <td>
-            <p><span id="/rim/nav/requestResult">&nbsp;</span></p>
+            <p class="less_on_top"><span id="/rim/nav/requestResult">&nbsp;</span></p>
         </td>
     </tr>
     <tr>
@@ -326,27 +334,36 @@
             <button id="/alliance/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
                     onclick="lock('/alliance/nav')">Lock Deck
             </button>
-            <button id="/alliance/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="unlock('/alliance/nav')">Unlock Deck
-            </button>
         </td>
         <td>
             <button id="/border/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
                     onclick="lock('/border/nav')">Lock Deck
-            </button>
-            <button id="/border/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="unlock('/border/nav')">Unlock Deck
             </button>
         </td>
         <td>
             <button id="/rim/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
                     onclick="lock('/rim/nav')">Lock Deck
             </button>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button id="/alliance/nav/unlockBtn" class="button_with_text" type="button"
+                    onclick="unlock('/alliance/nav')">Unlock Deck
+            </button>
+        </td>
+        <td>
+            <button id="/border/nav/unlockBtn" class="button_with_text" type="button"
+                    onclick="unlock('/border/nav')">Unlock Deck
+            </button>
+        </td>
+        <td>
             <button id="/rim/nav/unlockBtn" class="button_with_text" type="button"
                     onclick="unlock('/rim/nav')">Unlock Deck
             </button>
         </td>
     </tr>
+
     <tr>
         <td>
             <button id="/alliance/nav/shuffleBtn" class="button_with_text" type="button"
@@ -371,8 +388,8 @@
 
 
 <button id="historyBtn" class="button_with_text" type="button" onclick="clearHistory()">Clear History</button>
-<p>History
-<ol class="less_on_top"><span id="history"></span></ol>
+<h1>History</h1>
+<ol start="0" class="less_on_top"><span id="history"></span></ol>
 </p>
 <p>Request id: <span id="requestId"/><br></p>
 
