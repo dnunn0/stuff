@@ -8,24 +8,32 @@
          a {font-size: 3rem;}
          ol {font-size: 3rem;margin-bottom: 0.5rem;}
          td {text-align: center;}
+
+
+        img {
+            padding: 0;
+            margin: 0;
+            border:0;
+        }
+
+
          /* table {width:100%;margin: 2.5rem 0% 0% 0%;border: 1px solid black;} */
-          table {width:1150px;margin: 2.5rem 0% 0% 0%;}
+          table {width:1200px;margin: 2.5rem 0% 0% 0%;}
 
          .less_on_top {margin-top: -10px;}
          .external_image {
            -moz-force-broken-image-icon: 1;
          }
           .logo_image {
-             height: 1040px;width:1150px;
+             height: 1040px;width:1100px;
          }
          .large_card_image {
            height: 1040px;width: 715px;
          }
          .button_image {
-           -moz-force-broken-image-icon: 1;
             height: 480px;
             width: 330px;
-            }
+         }
         .button_with_image {
             width:335px;
             padding: 0 0 0 0;
@@ -33,7 +41,6 @@
             background: none;
             margin: 0 100px 0 0;
          }
-
          button.button_with_image:disabled {
               opacity: 0.3;
         }
@@ -300,29 +307,30 @@
         <td>
             <button class="button_with_image" id="/alliance/nav/drawBtn" type="button"
                     onclick="drawCard('/alliance/nav')">
-                <img src="/alliance/navCard/back.png" -alt='Request Alliance Nav card' class="button_image"/>
+                <img src="/alliance/navCard/back.png" -alt='Request Alliance Nav card'
+                     class="external_image button_image"/>
             </button>
         </td>
         <td>
             <button class="button_with_image" id="/border/nav/drawBtn" type="button" onclick="drawCard('/border/nav')">
-                <img src="/border/navCard/back.png" -alt='Request Border Nav card' class="button_image"/>
+                <img src="/border/navCard/back.png" -alt='Request Border Nav card' class="external_image button_image"/>
             </button>
         </td>
         <td>
             <button class="button_with_image" id="/rim/nav/drawBtn" type="button" onclick="drawCard('/rim/nav')">
-                <img src="/rim/navCard/back.png" -alt='Request Rim Nav card' class="button_image"/>
+                <img src="/rim/navCard/back.png" -alt='Request Rim Nav card' class="external_image button_image"/>
             </button>
         </td>
     </tr>
     <tr>
         <td>
-            <p class="less_on_top"><span id="/alliance/nav/status"></span></p>
+            <p class="less_on_top"><span id="/alliance/nav/status"></span>&emsp;&emsp;</p>
         </td>
         <td>
-            <p class="less_on_top"><span id="/border/nav/status"></span></p>
+            <p class="less_on_top"><span id="/border/nav/status"></span>&emsp;&emsp;</p>
         </td>
         <td>
-            <p class="less_on_top"><span id="/rim/nav/status"></span></p>
+            <p class="less_on_top"><span id="/rim/nav/status"></span>&emsp;&emsp;</p>
         </td>
     </tr>
     <tr>
