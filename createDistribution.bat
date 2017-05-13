@@ -59,6 +59,9 @@ call createBashRunScript.bat %mainClassName%  || Exit /b 1
 
 pushd dist && "C:\Program Files (x86)\7-Zip\7z" a -tzip -mx7 %app_name% && popd
 
+if "%1"=="" goto done
+copy /Y dist\%app_name%.zip %1
+
 goto :done
 
 :DELETE_DIR

@@ -33,7 +33,7 @@ jar {
 }
 
 tasks.create(name: 'createDistribution.bat',type: Exec, dependsOn: assembleDist) {
-    commandLine = ['cmd', '/c', 'createDistribution.bat']
+    commandLine = ['cmd', '/c', 'createDistribution.bat', 'c:\\WithAws']
 }
 
 
