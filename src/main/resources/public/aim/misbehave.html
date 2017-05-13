@@ -8,15 +8,11 @@
          a {font-size: 3rem;}
          ol {font-size: 3rem;margin-bottom: 0.5rem;margin-left:0.5rem}
          td {text-align: center;}
-
-
         img {
             padding: 0;
             margin: 0;
             border:0;
         }
-
-
          /* table {width:100%;margin: 2.5rem 0% 0% 0%;border: 1px solid black;} */
           table {width:1200px;margin: 2.5rem 0% 0% 0%;}
 
@@ -61,13 +57,15 @@
         let isDrawing=false;
 
         setupStatus();
+
         let deck_al=new Deck("/alliance/nav");
         let deck_bo=new Deck("/border/nav");
         let deck_ri=new Deck("/rim/nav");
+
         let decks = new Map();
-        decks.set("/alliance/nav", deck_al);
-        decks.set("/border/nav", deck_bo);
-        decks.set("/rim/nav", deck_ri);
+        decks.set(deck_al.navPath, deck_al);
+        decks.set(deck_bo.navPath, deck_bo);
+        decks.set(deck_ri.navPath, deck_ri);
 
         let dd_al = new DeckDisplay(deck_al);
         let dd_bo = new DeckDisplay(deck_bo);
@@ -76,6 +74,7 @@
         dds.set(deck_al, dd_al);
         dds.set(deck_bo, dd_bo);
         dds.set(deck_ri, dd_ri);
+
 
 
     function Deck(navPath) {
@@ -230,6 +229,13 @@
         };
     }
 
+    function updateStatus(msg) {
+	  let deck=FindAndUpdateDeckFrom(msg.data);
+	  let displayDeck=dds.get(deck);
+	  displayDeck.reportStatus();
+      displayDeck.applyStatus();
+    }
+
 	function sendRequest(method, path, onLoadCallback, onErrorCallback) {
 	  let xhttp = new XMLHttpRequest();
 	  xhttp.addEventListener("load", function(ev){onLoadCallback(xhttp); });
@@ -319,7 +325,9 @@
         return function(xhttp){return processActionResponse(xhttp, deck, successCallback);};
     }
 
-
+//TODO put drawCard et. al on DeckDisplay when i figure out private functions (which most of these shoudl be)
+//     or is this now modules?
+//TODO fix the ol chopping off numbers > 9
 	function drawCard(deckDisplay) {
 	  let deck=deckDisplay.deck;
 	  isDrawing=true;
@@ -343,29 +351,12 @@
 	     post(deckDisplay.deck.navPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse), createOnSendErrorCallback(deckDisplay));
 	}
 
-
 	function clearHistory() {
 		updateElement("history", false, "");
 	}
 
-    function getPageUrl() {
-        return document.location.toString();
-    }
-
-    function updateStatus(msg) {
-	  let deck=FindAndUpdateDeckFrom(msg.data);
-	  let displayDeck=dds.get(deck);
-	  displayDeck.reportStatus();
-      displayDeck.applyStatus();
-    }
-
-
 	window.onload = function(e) {
 	};
-
-	;
-
-
 
     </script>
 </head>
