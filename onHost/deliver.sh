@@ -1,3 +1,4 @@
+cmd //c "taskkill /f /im java*"
 cp  //tsclient/C/WithAws/firefly.zip /tmp
 rm -r /c/firefly
 rm /c/logs/*
