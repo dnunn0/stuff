@@ -6,7 +6,7 @@
          h1 {font-size: 3.5rem;}
          p {font-size: 3rem;}
          a {font-size: 3rem;}
-         ol {font-size: 3rem;margin-bottom: 0.5rem;}
+         ol {font-size: 3rem;margin-bottom: 0.5rem;margin-left:0.5rem}
          td {text-align: center;}
 
 
@@ -153,12 +153,16 @@
 	  result += "&nbsp;(" + this.deck.discardsCount +")";
 	  updateElement(this.statusId, false, result);
 	}
+    DeckDisplay.prototype.displayCardBack = function() {
+	  let card = new Card(this.deck, "back");
+      let cardDisplay = new CardDisplay(card);
+      cardDisplay.display(0, 0, true);
+    }
 
 	function CardDisplay(card) {
 	    this.card = card;
 	}
-	CardDisplay.prototype.display = function() {
-		  //TODO put all this into CardDisplay
+	CardDisplay.prototype.display = function(teaseTimeMs, postDisplayWaitTimeMs, hasMoreDrawingToDo) {
 	  let cardUrl=this.card.getUrl();
 	  let altText=this.card.action;
       let qm = quoteMarkFor(altText);
@@ -167,22 +171,53 @@
                 +"/>";
       let startOfWait = (new Date()).getTime();
 	  preloadImage(cardUrl, async function() {
-	      let teaseTime = 400;
 	      let endOfWait = (new Date()).getTime();
-	      let timeToSleep = Math.max(1, teaseTime - (endOfWait - startOfWait));
+	      let timeToSleep = Math.max(0, teaseTimeMs - (endOfWait - startOfWait));
           await sleep(timeToSleep);
 
           updateElement("/nav/card", false, newHtml);
-          await sleep(700);
-          isDrawing=false;
+          await sleep(Math.max(0, postDisplayWaitTimeMs));
+          isDrawing=hasMoreDrawingToDo;
           applyStatusForAllDecks();
       });
     }
 
 
 
+	function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
 
+	function quoteMarkFor(text) {
+	    let qm = '"';
+	    if (text.includes(qm)) qm = "'";
+	    return qm;
+	 }
 
+    function sleep(timeToSleepMs) {
+       return new Promise(resolve => setTimeout(resolve, timeToSleepMs));
+   }
+
+	function preloadImage(url, callback) {
+        let img=new Image();
+        img.src=url;
+        img.onload = callback;
+    }
+
+    function startWithSlash(text) {
+      if ((text) && (!text.startsWith("/"))) text ="/"+text;
+      return text;
+    }
+
+	function getUrl(path) {
+	    path = startWithSlash(path);
+	    return "http://"+hostPort+ path;
+	}
+
+	function updateElement(targetId, addEmphasis, newHtml) {
+	  if (addEmphasis) newHtml = "<font color='red'>" + newHtml + "</font>";
+	  document.getElementById(targetId).innerHTML = newHtml;
+	}
 
     function setupStatus() {
         let statusUrl="ws://" + hostPort + "/status";
@@ -217,26 +252,11 @@
 	  sendRequest("DELETE", path, onLoadCallback,onErrorCallback);
 	}
 
-    function startWithSlash(text) {
-      if ((text) && (!text.startsWith("/"))) text ="/"+text;
-      return text;
-    }
-
-	function getUrl(path) {
-	    path = startWithSlash(path);
-	    return "http://"+hostPort+ path;
-	}
-
-	function updateElement(target, addEmphasis, newHtml) {
-	  if (addEmphasis) newHtml = "<font color='red'>" + newHtml + "</font>";
-	  document.getElementById(target).innerHTML = newHtml;
-	}
-
 	function processActionResponse(xhttp, deckDisplay, successCallback) {
 
 		switch (xhttp.status) {
 		  case 200:
-			successCallback(xhttp.responseText, deckDisplay)
+			successCallback(deckDisplay, xhttp.responseText)
 		    updateRequestId(xhttp.getResponseHeader("id"));
 			break;
 		  case 404:
@@ -255,16 +275,8 @@
         updateElement(target, false, id);
 	}
 
-	function justDisplayResponse(responseText, deckDisplay) {
-	  deckDisplay.updateResponse(responseText);
-	}
-
-	function capitalizeFirstLetter(string) {
-        return string.charAt(0).toUpperCase() + string.slice(1);
-    }
-
-	function updateHistory(deck, card) {
-	    let anchorText = deck.navPath.replace("/","");
+	function updateHistory(card) {
+	    let anchorText = card.deck.navPath.replace("/","");
 	    anchorText = anchorText.replace("/nav", "");
 	    anchorText = capitalizeFirstLetter(anchorText);
 	    anchorText += "-"+card.action;
@@ -272,22 +284,6 @@
 		let item = "<a href='"+cardUrl+"' target='_blank'>"+ anchorText + "</a>";
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
-
-	function quoteMarkFor(text) {
-	    let qm = '"';
-	    if (text.includes(qm)) qm = "'";
-	    return qm;
-	 }
-
-    function sleep(timeToSleepMs) {
-       return new Promise(resolve => setTimeout(resolve, timeToSleepMs));
-   }
-
-	function preloadImage(url, callback) {
-        let img=new Image();
-        img.src=url;
-        img.onload = callback;
-    }
 
     function forEachDisplayDeck(valueKeyMap){
          dds.forEach(valueKeyMap);
@@ -303,13 +299,16 @@
         });
     }
 
-	function displayNavCard(responseText, deckDisplay) {
-	  let deck = deckDisplay.deck;
-	  let card = CardFromJson(deck, responseText);
+	function displayNavCard(deckDisplay, responseText) {
+	  let card = CardFromJson(deckDisplay.deck, responseText);
 	  let cardDisplay = new CardDisplay(card);
-	  cardDisplay.display();
+	  cardDisplay.display(400, 700, false);
       deckDisplay.updateResponse("&nbsp;");
-	  updateHistory(deck, card);
+	  updateHistory(card);
+	}
+
+	function justDisplayResponse(deckDisplay, responseText) {
+	  deckDisplay.updateResponse(responseText);
 	}
 
     function createOnSendErrorCallback(deckDisplay) {
@@ -322,19 +321,11 @@
 
 
 	function drawCard(deckDisplay) {
-	  isDrawing=true;
 	  let deck=deckDisplay.deck;
+	  isDrawing=true;
 
-      disableDrawButtons();
-      let card = new Card(deck, "back");
-      //TODO move image html into CardDisplay
-      let cardUrl=card.getUrl();
-      let altText=(deck.navPath.replace(/[^a-zA-Z]/g, " "));
-	  let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
-				+ " alt='"+altText+"'"
-				+"/>";
-	  updateElement("/nav/card", false, newHtml);
-
+       disableDrawButtons();
+        deckDisplay.displayCardBack();
 	  get(deck.navPath, createOnSendLoadCallback(deckDisplay, displayNavCard), createOnSendErrorCallback(deck));
 	}
 
