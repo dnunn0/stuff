@@ -9,24 +9,31 @@
          ol {font-size: 3rem;margin-bottom: 0.5rem;}
          td {text-align: center;}
          /* table {width:100%;margin: 2.5rem 0% 0% 0%;border: 1px solid black;} */
-          table {width:1000px;margin: 2.5rem 0% 0% 0%;}
-         .short_table {width:1500px;margin: 2.5rem 0% 0% 0%;}
+          table {width:1150px;margin: 2.5rem 0% 0% 0%;}
 
          .less_on_top {margin-top: -10px;}
-         .external {
+         .external_image {
            -moz-force-broken-image-icon: 1;
+         }
+          .logo_image {
+             height: 1040px;width:1150px;
+         }
+         .large_card_image {
            height: 1040px;width: 715px;
-                    }
+         }
          .button_image {
            -moz-force-broken-image-icon: 1;
-            height: 100%;
-            width: 75%;
+            height: 480px;
+            width: 330px;
             }
         .button_with_image {
-            padding: 0;
+            width:335px;
+            padding: 0 0 0 0;
             border: none;
             background: none;
+            margin: 0 100px 0 0;
          }
+
          button.button_with_image:disabled {
               opacity: 0.3;
         }
@@ -181,7 +188,7 @@
 	  let  card = JSON.parse(xhttp.responseText);
 	  let  cardUrl = getCardUrl(deck, cardPicName(card.action));
       let  qm = quoteMarkFor(card.action);
-      let  newHtml = "<img class='external' src='" + cardUrl +"'"
+      let  newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
                 + " alt="+qm+card.action+qm
                 +"/>";
       let  startOfWait = (new Date()).getTime();
@@ -212,7 +219,7 @@
 	function drawCard(deck) {
 	   isDrawing=true;
        disableDrawButtons();
-	  let  newHtml = "<img class='external' src='" + getCardUrl(deck, cardPicName("back")) +"'"
+	  let  newHtml = "<img class='external_image large_card_image' src='" + getCardUrl(deck, cardPicName("back")) +"'"
 				+ " alt='"+(deck.replace(/[^a-zA-Z]/g, " "))+"'"
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
@@ -284,7 +291,7 @@
 <body>
 <table>
     <tr>
-        <td><span id="/nav/card"><img src="/alliance/navCard/back.png" class='external'></span><br></td>
+        <td><span id="/nav/card"><img src="/SerenityLogo.png" class='external_image logo_image'></span><br></td>
     </tr>
 </table>
 
