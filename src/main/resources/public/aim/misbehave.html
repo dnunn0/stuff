@@ -120,15 +120,26 @@
         };
     }
 
-//TODO figure out how to push deck into callbackprocess since it shouldn't be visible to send
-	function sendRequest(method, deck, path, callbackProcess, successCallback) {
+	function sendRequest(method, path, onLoadCallback, onErrorCallback) {
 	  let xhttp = new XMLHttpRequest();
-	  xhttp.addEventListener("load", function(ev){callbackProcess(xhttp, deck, successCallback); });
-	  xhttp.addEventListener("error", function(ev){updateElement(deck.navPath +"/"+"requestResult", true, "Request probably didn't get to server.");});
+	  xhttp.addEventListener("load", function(ev){onLoadCallback(xhttp); });
+	  xhttp.addEventListener("error", function(ev){onErrorCallback(xhttp);});
 
 	  xhttp.open(method, getUrl(path), true);
 //	  xhttp.setRequestHeader("Authorize", "dm9yZGVsOnZvcmRlbA==");
 	  xhttp.send();
+	}
+
+	function get(path, onLoadCallback, onErrorCallback) {
+	  sendRequest("GET", path, onLoadCallback, onErrorCallback );
+	}
+
+	function post(path, onLoadCallback, onErrorCallback) {
+	  sendRequest("POST", path, onLoadCallback, onErrorCallback);
+    }
+
+	function del(path, onLoadCallback, onErrorCallback) {
+	  sendRequest("DELETE", path, onLoadCallback,onErrorCallback);
 	}
 
     function startWithSlash(text) {
@@ -259,48 +270,43 @@
 	  updateHistory(deck, card);
 	}
 
-	function processActionResponseFun(xhttp, deck, successCallback) {
-	  return processActionResponse(xhttp, deck, "card", "requestResult", successCallback);
-	}
+    function createOnSendErrorCallback(deck) {
+        return function(xhttp){updateElement(deck.navPath +"/"+"requestResult", true, "Request probably didn't get to server.");};
+    }
+
+    function createOnSendLoadCallback(deck, successCallback) {
+        return function(xhttp){return processActionResponse(xhttp, deck, "card", "requestResult", successCallback);};
+    }
+
 
 	function drawCard(deck) {
 	  isDrawing=true;
       disableDrawButtons();
       let card = new Card(deck, "back");
+      //TODO move image html into CardDisplay
       let cardUrl=card.getUrl();
       let altText=(deck.navPath.replace(/[^a-zA-Z]/g, " "));
 	  let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
 				+ " alt='"+altText+"'"
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
-	  get(deck, deck.navPath, processActionResponseFun, displayNavCard);
+	  get(deck.navPath, createOnSendLoadCallback(deck, displayNavCard), createOnSendErrorCallback(deck));
 	}
 
+//TODO move lock, etc. into DeckDisplay? (Deck?--lots is UI related...)
 	function lock(deck) {
-	  post(deck, deck.navLockPath, processActionResponseFun, justDisplayResponse);
+	  post(deck.navLockPath, createOnSendLoadCallback(deck, justDisplayResponse), createOnSendErrorCallback(deck));
 	}
 
 	function unlock(deck) {
-	  del(deck, deck.navLockPath, processActionResponseFun, justDisplayResponse);
+	  del(deck.navLockPath, createOnSendLoadCallback(deck, justDisplayResponse), createOnSendErrorCallback(deck));
 	}
 
 	function shuffle(deck) {
 	  if(confirm("Are you sure?")==true)
-	     post(deck, deck.navPath, processActionResponseFun, justDisplayResponse);
+	     post(deck.navPath, createOnSendLoadCallback(deck, justDisplayResponse), createOnSendErrorCallback(deck));
 	}
 
-
-	function get(deck, path, processActionCallback, successCallback) {
-	  sendRequest("GET", deck, path, processActionCallback, successCallback);
-	}
-
-	function post(deck, path, processActionCallback, successCallback) {
-	  sendRequest("POST", deck, path, processActionCallback, successCallback);
-	}
-
-	function del(deck, path, processActionCallback, successCallback) {
-	  sendRequest("DELETE", deck, path, processActionCallback, successCallback);
-	}
 
 	function clearHistory() {
 		updateElement("history", false, "");

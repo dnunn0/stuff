@@ -34,7 +34,7 @@ public class StatusBroadcaster {
     public synchronized void broadcast(String message) {
         subscribers.stream()
                 .filter(Session::isOpen)
-                .forEach(session -> send(session, message));
+                .forEach(session -> this.send(session, message));
     }
 
     public void send(Session user, String message) {
