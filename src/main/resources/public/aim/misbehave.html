@@ -75,16 +75,16 @@
        this.navLockPath=navPath+"/lock";
        this.nextDrawDisabledStatus=false;
     }
-    Deck.prototype.getCardUrl = function (cardAction) {
-        let cardName = cardAction.replace(/[^a-zA-Z]/g, "")+".png";
-	    cardName = startWithSlash(cardName);
-	    return "http://"+hostPort+ this.navPath + "Card" + cardName;
+
+	function Card(deck, action) {
+	    this.deck=deck;
+	    this.action=action;
+	}
+	function CardFromJson(deck, jsonCard) {
+	    let cardj = JSON.parse(jsonCard);
+	    return new Card(deck, cardj.action);
 	}
 
-	function Card(deck) {
-	    this.deck=deck;
-	    this.action="will this get overriden?";
-	}
 	Card.prototype.getUrl = function () {
         let cardName = this.action.replace(/[^a-zA-Z]/g, "")+".png";
 	    cardName = startWithSlash(cardName);
@@ -170,14 +170,11 @@
     }
 
 	function updateHistory(deck, card) {
-	    let cardo=new Card(deck);
-	    Object.assign(cardo, card);
 	    let anchorText = deck.navPath.replace("/","");
 	    anchorText = anchorText.replace("/nav", "");
 	    anchorText = capitalizeFirstLetter(anchorText);
-	    anchorText += "-"+cardo.action;
-	  //  let cardUrl=deck.getCardUrl(card.action);
-	    let cardUrl=cardo.getUrl();
+	    anchorText += "-"+card.action;
+	    let cardUrl=card.getUrl();
 		let item = "<a href='"+cardUrl+"' target='_blank'>"+ anchorText + "</a>";
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
@@ -218,10 +215,8 @@
 
 	function displayNavCard(xhttp, deck, cardArea, responseStatusArea) {
 	  let target = cardArea;
-	  let card = JSON.parse(xhttp.responseText);
-	  let cardo = new Card(deck);
-	  Object.assign(cardo, card);
-	  //let cardUrl=deck.getCardUrl(cardo.action);
+	  let cardo = CardFromJson(deck, xhttp.responseText);
+	  //TODO put all this into card
 	  let cardUrl=cardo.getUrl();
 	  let altText=cardo.action;
       let qm = quoteMarkFor(cardo.action);
@@ -242,7 +237,7 @@
       });
       updateResponse("&nbsp;", deck, responseStatusArea);
 	  updateRequestId(xhttp.getResponseHeader("id"));
-	  updateHistory(deck, card);
+	  updateHistory(deck, cardo);
 	}
 
 	function processActionResponseFun(xhttp, deck, successCallback) {
@@ -252,9 +247,7 @@
 	function drawCard(deck) {
 	  isDrawing=true;
       disableDrawButtons();
-      let card = new Card(deck);
-      card.action="back";
-      //let cardUrl=deck.getCardUrl("back");
+      let card = new Card(deck, "back");
       let cardUrl=card.getUrl();
       let altText=(deck.navPath.replace(/[^a-zA-Z]/g, " "));
 	  let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
@@ -299,6 +292,7 @@
     }
 
     function updateStatus(msg) {
+    //TODO put status into Deck Object
 	  let stat = JSON.parse(msg.data);
 	  let deckName = stat.source;
 	  let result = stat.remainingCardsCount +"/" + (stat.remainingCardsCount+stat.discardsCount);
