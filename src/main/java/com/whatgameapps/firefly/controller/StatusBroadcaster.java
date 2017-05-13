@@ -39,6 +39,7 @@ public class StatusBroadcaster {
 
     public void send(Session user, String message) {
         user.getRemote().sendStringByFuture(message);
+        System.out.format("Send to %s: [%s]\n", user.getRemoteAddress(), message);
     }
 
     public void update(Session user) {

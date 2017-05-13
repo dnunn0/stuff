@@ -60,11 +60,22 @@
         let hostPort = location.hostname + ":" + location.port;
         let isDrawing=false;
         let decks = ["/alliance/nav", "/border/nav", "/rim/nav"];
-        let nextDrawDisabledStatus= new Map();
-        for(let i = 0, len = decks.length; i< len; ++i) {
-            nextDrawDisabledStatus.set(decks[i], false);
-        }
+
         setupStatus();
+        let deck_al=new Deck("/alliance/nav");
+        let deck_bo=new Deck("/border/nav");
+        let deck_ri=new Deck("/rim/nav");
+        let deckos = new Map();
+        deckos.set("/alliance/nav", deck_al);
+        deckos.set("/border/nav", deck_bo);
+        deckos.set("/rim/nav", deck_ri);
+
+
+    function Deck(navPath) {
+       this.navPath=navPath;
+       this.navLockPath="/lock";
+       this.nextDrawDisabledStatus=false;
+    }
 
     function setupStatus() {
         let statusUrl="ws://" + hostPort + "/status";
@@ -186,7 +197,7 @@
     function restoreDrawButtons() {
         for(let i=0, len=decks.length; i < len; i++) {
             let control = document.getElementById(decks[i]+"/drawBtn");
-            control.disabled = nextDrawDisabledStatus.get(decks[i]);
+            control.disabled = deckos.get(decks[i]).nextDrawDisabledStatus;
         }
     }
 
@@ -223,27 +234,27 @@
 	  return processActionResponse(xhttp, deck, "card", "requestResult", successCallback);
 	}
 
-	function drawCard(deck) {
+	function drawCard(decko) {
 	   isDrawing=true;
        disableDrawButtons();
-	  let  newHtml = "<img class='external_image large_card_image' src='" + getCardUrl(deck, cardPicName("back")) +"'"
-				+ " alt='"+(deck.replace(/[^a-zA-Z]/g, " "))+"'"
+	  let  newHtml = "<img class='external_image large_card_image' src='" + getCardUrl(decko.navPath, cardPicName("back")) +"'"
+				+ " alt='"+(decko.navPath.replace(/[^a-zA-Z]/g, " "))+"'"
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
-	  get(deck, '', processActionResponseFun, displayNavCard);
+	  get(decko.navPath, '', processActionResponseFun, displayNavCard);
 	}
 
-	function lock(deck) {
-	  post(deck, navLockPath, processActionResponseFun, justDisplayResponse);
+	function lock(decko) {
+	  post(decko.navPath, decko.navLockPath, processActionResponseFun, justDisplayResponse);
 	}
 
-	function unlock(deck) {
-	  del(deck, navLockPath, processActionResponseFun, justDisplayResponse);
+	function unlock(decko) {
+	  del(decko.navPath, decko.navLockPath, processActionResponseFun, justDisplayResponse);
 	}
 
-	function shuffle(deck) {
+	function shuffle(decko) {
 	  if(confirm("Are you sure?")==true)
-	     post(deck, '', processActionResponseFun, justDisplayResponse);
+	     post(decko.navPath, '', processActionResponseFun, justDisplayResponse);
 	}
 
 
@@ -269,19 +280,19 @@
 
     function updateStatus(msg) {
 	  let  stat = JSON.parse(msg.data);
-	  let  deck = stat.source;
+	  let  deckName = stat.source;
 	  let  result = stat.remainingCardsCount +"/" + (stat.remainingCardsCount+stat.discardsCount);
 	  result += "&nbsp;(" + stat.discardsCount +")";
-	  updateElement(deck +"/status", false, result);
+	  updateElement(deckName +"/status", false, result);
 
 	  let  hasCards = stat.remainingCardsCount > 0;
 	  let  isLocked = stat.isLocked;
-	  nextDrawDisabledStatus.set(deck, !hasCards || isLocked);
+	  deckos.get(deckName).nextDrawDisabledStatus=!hasCards || isLocked;
 	  if(!isDrawing) {
-	      document.getElementById(deck + "/drawBtn").disabled = nextDrawDisabledStatus.get(deck);
+	      document.getElementById(deckName + "/drawBtn").disabled = deckos.get(deckName).nextDrawDisabledStatus;
 	  }
-	  document.getElementById(deck + "/shuffleBtn").disabled = hasCards || isLocked;
-	  document.getElementById(deck + "/unlockBtn").disabled = !isLocked;
+	  document.getElementById(deckName + "/shuffleBtn").disabled = hasCards || isLocked;
+	  document.getElementById(deckName + "/unlockBtn").disabled = !isLocked;
     }
 
 
@@ -306,18 +317,20 @@
     <tr id="drawActions">
         <td>
             <button class="button_with_image" id="/alliance/nav/drawBtn" type="button"
-                    onclick="drawCard('/alliance/nav')">
+                    onclick="drawCard(deck_al)">
                 <img src="/alliance/navCard/back.png" -alt='Request Alliance Nav card'
                      class="external_image button_image"/>
             </button>
         </td>
         <td>
-            <button class="button_with_image" id="/border/nav/drawBtn" type="button" onclick="drawCard('/border/nav')">
+            <button class="button_with_image" id="/border/nav/drawBtn" type="button"
+                    onclick="drawCard(deck_bo)">
                 <img src="/border/navCard/back.png" -alt='Request Border Nav card' class="external_image button_image"/>
             </button>
         </td>
         <td>
-            <button class="button_with_image" id="/rim/nav/drawBtn" type="button" onclick="drawCard('/rim/nav')">
+            <button class="button_with_image" id="/rim/nav/drawBtn" type="button"
+                    onclick="drawCard(deck_ri)">
                 <img src="/rim/navCard/back.png" -alt='Request Rim Nav card' class="external_image button_image"/>
             </button>
         </td>
@@ -347,34 +360,34 @@
     <tr>
         <td>
             <button id="/alliance/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
-                    onclick="lock('/alliance/nav')">Lock Deck
+                    onclick="lock(deck_al)">Lock Deck
             </button>
         </td>
         <td>
             <button id="/border/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
-                    onclick="lock('/border/nav')">Lock Deck
+                    onclick="lock(deck_bo)">Lock Deck
             </button>
         </td>
         <td>
             <button id="/rim/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
-                    onclick="lock('/rim/nav')">Lock Deck
+                    onclick="lock(deck_ri)">Lock Deck
             </button>
         </td>
     </tr>
     <tr>
         <td>
             <button id="/alliance/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="unlock('/alliance/nav')">Unlock Deck
+                    onclick="unlock(deck_al)">Unlock Deck
             </button>
         </td>
         <td>
             <button id="/border/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="unlock('/border/nav')">Unlock Deck
+                    onclick="unlock(deck_bo)">Unlock Deck
             </button>
         </td>
         <td>
             <button id="/rim/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="unlock('/rim/nav')">Unlock Deck
+                    onclick="unlock(deck_ri)">Unlock Deck
             </button>
         </td>
     </tr>
@@ -382,16 +395,17 @@
     <tr>
         <td>
             <button id="/alliance/nav/shuffleBtn" class="button_with_text" type="button"
-                    onclick="shuffle('/alliance/nav')">Shuffle
+                    onclick="shuffle(deck_al)">Shuffle
             </button>
         </td>
         <td>
             <button id="/border/nav/shuffleBtn" class="button_with_text" type="button"
-                    onclick="shuffle('/border/nav')">Shuffle
+                    onclick="shuffle(deck_bo)">Shuffle
             </button>
         </td>
         <td>
-            <button id="/rim/nav/shuffleBtn" class="button_with_text" type="button" onclick="shuffle('/rim/nav')">
+            <button id="/rim/nav/shuffleBtn" class="button_with_text" type="button"
+                    onclick="shuffle(deck_ri)">
                 Shuffle
             </button>
         </td>
