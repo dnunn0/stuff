@@ -81,6 +81,16 @@
 	    return "http://"+hostPort+ this.navPath + "Card" + cardName;
 	}
 
+	function Card(deck) {
+	    this.deck=deck;
+	    this.action="will this get overriden?";
+	}
+	Card.prototype.getUrl = function () {
+        let cardName = this.action.replace(/[^a-zA-Z]/g, "")+".png";
+	    cardName = startWithSlash(cardName);
+	    return "http://"+hostPort+ this.deck.navPath + "Card" + cardName;
+	}
+
     function setupStatus() {
         let statusUrl="ws://" + hostPort + "/status";
         let webSocket = new WebSocket(statusUrl);
@@ -160,11 +170,14 @@
     }
 
 	function updateHistory(deck, card) {
+	    let cardo=new Card(deck);
+	    Object.assign(cardo, card);
 	    let anchorText = deck.navPath.replace("/","");
 	    anchorText = anchorText.replace("/nav", "");
 	    anchorText = capitalizeFirstLetter(anchorText);
-	    anchorText += "-"+card.action;
-	    let cardUrl=deck.getCardUrl(card.action);
+	    anchorText += "-"+cardo.action;
+	  //  let cardUrl=deck.getCardUrl(card.action);
+	    let cardUrl=cardo.getUrl();
 		let item = "<a href='"+cardUrl+"' target='_blank'>"+ anchorText + "</a>";
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
@@ -206,10 +219,14 @@
 	function displayNavCard(xhttp, deck, cardArea, responseStatusArea) {
 	  let target = cardArea;
 	  let card = JSON.parse(xhttp.responseText);
-	  let cardUrl=deck.getCardUrl(card.action);
-      let qm = quoteMarkFor(card.action);
+	  let cardo = new Card(deck);
+	  Object.assign(cardo, card);
+	  //let cardUrl=deck.getCardUrl(cardo.action);
+	  let cardUrl=cardo.getUrl();
+	  let altText=cardo.action;
+      let qm = quoteMarkFor(cardo.action);
       let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
-                + " alt="+qm+card.action+qm
+                + " alt="+qm+altText+qm
                 +"/>";
       let startOfWait = (new Date()).getTime();
 	  preloadImage(cardUrl, async function() {
@@ -235,7 +252,10 @@
 	function drawCard(deck) {
 	  isDrawing=true;
       disableDrawButtons();
-      let cardUrl=deck.getCardUrl("back");
+      let card = new Card(deck);
+      card.action="back";
+      //let cardUrl=deck.getCardUrl("back");
+      let cardUrl=card.getUrl();
       let altText=(deck.navPath.replace(/[^a-zA-Z]/g, " "));
 	  let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
 				+ " alt='"+altText+"'"
