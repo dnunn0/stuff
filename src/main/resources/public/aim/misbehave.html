@@ -120,6 +120,10 @@
 	function DeckDisplay(deck) {
 	   this.deck = deck;
 	   this.responseStatusArea=deck.navPath+"/requestResult";
+	   this.drawBtnId=this.deck.navPath +"/drawBtn";
+	   this.shuffleBtnId=this.deck.navPath +"/shuffleBtn";
+	   this.unlockBtnId=this.deck.navPath +"/unlockBtn";
+	   this.statusId=this.deck.navPath+"/status";
 	}
 	DeckDisplay.prototype.reportError = function(message) {
 	    updateElement(this.responseStatusArea, true, message);
@@ -131,6 +135,28 @@
 	DeckDisplay.prototype.updateResponse = function(message) {
 	    updateElement(this.responseStatusArea, false, message);
     }
+    DeckDisplay.prototype.disableDrawCardButton = function(newState) {
+        let control = document.getElementById(this.drawBtnId);
+        control.disabled = newState;
+    }
+    DeckDisplay.prototype.applyNextDrawDisabledStatus = function() {
+    //TODO how to make private methods (and then can make disable(id) private too)
+        this.disableDrawCardButton(this.deck.nextDrawDisabledStatus);
+    }
+    DeckDisplay.prototype.applyStatus = function() {
+        if(!isDrawing) this.applyNextDrawDisabledStatus();
+        document.getElementById(this.shuffleBtnId).disabled = !this.deck.shouldShuffle;
+        document.getElementById(this.unlockBtnId).disabled = !this.deck.isLocked;
+    }
+    DeckDisplay.prototype.reportStatus = function() {
+	  let result = this.deck.remainingCardsCount +"/" + (this.deck.remainingCardsCount+this.deck.discardsCount);
+	  result += "&nbsp;(" + this.deck.discardsCount +")";
+	  updateElement(this.statusId, false, result);
+	}
+
+
+
+
 
     function setupStatus() {
         let statusUrl="ws://" + hostPort + "/status";
@@ -180,12 +206,12 @@
 	  document.getElementById(target).innerHTML = newHtml;
 	}
 
-	function processActionResponse(xhttp, deck, cardArea, responseStatusArea, successCallback) {
+	function processActionResponse(xhttp, deck, cardArea, successCallback) {
 	    let deckDisplay=dds.get(deck);
 
 		switch (xhttp.status) {
 		  case 200:
-			successCallback(xhttp, deckDisplay, cardArea, responseStatusArea)
+			successCallback(xhttp.responseText, deckDisplay, cardArea)
 		    updateRequestId(xhttp.getResponseHeader("id"));
 			break;
 		  case 404:
@@ -204,14 +230,8 @@
         updateElement(target, false, id);
 	}
 
-	function justDisplayResponse(xhttp, deckDisplay, cardArea, responseStatusArea) {
-	  let result = xhttp.responseText;
-	  deckDisplay.updateResponse(result);
-	}
-
-    function updateResponse(response, deck, responseStatusArea) {
-	  let target = responseStatusArea;
-	  updateElement(deck.navPath +"/"+target, false, response);
+	function justDisplayResponse(responseText, deckDisplay) {
+	  deckDisplay.updateResponse(responseText);
 	}
 
 	function capitalizeFirstLetter(string) {
@@ -245,27 +265,24 @@
         img.onload = callback;
     }
 
-    function forEachDeck(valueKeyMap){
-         decks.forEach(valueKeyMap);
+    function forEachDisplayDeck(valueKeyMap){
+         dds.forEach(valueKeyMap);
     }
     function disableDrawButtons() {
-        forEachDeck(function(value, key, map) {
-            let control = document.getElementById(key+"/drawBtn");
-            control.disabled = true;
+        forEachDisplayDeck(function(value, key, map) {
+            value.disableDrawCardButton(true);
+        });
+    }
+    function applyStatusForAllDecks() {
+        forEachDisplayDeck(function(value, key, map) {
+            value.applyStatus();
         });
     }
 
-    function restoreDrawButtons() {
-        forEachDeck(function(value, key, map) {
-            let control = document.getElementById(key+"/drawBtn");
-            control.disabled = value.nextDrawDisabledStatus;
-        });
-    }
-
-	function displayNavCard(xhttp, deckDisplay, cardArea, responseStatusArea) {
+	function displayNavCard(responseText, deckDisplay, cardArea) {
 	  let deck = deckDisplay.deck;
 	  let target = cardArea;
-	  let card = CardFromJson(deck, xhttp.responseText);
+	  let card = CardFromJson(deck, responseText);
 	  //TODO put all this into CardDisplay
 	  let cardUrl=card.getUrl();
 	  let altText=card.action;
@@ -282,8 +299,8 @@
 
           updateElement("/nav/card", false, newHtml);
           await sleep(700);
-          restoreDrawButtons();
           isDrawing=false;
+          applyStatusForAllDecks();
       });
       deckDisplay.updateResponse("&nbsp;");
 	  updateHistory(deck, card);
@@ -294,7 +311,7 @@
     }
 
     function createOnSendLoadCallback(deck, successCallback) {
-        return function(xhttp){return processActionResponse(xhttp, deck, "card", "requestResult", successCallback);};
+        return function(xhttp){return processActionResponse(xhttp, deck, "card", successCallback);};
     }
 
 
@@ -340,16 +357,9 @@
 
     function updateStatus(msg) {
 	  let deck=FindAndUpdateDeckFrom(msg.data);
-
-	  let result = deck.remainingCardsCount +"/" + (deck.remainingCardsCount+deck.discardsCount);
-	  result += "&nbsp;(" + deck.discardsCount +")";
-	  updateElement(deck.navPath +"/status", false, result);
-
-	  if(!isDrawing) {
-	      document.getElementById(deck.navPath + "/drawBtn").disabled = deck.nextDrawDisabledStatus;
-	  }
-	  document.getElementById(deck.navPath + "/shuffleBtn").disabled = !deck.shouldShuffle;
-	  document.getElementById(deck.navPath + "/unlockBtn").disabled = !deck.isLocked;
+	  let displayDeck=dds.get(deck);
+	  displayDeck.reportStatus();
+      displayDeck.applyStatus();
     }
 
 
