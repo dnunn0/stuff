@@ -69,6 +69,14 @@
         decks.set("/border/nav", deck_bo);
         decks.set("/rim/nav", deck_ri);
 
+        let dd_al = new DeckDisplay(deck_al);
+        let dd_bo = new DeckDisplay(deck_bo);
+        let dd_ri = new DeckDisplay(deck_ri);
+        let dds = new Map();
+        dds.set(deck_al, dd_al);
+        dds.set(deck_bo, dd_bo);
+        dds.set(deck_ri, dd_ri);
+
 
     function Deck(navPath) {
        this.navPath=navPath;
@@ -107,6 +115,18 @@
         let cardName = this.action.replace(/[^a-zA-Z]/g, "")+".png";
 	    cardName = startWithSlash(cardName);
 	    return "http://"+hostPort+ this.deck.navPath + "Card" + cardName;
+	}
+
+	function DeckDisplay(deck) {
+	   this.deck = deck;
+	   this.responseStatusArea=deck.navPath+"/requestResult";
+	}
+	DeckDisplay.prototype.reportError = function(message) {
+	    updateElement(this.responseStatusArea, true, message);
+	}
+	DeckDisplay.prototype.reportUnexpectedError = function(xhttp) {
+		let result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
+	    this.reportError(result);
 	}
 
     function setupStatus() {
@@ -158,24 +178,21 @@
 	}
 
 	function processActionResponse(xhttp, deck, cardArea, responseStatusArea, successCallback) {
+	    let deckDisplay=dds.get(deck);
+
 		switch (xhttp.status) {
 		  case 200:
 			successCallback(xhttp, deck, cardArea, responseStatusArea)
 			break;
 		  case 404:
-			updateElement(deck.navPath +"/"+responseStatusArea, true, "Needs shuffling!");
+			deckDisplay.reportError("Needs shuffling!");
 			break;
 		  case 409:
-			updateElement(deck.navPath +"/"+responseStatusArea, true, "Locked!");
+			deckDisplay.reportError("Locked!");
 			break;
 		  default:
-			displayUnexpectedError(xhttp, deck, responseStatusArea);
+			deckDisplay.reportUnexpectedError(xhttp);
 		}
-	}
-
-	function displayUnexpectedError(xhttp, deck, target) {
-		let result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
-	    updateElement(deck.navPath +"/"+target, true, result);
 	}
 
 	function updateRequestId(id) {
@@ -279,8 +296,10 @@
     }
 
 
-	function drawCard(deck) {
+	function drawCard(deckDisplay) {
 	  isDrawing=true;
+	  let deck=deckDisplay.deck;
+
       disableDrawButtons();
       let card = new Card(deck, "back");
       //TODO move image html into CardDisplay
@@ -290,6 +309,7 @@
 				+ " alt='"+altText+"'"
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
+
 	  get(deck.navPath, createOnSendLoadCallback(deck, displayNavCard), createOnSendErrorCallback(deck));
 	}
 
@@ -352,20 +372,20 @@
     <tr id="drawActions">
         <td>
             <button class="button_with_image" id="/alliance/nav/drawBtn" type="button"
-                    onclick="drawCard(deck_al)">
+                    onclick="drawCard(dd_al)">
                 <img src="/alliance/navCard/back.png" -alt='Request Alliance Nav card'
                      class="external_image button_image"/>
             </button>
         </td>
         <td>
             <button class="button_with_image" id="/border/nav/drawBtn" type="button"
-                    onclick="drawCard(deck_bo)">
+                    onclick="drawCard(dd_bo)">
                 <img src="/border/navCard/back.png" -alt='Request Border Nav card' class="external_image button_image"/>
             </button>
         </td>
         <td>
             <button class="button_with_image" id="/rim/nav/drawBtn" type="button"
-                    onclick="drawCard(deck_ri)">
+                    onclick="drawCard(dd_ri)">
                 <img src="/rim/navCard/back.png" -alt='Request Rim Nav card' class="external_image button_image"/>
             </button>
         </td>
