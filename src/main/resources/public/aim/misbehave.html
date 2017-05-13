@@ -29,6 +29,8 @@
          td {text-align: center;}
          table {width:100%;margin: 2.5rem 0% 0% 0%;}
          .less_on_top {margin-top: -10px;}
+
+
     </style>
     <title>Firefly</title>
     <script>
@@ -199,22 +201,40 @@
 	  return processActionResponse(xhttp, deck, "card", "requestResult", successCallback);
 	}
 
-	function get(deck, path) {
+	function drawCard(deck) {
 	   isDrawing=true;
        disableDrawButtons();
 	  let  newHtml = "<img class='external' src='" + getCardUrl(deck, cardPicName("back")) +"'"
 				+ " alt='"+(deck.replace(/[^a-zA-Z]/g, " "))+"'"
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
-	  sendRequest("GET", deck, path, processActionResponseFun, displayNavCard);
+	  get(deck, '', processActionResponseFun, displayNavCard);
 	}
 
-	function post(deck, path) {
-	  sendRequest("POST", deck, path, processActionResponseFun, justDisplayResponse);
+	function lock(deck) {
+	  post(deck, navLockPath, processActionResponseFun, justDisplayResponse);
 	}
 
-	function del(deck, path) {
-	  sendRequest("DELETE", deck, path, processActionResponseFun, justDisplayResponse);
+	function unlock(deck) {
+	  del(deck, navLockPath, processActionResponseFun, justDisplayResponse);
+	}
+
+	function shuffle(deck) {
+	  if(confirm("Are you sure?")==true)
+	     post(deck, '', processActionResponseFun, justDisplayResponse);
+	}
+
+
+	function get(deck, path, processActionCallback, successCallback) {
+	  sendRequest("GET", deck, path, processActionCallback, successCallback);
+	}
+
+	function post(deck, path, processActionCallback, successCallback) {
+	  sendRequest("POST", deck, path, processActionCallback, successCallback);
+	}
+
+	function del(deck, path, processActionCallback, successCallback) {
+	  sendRequest("DELETE", deck, path, processActionCallback, successCallback);
 	}
 
 	function clearHistory() {
@@ -248,6 +268,8 @@
 
 	;
 
+
+
     </script>
 </head>
 
@@ -262,17 +284,17 @@
     <tr id="drawActions">
         <td>
             <button class="button_with_image" id="/alliance/nav/drawBtn" type="button"
-                    onclick="get('/alliance/nav', '')">
+                    onclick="drawCard('/alliance/nav')">
                 <img src="/alliance/navCard/back.png" -alt='Request Alliance Nav card' class="button_image"/>
             </button>
         </td>
         <td>
-            <button class="button_with_image" id="/border/nav/drawBtn" type="button" onclick="get('/border/nav', '')">
+            <button class="button_with_image" id="/border/nav/drawBtn" type="button" onclick="drawCard('/border/nav')">
                 <img src="/border/navCard/back.png" -alt='Request Border Nav card' class="button_image"/>
             </button>
         </td>
         <td>
-            <button class="button_with_image" id="/rim/nav/drawBtn" type="button" onclick="get('/rim/nav', '')">
+            <button class="button_with_image" id="/rim/nav/drawBtn" type="button" onclick="drawCard('/rim/nav')">
                 <img src="/rim/navCard/back.png" -alt='Request Rim Nav card' class="button_image"/>
             </button>
         </td>
@@ -302,42 +324,42 @@
     <tr>
         <td>
             <button id="/alliance/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
-                    onclick="post('/alliance/nav', navLockPath)">Lock Deck
+                    onclick="lock('/alliance/nav')">Lock Deck
             </button>
             <button id="/alliance/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="del('/alliance/nav', navLockPath)">Unlock Deck
+                    onclick="unlock('/alliance/nav')">Unlock Deck
             </button>
         </td>
         <td>
             <button id="/border/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
-                    onclick="post('/border/nav', navLockPath)">Lock Deck
+                    onclick="lock('/border/nav')">Lock Deck
             </button>
             <button id="/border/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="del('/border/nav', navLockPath)">Unlock Deck
+                    onclick="unlock('/border/nav')">Unlock Deck
             </button>
         </td>
         <td>
             <button id="/rim/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
-                    onclick="post('/rim/nav', navLockPath)">Lock Deck
+                    onclick="lock('/rim/nav')">Lock Deck
             </button>
             <button id="/rim/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="del('/rim/nav', navLockPath)">Unlock Deck
+                    onclick="unlock('/rim/nav')">Unlock Deck
             </button>
         </td>
     </tr>
     <tr>
         <td>
             <button id="/alliance/nav/shuffleBtn" class="button_with_text" type="button"
-                    onclick="post('/alliance/nav', '')">Shuffle
+                    onclick="shuffle('/alliance/nav')">Shuffle
             </button>
         </td>
         <td>
             <button id="/border/nav/shuffleBtn" class="button_with_text" type="button"
-                    onclick="post('/border/nav', '')">Shuffle
+                    onclick="shuffle('/border/nav')">Shuffle
             </button>
         </td>
         <td>
-            <button id="/rim/nav/shuffleBtn" class="button_with_text" type="button" onclick="post('/rim/nav', '')">
+            <button id="/rim/nav/shuffleBtn" class="button_with_text" type="button" onclick="shuffle('/rim/nav')">
                 Shuffle
             </button>
         </td>
