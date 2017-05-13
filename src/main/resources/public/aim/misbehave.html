@@ -128,6 +128,9 @@
 		let result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
 	    this.reportError(result);
 	}
+	DeckDisplay.prototype.updateResponse = function(message) {
+	    updateElement(this.responseStatusArea, false, message);
+    }
 
     function setupStatus() {
         let statusUrl="ws://" + hostPort + "/status";
@@ -182,7 +185,8 @@
 
 		switch (xhttp.status) {
 		  case 200:
-			successCallback(xhttp, deck, cardArea, responseStatusArea)
+			successCallback(xhttp, deckDisplay, cardArea, responseStatusArea)
+		    updateRequestId(xhttp.getResponseHeader("id"));
 			break;
 		  case 404:
 			deckDisplay.reportError("Needs shuffling!");
@@ -200,11 +204,9 @@
         updateElement(target, false, id);
 	}
 
-	function justDisplayResponse(xhttp, deck, cardArea, responseStatusArea) {
+	function justDisplayResponse(xhttp, deckDisplay, cardArea, responseStatusArea) {
 	  let result = xhttp.responseText;
-	  let target = responseStatusArea;
-	  updateResponse(result, deck, responseStatusArea);
-	  updateRequestId(xhttp.getResponseHeader("id"));
+	  deckDisplay.updateResponse(result);
 	}
 
     function updateResponse(response, deck, responseStatusArea) {
@@ -260,7 +262,8 @@
         });
     }
 
-	function displayNavCard(xhttp, deck, cardArea, responseStatusArea) {
+	function displayNavCard(xhttp, deckDisplay, cardArea, responseStatusArea) {
+	  let deck = deckDisplay.deck;
 	  let target = cardArea;
 	  let card = CardFromJson(deck, xhttp.responseText);
 	  //TODO put all this into CardDisplay
@@ -282,8 +285,7 @@
           restoreDrawButtons();
           isDrawing=false;
       });
-      updateResponse("&nbsp;", deck, responseStatusArea);
-	  updateRequestId(xhttp.getResponseHeader("id"));
+      deckDisplay.updateResponse("&nbsp;");
 	  updateHistory(deck, card);
 	}
 
