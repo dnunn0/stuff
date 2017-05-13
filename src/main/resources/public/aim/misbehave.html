@@ -73,15 +73,33 @@
     function Deck(navPath) {
        this.navPath=navPath;
        this.navLockPath=navPath+"/lock";
+       this.remainingCardsCount = -1;
+       this.discardsCount=-1;
+       this.isLocked=false;
+       this.hasCards=false;
        this.nextDrawDisabledStatus=false;
+       this.shouldShuffle=false;
+    }
+    function FindAndUpdateDeckFrom(statusJsonString) {
+        let statusj=JSON.parse(statusJsonString);
+	    let deckName = statusj.source;
+	    let deck=decks.get(deckName);
+
+        deck.remainingCardsCount=statusj.remainingCardsCount;
+        deck.discardsCount=statusj.discardsCount;
+        deck.isLocked=statusj.isLocked;
+        deck.hasCards=deck.remainingCardsCount > 0;
+        deck.nextDrawDisabledStatus=!deck.hasCards || deck.isLocked;
+        deck.shouldShuffle=!(deck.hasCards || deck.isLocked);
+        return deck;
     }
 
 	function Card(deck, action) {
 	    this.deck=deck;
 	    this.action=action;
 	}
-	function CardFromJson(deck, jsonCard) {
-	    let cardj = JSON.parse(jsonCard);
+	function CardFromJson(deck, cardJsonString) {
+	    let cardj = JSON.parse(cardJsonString);
 	    return new Card(deck, cardj.action);
 	}
 
@@ -102,6 +120,7 @@
         };
     }
 
+//TODO figure out how to push deck into callbackprocess since it shouldn't be visible to send
 	function sendRequest(method, deck, path, callbackProcess, successCallback) {
 	  let xhttp = new XMLHttpRequest();
 	  xhttp.addEventListener("load", function(ev){callbackProcess(xhttp, deck, successCallback); });
@@ -292,21 +311,17 @@
     }
 
     function updateStatus(msg) {
-    //TODO put status into Deck Object
-	  let stat = JSON.parse(msg.data);
-	  let deckName = stat.source;
-	  let result = stat.remainingCardsCount +"/" + (stat.remainingCardsCount+stat.discardsCount);
-	  result += "&nbsp;(" + stat.discardsCount +")";
-	  updateElement(deckName +"/status", false, result);
+	  let deck=FindAndUpdateDeckFrom(msg.data);
 
-	  let hasCards = stat.remainingCardsCount > 0;
-	  let isLocked = stat.isLocked;
-	  decks.get(deckName).nextDrawDisabledStatus=!hasCards || isLocked;
+	  let result = deck.remainingCardsCount +"/" + (deck.remainingCardsCount+deck.discardsCount);
+	  result += "&nbsp;(" + deck.discardsCount +")";
+	  updateElement(deck.navPath +"/status", false, result);
+
 	  if(!isDrawing) {
-	      document.getElementById(deckName + "/drawBtn").disabled = decks.get(deckName).nextDrawDisabledStatus;
+	      document.getElementById(deck.navPath + "/drawBtn").disabled = deck.nextDrawDisabledStatus;
 	  }
-	  document.getElementById(deckName + "/shuffleBtn").disabled = hasCards || isLocked;
-	  document.getElementById(deckName + "/unlockBtn").disabled = !isLocked;
+	  document.getElementById(deck.navPath + "/shuffleBtn").disabled = !deck.shouldShuffle;
+	  document.getElementById(deck.navPath + "/unlockBtn").disabled = !deck.isLocked;
     }
 
 
