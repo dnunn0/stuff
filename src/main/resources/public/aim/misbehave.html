@@ -200,13 +200,13 @@
                 +"/>";
       let  startOfWait = (new Date()).getTime();
 	  preloadImage(cardUrl, async function() {
-	      let  teaseTime = 600;
+	      let  teaseTime = 400;
 	      let  endOfWait = (new Date()).getTime();
 	      let  timeToSleep = Math.max(1, teaseTime - (endOfWait - startOfWait));
           await sleep(timeToSleep);
 
           updateElement("/nav/card", false, newHtml);
-          await sleep(1000);
+          await sleep(700);
           restoreDrawButtons();
           isDrawing=false;
       });
