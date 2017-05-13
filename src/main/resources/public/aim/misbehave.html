@@ -59,16 +59,15 @@
         let navLockPath = "/lock";
         let hostPort = location.hostname + ":" + location.port;
         let isDrawing=false;
-        let decks = ["/alliance/nav", "/border/nav", "/rim/nav"];
 
         setupStatus();
         let deck_al=new Deck("/alliance/nav");
         let deck_bo=new Deck("/border/nav");
         let deck_ri=new Deck("/rim/nav");
-        let deckos = new Map();
-        deckos.set("/alliance/nav", deck_al);
-        deckos.set("/border/nav", deck_bo);
-        deckos.set("/rim/nav", deck_ri);
+        let decks = new Map();
+        decks.set("/alliance/nav", deck_al);
+        decks.set("/border/nav", deck_bo);
+        decks.set("/rim/nav", deck_ri);
 
 
     function Deck(navPath) {
@@ -187,18 +186,21 @@
         img.onload = callback;
     }
 
+    function forEachDeck(valueKeyMap){
+         decks.forEach(valueKeyMap);
+    }
     function disableDrawButtons() {
-        for(let i=0, len=decks.length; i < len; i++) {
-            let control = document.getElementById(decks[i]+"/drawBtn");
+        forEachDeck(function(value, key, map) {
+            let control = document.getElementById(key+"/drawBtn");
             control.disabled = true;
-        }
+        });
     }
 
     function restoreDrawButtons() {
-        for(let i=0, len=decks.length; i < len; i++) {
-            let control = document.getElementById(decks[i]+"/drawBtn");
-            control.disabled = deckos.get(decks[i]).nextDrawDisabledStatus;
-        }
+        forEachDeck(function(value, key, map) {
+            let control = document.getElementById(key+"/drawBtn");
+            control.disabled = value.nextDrawDisabledStatus;
+        });
     }
 
 	function displayNavCard(xhttp, deck, cardArea, responseStatusArea) {
@@ -287,9 +289,9 @@
 
 	  let  hasCards = stat.remainingCardsCount > 0;
 	  let  isLocked = stat.isLocked;
-	  deckos.get(deckName).nextDrawDisabledStatus=!hasCards || isLocked;
+	  decks.get(deckName).nextDrawDisabledStatus=!hasCards || isLocked;
 	  if(!isDrawing) {
-	      document.getElementById(deckName + "/drawBtn").disabled = deckos.get(deckName).nextDrawDisabledStatus;
+	      document.getElementById(deckName + "/drawBtn").disabled = decks.get(deckName).nextDrawDisabledStatus;
 	  }
 	  document.getElementById(deckName + "/shuffleBtn").disabled = hasCards || isLocked;
 	  document.getElementById(deckName + "/unlockBtn").disabled = !isLocked;
