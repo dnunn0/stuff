@@ -154,6 +154,32 @@
 	  updateElement(this.statusId, false, result);
 	}
 
+	function CardDisplay(card) {
+	    this.card = card;
+	}
+	CardDisplay.prototype.display = function() {
+		  //TODO put all this into CardDisplay
+	  let cardUrl=this.card.getUrl();
+	  let altText=this.card.action;
+      let qm = quoteMarkFor(altText);
+      let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
+                + " alt="+qm+altText+qm
+                +"/>";
+      let startOfWait = (new Date()).getTime();
+	  preloadImage(cardUrl, async function() {
+	      let teaseTime = 400;
+	      let endOfWait = (new Date()).getTime();
+	      let timeToSleep = Math.max(1, teaseTime - (endOfWait - startOfWait));
+          await sleep(timeToSleep);
+
+          updateElement("/nav/card", false, newHtml);
+          await sleep(700);
+          isDrawing=false;
+          applyStatusForAllDecks();
+      });
+    }
+
+
 
 
 
@@ -206,12 +232,11 @@
 	  document.getElementById(target).innerHTML = newHtml;
 	}
 
-	function processActionResponse(xhttp, deck, cardArea, successCallback) {
-	    let deckDisplay=dds.get(deck);
+	function processActionResponse(xhttp, deckDisplay, successCallback) {
 
 		switch (xhttp.status) {
 		  case 200:
-			successCallback(xhttp.responseText, deckDisplay, cardArea)
+			successCallback(xhttp.responseText, deckDisplay)
 		    updateRequestId(xhttp.getResponseHeader("id"));
 			break;
 		  case 404:
@@ -258,8 +283,7 @@
        return new Promise(resolve => setTimeout(resolve, timeToSleepMs));
    }
 
-	function preloadImage(url, callback)
-    {
+	function preloadImage(url, callback) {
         let img=new Image();
         img.src=url;
         img.onload = callback;
@@ -279,39 +303,21 @@
         });
     }
 
-	function displayNavCard(responseText, deckDisplay, cardArea) {
+	function displayNavCard(responseText, deckDisplay) {
 	  let deck = deckDisplay.deck;
-	  let target = cardArea;
 	  let card = CardFromJson(deck, responseText);
-	  //TODO put all this into CardDisplay
-	  let cardUrl=card.getUrl();
-	  let altText=card.action;
-      let qm = quoteMarkFor(card.action);
-      let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
-                + " alt="+qm+altText+qm
-                +"/>";
-      let startOfWait = (new Date()).getTime();
-	  preloadImage(cardUrl, async function() {
-	      let teaseTime = 400;
-	      let endOfWait = (new Date()).getTime();
-	      let timeToSleep = Math.max(1, teaseTime - (endOfWait - startOfWait));
-          await sleep(timeToSleep);
-
-          updateElement("/nav/card", false, newHtml);
-          await sleep(700);
-          isDrawing=false;
-          applyStatusForAllDecks();
-      });
+	  let cardDisplay = new CardDisplay(card);
+	  cardDisplay.display();
       deckDisplay.updateResponse("&nbsp;");
 	  updateHistory(deck, card);
 	}
 
-    function createOnSendErrorCallback(deck) {
-        return function(xhttp){updateElement(deck.navPath +"/"+"requestResult", true, "Request probably didn't get to server.");};
+    function createOnSendErrorCallback(deckDisplay) {
+        return function(xhttp){deckDisplay.reportUnexpectedError("Send failed.");};
     }
 
     function createOnSendLoadCallback(deck, successCallback) {
-        return function(xhttp){return processActionResponse(xhttp, deck, "card", successCallback);};
+        return function(xhttp){return processActionResponse(xhttp, deck, successCallback);};
     }
 
 
@@ -329,21 +335,21 @@
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
 
-	  get(deck.navPath, createOnSendLoadCallback(deck, displayNavCard), createOnSendErrorCallback(deck));
+	  get(deck.navPath, createOnSendLoadCallback(deckDisplay, displayNavCard), createOnSendErrorCallback(deck));
 	}
 
 //TODO move lock, etc. into DeckDisplay? (Deck?--lots is UI related...)
-	function lock(deck) {
-	  post(deck.navLockPath, createOnSendLoadCallback(deck, justDisplayResponse), createOnSendErrorCallback(deck));
+	function lock(deckDisplay) {
+	  post(deckDisplay.deck.navLockPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse), createOnSendErrorCallback(deckDisplay));
 	}
 
-	function unlock(deck) {
-	  del(deck.navLockPath, createOnSendLoadCallback(deck, justDisplayResponse), createOnSendErrorCallback(deck));
+	function unlock(deckDisplay) {
+	  del(deckDisplay.deck.navLockPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse), createOnSendErrorCallback(deckDisplay));
 	}
 
-	function shuffle(deck) {
+	function shuffle(deckDisplay) {
 	  if(confirm("Are you sure?")==true)
-	     post(deck.navPath, createOnSendLoadCallback(deck, justDisplayResponse), createOnSendErrorCallback(deck));
+	     post(deckDisplay.deck.navPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse), createOnSendErrorCallback(deckDisplay));
 	}
 
 
@@ -427,34 +433,34 @@
     <tr>
         <td>
             <button id="/alliance/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
-                    onclick="lock(deck_al)">Lock Deck
+                    onclick="lock(dd_al)">Lock Deck
             </button>
         </td>
         <td>
             <button id="/border/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
-                    onclick="lock(deck_bo)">Lock Deck
+                    onclick="lock(dd_bo)">Lock Deck
             </button>
         </td>
         <td>
             <button id="/rim/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
-                    onclick="lock(deck_ri)">Lock Deck
+                    onclick="lock(dd_ri)">Lock Deck
             </button>
         </td>
     </tr>
     <tr>
         <td>
             <button id="/alliance/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="unlock(deck_al)">Unlock Deck
+                    onclick="unlock(dd_al)">Unlock Deck
             </button>
         </td>
         <td>
             <button id="/border/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="unlock(deck_bo)">Unlock Deck
+                    onclick="unlock(dd_bo)">Unlock Deck
             </button>
         </td>
         <td>
             <button id="/rim/nav/unlockBtn" class="button_with_text" type="button"
-                    onclick="unlock(deck_ri)">Unlock Deck
+                    onclick="unlock(dd_ri)">Unlock Deck
             </button>
         </td>
     </tr>
@@ -462,17 +468,17 @@
     <tr>
         <td>
             <button id="/alliance/nav/shuffleBtn" class="button_with_text" type="button"
-                    onclick="shuffle(deck_al)">Shuffle
+                    onclick="shuffle(dd_al)">Shuffle
             </button>
         </td>
         <td>
             <button id="/border/nav/shuffleBtn" class="button_with_text" type="button"
-                    onclick="shuffle(deck_bo)">Shuffle
+                    onclick="shuffle(dd_bo)">Shuffle
             </button>
         </td>
         <td>
             <button id="/rim/nav/shuffleBtn" class="button_with_text" type="button"
-                    onclick="shuffle(deck_ri)">
+                    onclick="shuffle(dd_ri)">
                 Shuffle
             </button>
         </td>
