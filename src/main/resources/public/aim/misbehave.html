@@ -95,7 +95,7 @@
 	function sendRequest(method, deck, path, callbackProcess, successCallback) {
 	  let xhttp = new XMLHttpRequest();
 	  xhttp.addEventListener("load", function(ev){callbackProcess(xhttp, deck, successCallback); });
-	  xhttp.addEventListener("error", function(ev){updateElement(deck +"/"+"requestResult", true, "Request probably didn't get to server.");});
+	  xhttp.addEventListener("error", function(ev){updateElement(deck.navPath +"/"+"requestResult", true, "Request probably didn't get to server.");});
 
 	  xhttp.open(method, getUrl(path), true);
 //	  xhttp.setRequestHeader("Authorize", "dm9yZGVsOnZvcmRlbA==");
@@ -123,10 +123,10 @@
 			successCallback(xhttp, deck, cardArea, responseStatusArea)
 			break;
 		  case 404:
-			updateElement(deck +"/"+responseStatusArea, true, "Needs shuffling!");
+			updateElement(deck.navPath +"/"+responseStatusArea, true, "Needs shuffling!");
 			break;
 		  case 409:
-			updateElement(deck +"/"+responseStatusArea, true, "Locked!");
+			updateElement(deck.navPath +"/"+responseStatusArea, true, "Locked!");
 			break;
 		  default:
 			displayUnexpectedError(xhttp, deck, responseStatusArea);
@@ -135,25 +135,24 @@
 
 	function displayUnexpectedError(xhttp, deck, target) {
 		let result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
-	    updateElement(deck +"/"+target, true, result);
+	    updateElement(deck.navPath +"/"+target, true, result);
 	}
 
-	function updateRequestId(id, deck, shouldOverride) {
+	function updateRequestId(id) {
 		let target = "requestId";
-		if (shouldOverride || "" == document.getElementById(target).innerHTML)
-			updateElement(target, false, id);
+        updateElement(target, false, id);
 	}
 
 	function justDisplayResponse(xhttp, deck, cardArea, responseStatusArea) {
 	  let result = xhttp.responseText;
 	  let target = responseStatusArea;
 	  updateResponse(result, deck, responseStatusArea);
-	  updateRequestId(xhttp.getResponseHeader("id"), deck, true);
+	  updateRequestId(xhttp.getResponseHeader("id"));
 	}
 
     function updateResponse(response, deck, responseStatusArea) {
 	  let target = responseStatusArea;
-	  updateElement(deck +"/"+target, false, response);
+	  updateElement(deck.navPath +"/"+target, false, response);
 	}
 
 	function capitalizeFirstLetter(string) {
@@ -161,12 +160,11 @@
     }
 
 	function updateHistory(deck, card) {
-	    let anchorText = deck.replace("/","");
+	    let anchorText = deck.navPath.replace("/","");
 	    anchorText = anchorText.replace("/nav", "");
 	    anchorText = capitalizeFirstLetter(anchorText);
 	    anchorText += "-"+card.action;
-	    let decko=decks.get(deck);
-	    let cardUrl=decko.getCardUrl(card.action);
+	    let cardUrl=deck.getCardUrl(card.action);
 		let item = "<a href='"+cardUrl+"' target='_blank'>"+ anchorText + "</a>";
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
@@ -208,8 +206,7 @@
 	function displayNavCard(xhttp, deck, cardArea, responseStatusArea) {
 	  let target = cardArea;
 	  let card = JSON.parse(xhttp.responseText);
-	  let decko=decks.get(deck);
-	  let cardUrl=decko.getCardUrl(card.action);
+	  let cardUrl=deck.getCardUrl(card.action);
       let qm = quoteMarkFor(card.action);
       let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
                 + " alt="+qm+card.action+qm
@@ -227,41 +224,37 @@
           isDrawing=false;
       });
       updateResponse("&nbsp;", deck, responseStatusArea);
-	  updateRequestId(xhttp.getResponseHeader("id"), deck, true);
+	  updateRequestId(xhttp.getResponseHeader("id"));
 	  updateHistory(deck, card);
-	}
-
-	function cardPicName(cardName) {
-		return cardName.replace(/[^a-zA-Z]/g, "")+".png";
 	}
 
 	function processActionResponseFun(xhttp, deck, successCallback) {
 	  return processActionResponse(xhttp, deck, "card", "requestResult", successCallback);
 	}
 
-	function drawCard(decko) {
+	function drawCard(deck) {
 	  isDrawing=true;
       disableDrawButtons();
-      let cardUrl=decko.getCardUrl("back");
-      let altText=(decko.navPath.replace(/[^a-zA-Z]/g, " "));
+      let cardUrl=deck.getCardUrl("back");
+      let altText=(deck.navPath.replace(/[^a-zA-Z]/g, " "));
 	  let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
 				+ " alt='"+altText+"'"
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
-	  get(decko.navPath, decko.navPath, processActionResponseFun, displayNavCard);
+	  get(deck, deck.navPath, processActionResponseFun, displayNavCard);
 	}
 
-	function lock(decko) {
-	  post(decko.navPath, decko.navLockPath, processActionResponseFun, justDisplayResponse);
+	function lock(deck) {
+	  post(deck, deck.navLockPath, processActionResponseFun, justDisplayResponse);
 	}
 
-	function unlock(decko) {
-	  del(decko.navPath, decko.navLockPath, processActionResponseFun, justDisplayResponse);
+	function unlock(deck) {
+	  del(deck, deck.navLockPath, processActionResponseFun, justDisplayResponse);
 	}
 
-	function shuffle(decko) {
+	function shuffle(deck) {
 	  if(confirm("Are you sure?")==true)
-	     post(decko.navPath, decko.navPath, processActionResponseFun, justDisplayResponse);
+	     post(deck, deck.navPath, processActionResponseFun, justDisplayResponse);
 	}
 
 
