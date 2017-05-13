@@ -6,7 +6,7 @@
          h1 {font-size: 3.5rem;}
          p {font-size: 3rem;}
          a {font-size: 3rem;}
-         ol {font-size: 3rem;margin-bottom: 0.5rem;margin-left:0.5rem}
+         ol {font-size: 3rem;margin-bottom: 0.5rem;margin-left:1.5rem;}
          td {text-align: center;}
         img {
             padding: 0;
@@ -308,7 +308,8 @@
 	function displayNavCard(deckDisplay, responseText) {
 	  let card = CardFromJson(deckDisplay.deck, responseText);
 	  let cardDisplay = new CardDisplay(card);
-	  cardDisplay.display(400, 700, false);
+	  cardDisplay.display(40, 70, false);
+	  console.log("fix timings!");
       deckDisplay.updateResponse("&nbsp;");
 	  updateHistory(card);
 	}
@@ -327,7 +328,6 @@
 
 //TODO put drawCard et. al on DeckDisplay when i figure out private functions (which most of these shoudl be)
 //     or is this now modules?
-//TODO fix the ol chopping off numbers > 9
 	function drawCard(deckDisplay) {
 	  let deck=deckDisplay.deck;
 	  isDrawing=true;
