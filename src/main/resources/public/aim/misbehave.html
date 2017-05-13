@@ -56,7 +56,7 @@
     </style>
     <title>Firefly</title>
     <script>
-        let navLockPath = "/lock";
+
         let hostPort = location.hostname + ":" + location.port;
         let isDrawing=false;
 
@@ -75,6 +75,11 @@
        this.navLockPath="/lock";
        this.nextDrawDisabledStatus=false;
     }
+    Deck.prototype.getCardUrl = function (cardAction) {
+        let cardName = cardAction.replace(/[^a-zA-Z]/g, "")+".png";
+	    cardName = startWithSlash(cardName);
+	    return "http://"+hostPort+ this.navPath + "Card" + cardName;
+	}
 
     function setupStatus() {
         let statusUrl="ws://" + hostPort + "/status";
@@ -105,11 +110,6 @@
 	function getUrl(deck, path) {
 	    path = startWithSlash(path);
 	    return "http://"+hostPort+ deck + path;
-	}
-
-	function getCardUrl(deck, cardName) {
-	    cardName = startWithSlash(cardName);
-	    return "http://"+hostPort+ deck + "Card" + cardName;
 	}
 
 	function updateElement(target, addEmphasis, newHtml) {
@@ -165,7 +165,9 @@
 	    anchorText = anchorText.replace("/nav", "");
 	    anchorText = capitalizeFirstLetter(anchorText);
 	    anchorText += "-"+card.action;
-		let  item = "<a href='"+getCardUrl(deck, cardPicName(card.action))+"' target='_blank'>"+ anchorText + "</a>";
+	    let  decko=decks.get(deck);
+	    let  cardUrl=decko.getCardUrl(card.action);
+		let  item = "<a href='"+cardUrl+"' target='_blank'>"+ anchorText + "</a>";
 		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
 	}
 
@@ -206,7 +208,8 @@
 	function displayNavCard(xhttp, deck, cardArea, responseStatusArea) {
 	  let  target = cardArea;
 	  let  card = JSON.parse(xhttp.responseText);
-	  let  cardUrl = getCardUrl(deck, cardPicName(card.action));
+	  let  decko=decks.get(deck);
+	  let  cardUrl=decko.getCardUrl(card.action);
       let  qm = quoteMarkFor(card.action);
       let  newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
                 + " alt="+qm+card.action+qm
@@ -239,7 +242,9 @@
 	function drawCard(decko) {
 	   isDrawing=true;
        disableDrawButtons();
-	  let  newHtml = "<img class='external_image large_card_image' src='" + getCardUrl(decko.navPath, cardPicName("back")) +"'"
+       	  let  cardUrl=decko.getCardUrl("back");
+
+	  let  newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
 				+ " alt='"+(decko.navPath.replace(/[^a-zA-Z]/g, " "))+"'"
 				+"/>";
 	  updateElement("/nav/card", false, newHtml);
