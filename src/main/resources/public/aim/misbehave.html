@@ -215,11 +215,11 @@
 
 	function displayNavCard(xhttp, deck, cardArea, responseStatusArea) {
 	  let target = cardArea;
-	  let cardo = CardFromJson(deck, xhttp.responseText);
-	  //TODO put all this into card
-	  let cardUrl=cardo.getUrl();
-	  let altText=cardo.action;
-      let qm = quoteMarkFor(cardo.action);
+	  let card = CardFromJson(deck, xhttp.responseText);
+	  //TODO put all this into CardDisplay
+	  let cardUrl=card.getUrl();
+	  let altText=card.action;
+      let qm = quoteMarkFor(card.action);
       let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
                 + " alt="+qm+altText+qm
                 +"/>";
@@ -237,7 +237,7 @@
       });
       updateResponse("&nbsp;", deck, responseStatusArea);
 	  updateRequestId(xhttp.getResponseHeader("id"));
-	  updateHistory(deck, cardo);
+	  updateHistory(deck, card);
 	}
 
 	function processActionResponseFun(xhttp, deck, successCallback) {
