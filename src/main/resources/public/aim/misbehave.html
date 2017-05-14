@@ -87,7 +87,7 @@
        this.nextDrawDisabledStatus=false;
        this.shouldShuffle=false;
     }
-    function FindAndUpdateDeckFrom(statusJsonString) {
+    Deck.FindAndUpdateFrom = function(statusJsonString) {
         let statusj=JSON.parse(statusJsonString);
 	    let deckName = statusj.source;
 	    let deck=decks.get(deckName);
@@ -105,7 +105,7 @@
 	    this.deck=deck;
 	    this.action=action;
 	}
-	function CardFromJson(deck, cardJsonString) {
+	Card.FromJson = function(deck, cardJsonString) {
 	    let cardj = JSON.parse(cardJsonString);
 	    return new Card(deck, cardj.action);
 	}
@@ -124,6 +124,12 @@
 	   this.unlockBtnId=this.deck.navPath +"/unlockBtn";
 	   this.statusId=this.deck.navPath+"/status";
 	}
+	DeckDisplay.updateStatus = function(msg) {
+	  let deck=Deck.FindAndUpdateFrom(msg.data);
+	  let displayDeck=dds.get(deck);
+	  displayDeck.reportStatus();
+      displayDeck.applyStatus();
+    }
 	DeckDisplay.prototype.reportError = function(message) {
 	    updateElement(this.responseStatusArea, true, message);
 	}
@@ -218,22 +224,40 @@
 	  document.getElementById(targetId).innerHTML = newHtml;
 	}
 
+	function createCookie(name, value, hours) {
+        let expires = "";
+        if (hours) {
+            let date = new Date();
+            date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    }
+
+    function getCookie(c_name) {
+        if (document.cookie.length > 0) {
+            let c_start = document.cookie.indexOf(c_name + "=");
+            if (c_start != -1) {
+                c_start = c_start + c_name.length + 1;
+                let c_end = document.cookie.indexOf(";", c_start);
+                if (c_end == -1) {
+                    c_end = document.cookie.length;
+                }
+                return unescape(document.cookie.substring(c_start, c_end));
+            }
+        }
+        return "";
+    }
+
     function setupStatus() {
         let statusUrl="ws://" + hostPort + "/status";
         let webSocket = new WebSocket(statusUrl);
-        webSocket.onmessage = function (msg) { updateStatus(msg); };
+        webSocket.onmessage = function (msg) { DeckDisplay.updateStatus(msg); };
         webSocket.onclose = function () { console.log("WebSocket connection closed ") }
         webSocket.onopen = function(e) {
             console.log("WebSocket connection open. Asking for status update. ");
             webSocket.send('update status');
         };
-    }
-
-    function updateStatus(msg) {
-	  let deck=FindAndUpdateDeckFrom(msg.data);
-	  let displayDeck=dds.get(deck);
-	  displayDeck.reportStatus();
-      displayDeck.applyStatus();
     }
 
 	function sendRequest(method, path, onLoadCallback, onErrorCallback) {
@@ -281,6 +305,11 @@
         updateElement(target, false, id);
 	}
 
+    function setHistory(history) {
+        updateElement("history", false, history);
+		createCookie("moveHistory", history, 12);
+    }
+
 	function updateHistory(card) {
 	    let anchorText = card.deck.navPath.replace("/","");
 	    anchorText = anchorText.replace("/nav", "");
@@ -288,28 +317,28 @@
 	    anchorText += "-"+card.action;
 	    let cardUrl=card.getUrl();
 		let item = "<a href='"+cardUrl+"' target='_blank'>"+ anchorText + "</a>";
-		updateElement("history", false, "<li>"+item+"</li>" + document.getElementById("history").innerHTML);
+		let history = "<li>"+item+"</li>" + document.getElementById("history").innerHTML;
+		setHistory(history);
 	}
 
-    function forEachDisplayDeck(valueKeyMap){
+    function forEachDeckDisplay(valueKeyMap){
          dds.forEach(valueKeyMap);
     }
     function disableDrawButtons() {
-        forEachDisplayDeck(function(value, key, map) {
+        forEachDeckDisplay(function(value, key, map) {
             value.disableDrawCardButton(true);
         });
     }
     function applyStatusForAllDecks() {
-        forEachDisplayDeck(function(value, key, map) {
+        forEachDeckDisplay(function(value, key, map) {
             value.applyStatus();
         });
     }
 
 	function displayNavCard(deckDisplay, responseText) {
-	  let card = CardFromJson(deckDisplay.deck, responseText);
+	  let card = Card.FromJson(deckDisplay.deck, responseText);
 	  let cardDisplay = new CardDisplay(card);
-	  cardDisplay.display(40, 70, false);
-	  console.log("fix timings!");
+	  cardDisplay.display(400, 700, false);
       deckDisplay.updateResponse("&nbsp;");
 	  updateHistory(card);
 	}
@@ -352,10 +381,12 @@
 	}
 
 	function clearHistory() {
-		updateElement("history", false, "");
+		setHistory("");
 	}
 
 	window.onload = function(e) {
+	    let history=getCookie("moveHistory");
+	    updateElement("history", false, history);
 	};
 
     </script>
