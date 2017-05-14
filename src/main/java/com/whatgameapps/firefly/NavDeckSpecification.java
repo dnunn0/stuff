@@ -1,32 +1,38 @@
 package com.whatgameapps.firefly;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.SortedMultiset;
+import com.google.common.collect.TreeMultiset;
 import org.apache.http.annotation.Immutable;
 
-import java.util.Map;
+import java.util.Set;
 
 @Immutable
 public class NavDeckSpecification {
     public final int count;
-    public final ImmutableMultimap<String, Integer> deckSpec;
+    private final SortedMultiset<String> foo = TreeMultiset.create();
+
+    public NavDeckSpecification(final NavDeckSpecification basis, final int cumulativeCardCount, final ImmutableMultimap<String, Integer> addedCards) {
+        this(cumulativeCardCount, addedCards);
+        this.addCards(basis.entrySet());
+    }
 
     public NavDeckSpecification(int count, ImmutableMultimap<String, Integer> deckSpec) {
         this.count = count;
-        this.deckSpec = deckSpec;
+        addCards(deckSpec);
     }
 
-    public NavDeckSpecification(final NavDeckSpecification basis, final int cumulativeCardCount, final ImmutableMultimap<String, Integer> addedCards) {
-        Multimap<String, Integer> cards = ArrayListMultimap.create(basis.deckSpec);
-        cards.putAll(addedCards);
-        this.deckSpec = ImmutableMultimap.copyOf(cards);
-        this.count = cumulativeCardCount;
+    private void addCards(Set<Multiset.Entry<String>> deckSpec) {
+        deckSpec.forEach(e -> this.foo.add(e.getElement(), e.getCount()));
     }
 
-    public ImmutableCollection<Map.Entry<String, Integer>> entrySet() {
-        return this.deckSpec.entries();
+    public Set<Multiset.Entry<String>> entrySet() {
+        return this.foo.entrySet();
+    }
+
+    private void addCards(ImmutableMultimap<String, Integer> deckSpec) {
+        deckSpec.entries().stream().forEach(e -> this.foo.add(e.getKey(), e.getValue()));
     }
 
     public String toString() {

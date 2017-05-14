@@ -1,5 +1,6 @@
 package com.whatgameapps.firefly;
 
+import com.google.common.collect.ImmutableMultimap;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
 import com.whatgameapps.firefly.rest.NavCard;
 import org.junit.After;
@@ -28,8 +29,8 @@ public class NavDeckTest {
 
     private void createAndCheckDeck(final AllianceNavDeckSpecification expectedDeck) {
         final NavDeck sut = new NavDeck(expectedDeck);
-        expectedDeck.entrySet().forEach((spec) ->
-                assertEquals(spec.getKey(), (int) spec.getValue(), sut.countCards(spec.getKey())));
+        expectedDeck.entrySet().stream().forEach((spec) ->
+                assertEquals(spec.getElement(), spec.getCount(), sut.countCards(spec.getElement())));
     }
 
     @Test
@@ -37,6 +38,15 @@ public class NavDeckTest {
         AllianceNavDeckSpecification spec = AllianceNavDeckSpecification.KALIDASA;
         final NavDeck sut = new NavDeck(spec);
         assertEquals(spec.count, sut.size());
+    }
+
+    @Test
+    public void combinesSpecsCorrectly() {
+        AllianceNavDeckSpecification spec2 = new AllianceNavDeckSpecification(AllianceNavDeckSpecification.RESHUFFLE, 40, ImmutableMultimap.<String, Integer>builder()
+                .put("Alliance Cruiser - Reshuffle", 3)
+                .build());
+        final NavDeck sut = new NavDeck(spec2);
+        assertEquals(spec2.count, sut.size());
     }
 
     @Test

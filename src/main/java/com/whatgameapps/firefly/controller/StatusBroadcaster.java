@@ -22,7 +22,7 @@ public class StatusBroadcaster {
         this.sources.add(source);
     }
 
-    void informListeners(NavDeckStatus status) {
+    void informSubscribers(NavDeckStatus status) {
         String statusJson = toJson(status);
         this.broadcast(statusJson);
     }

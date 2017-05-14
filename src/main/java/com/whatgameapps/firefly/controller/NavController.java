@@ -9,6 +9,10 @@ import spark.Request;
 import spark.Response;
 import spark.Service;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Map;
+
 public class NavController {
     public static final String ID_HEADER = "id";
     public static final int NOT_FOUND_ERROR = HttpStatus.NOT_FOUND_404;
@@ -16,6 +20,8 @@ public class NavController {
     public static final String NAV = "/nav";
     public static final String LOCK = "/lock";
     public static final String STATUS = "/status";
+    public static final String SPEC = "/spec";
+
     public static String ALLIANCE_SPACE = "/alliance";
     public static String RIM_SPACE = "/rim";
     public static String BORDER_SPACE = "/border";
@@ -34,6 +40,8 @@ public class NavController {
         spark.get(getNavPath(), this::drawCard, JsonRenderer.getInstance());
         spark.post(getNavPath(), this::reset);
         spark.options(getNavPath(), this::allowCors);
+        spark.get(getSpecPath(), this::describe, JsonRenderer.getInstance());
+        spark.options(getSpecPath(), this::allowCors);
     }
 
     public NavController(String spaceSectorPath, NavDeckSpecification spec, StatusBroadcaster listeners) {
@@ -52,6 +60,10 @@ public class NavController {
         return getNavPath() + STATUS;
     }
 
+    public String getSpecPath() {
+        return getNavPath() + SPEC;
+    }
+
     protected String allowCors(Request request, Response response) {
         //apparently needed for cross site request for chrome. AfterAll takes care of headers
         //http://stackoverflow.com/questions/33297190/response-for-preflight-has-invalid-http-status-code-404-angular-js
@@ -65,7 +77,7 @@ public class NavController {
     }
 
     void informListeners() {
-        this.listeners.informListeners(this.status());
+        this.listeners.informSubscribers(this.status());
     }
 
     public NavDeckStatus status() {
@@ -101,6 +113,14 @@ public class NavController {
         informListeners();
         return reply;
     }
+
+    ArrayList<Map.Entry<String, Integer>> describe(Request req, Response res) {
+        //TODO consider dropping guava altogether. this is ridculous.
+        final ArrayList<Map.Entry<String, Integer>> reply = new ArrayList();
+        this.deck.spec.entrySet().forEach(e -> reply.add(new AbstractMap.SimpleEntry<String, Integer>(e.getElement(), e.getCount())));
+        return reply;
+    }
+
 
     NavDeckStatus status(Request req, Response res) {
         return status();

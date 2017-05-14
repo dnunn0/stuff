@@ -14,6 +14,8 @@ import spark.Request;
 import spark.SparkRequestStub;
 import spark.SparkResponseWrapper;
 
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
@@ -23,16 +25,13 @@ import static org.junit.Assert.assertTrue;
 
 public class NavControllerTest {
     private final static AllianceNavDeckSpecification noReshuffleCardSpec = new AllianceNavDeckSpecification(3, ImmutableMultimap.<String, Integer>builder()
+            .put("The Big Black", 3)
             .build());
     private final TestUtils testUtils = new TestUtils();
     private final Request req = new SparkRequestStub();
     private final spark.Response res = new SparkResponseWrapper();
     private final StatusBroadcaster middleman = new StatusBroadcaster();
     private NavController sut = createNavController(AllianceNavDeckSpecification.BASIC);
-
-    private NavController createNavController(NavDeckSpecification spec) {
-        return new NavController(NavController.ALLIANCE_SPACE, spec, middleman);
-    }
 
     @After
     public void restoreStdout() {
@@ -119,6 +118,10 @@ public class NavControllerTest {
         checkStatus(sut.deck.spec.count - 1, 1, false, sut.status(req, res));
     }
 
+    private NavController createNavController(NavDeckSpecification spec) {
+        return new NavController(NavController.ALLIANCE_SPACE, spec, middleman);
+    }
+
     @Test
     public void statusAfterDrawingAllCardsShouldBeRight() {
         sut = createNavController(noReshuffleCardSpec);
@@ -140,6 +143,14 @@ public class NavControllerTest {
         sut.lock(req, res);
         sut.unlock(req, res);
         checkStatus(sut.deck.spec.count, 0, false, sut.status(req, res));
+    }
+
+    @Test
+    public void describeReturnsMultiset() {
+        sut = createNavController(noReshuffleCardSpec);
+        ArrayList<Map.Entry<String, Integer>> cardCounts = sut.describe(req, res);
+        assertEquals(1, cardCounts.size());
+        cardCounts.forEach(count -> assertEquals(3, (long) count.getValue()));
     }
 
 }

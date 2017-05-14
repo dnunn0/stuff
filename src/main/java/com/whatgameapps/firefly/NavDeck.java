@@ -23,7 +23,7 @@ public class NavDeck {
     private void createDeck(final NavDeckSpecification deckSpec) {
 
         List<NavCard> cardList = deckSpec.entrySet().stream()
-                .map(cardsSpec -> createCards(cardsSpec.getKey(), cardsSpec.getValue()))
+                .map(cardsSpec -> createCards(cardsSpec.getElement(), cardsSpec.getCount()))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
