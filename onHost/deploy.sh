@@ -1,4 +1,4 @@
-cp  //tsclient/C/WithAws/firefly.zip /tmp
+cmd //c "robocopy /J \\\\tsclient\C\WithAws %TEMP%"
 cmd //c "taskkill /f /im java*"
 sleep 1s
 rm -r /c/firefly
