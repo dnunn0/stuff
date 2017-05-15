@@ -42,7 +42,7 @@ public class NavDeckTest {
 
     @Test
     public void combinesSpecsCorrectly() {
-        AllianceNavDeckSpecification spec2 = new AllianceNavDeckSpecification(AllianceNavDeckSpecification.RESHUFFLE, 40, ImmutableMultimap.<String, Integer>builder()
+        AllianceNavDeckSpecification spec2 = new AllianceNavDeckSpecification(AllianceNavDeckSpecification.RESHUFFLE, 4, ImmutableMultimap.<String, Integer>builder()
                 .put("Alliance Cruiser - Reshuffle", 3)
                 .build());
         final NavDeck sut = new NavDeck(spec2);

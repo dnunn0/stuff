@@ -13,8 +13,12 @@ public class NavCard {
 
     public final String action;
 
-    public NavCard(final String action) {
+    public NavCard(String action) {
         this.action = action;
+    }
+
+    public static NavCard From(String storage) {
+        return new NavCard(storage);
     }
 
     @Override
@@ -39,5 +43,9 @@ public class NavCard {
 
     public boolean isReshuffle() {
         return this.action.toUpperCase().contains(NavCard.RESHUFFLE.toUpperCase());
+    }
+
+    public String externalized() {
+        return this.action;
     }
 }
