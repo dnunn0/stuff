@@ -14,8 +14,13 @@
             border:0;
         }
          /* table {width:100%;margin: 2.5rem 0% 0% 0%;border: 1px solid black;} */
-          table {width:1200px;margin: 2.5rem 0% 0% 0%;}
-
+          table {font-size: 3rem;width:1200px;margin: 2.5rem 0% 0% 0%;}
+         button {
+              border: none;
+         }
+         button:disabled {
+              border: none;
+         }
          .less_on_top {margin-top: -10px;}
          .external_image {
            -moz-force-broken-image-icon: 1;
@@ -33,21 +38,92 @@
         .button_with_image {
             width:335px;
             padding: 0 0 0 0;
-            border: none;
             background: none;
             margin: 0 100px 0 0;
+            cursor: pointer;
+            transition: all 0.3s ease-out;
          }
          button.button_with_image:disabled {
               opacity: 0.3;
         }
-         .button_with_text_no_top_margin {
-            font-size: 2.5rem;
+        .top_margin {
+            margin: 2.5rem 0rem 0rem 0rem;
          }
          .button_with_text {
-            margin: 2.5rem 0rem 0rem 0rem;
             font-size: 2.5rem;
+              border: 2px solid #06D85F;
+              border-radius: 20px/50px;
+              cursor: pointer;
+              transition: all 0.3s ease-out;
          }
 
+
+.overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.7);
+  transition: opacity 500ms;
+  visibility: hidden;
+  opacity: 0;
+}
+.overlay:target {
+  visibility: visible;
+  opacity: 1;
+}
+
+.popup {
+overflow-y: auto;
+  margin: 70px auto;
+  padding: 0;
+  background: #fff;
+  border-radius: 5px;
+  width: 80%;
+ /* height: 95%;*/
+    position: relative;
+  transition: all 5s ease-in-out;
+}
+
+.popup .close {
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 00px;
+  right: 15px;
+  transition: all 200ms;
+  font-size: 50px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #333;
+}
+
+
+.popup .close:hover {
+  color: #06D85F;
+}
+.popup .content {
+  max-height: 100%;
+  overflow: auto;
+}
+
+.popup table {
+   width: 100%;
+   margin: 0% 0px 7px 0%;
+   border-collapse: collapse;
+   border-bottom: 5px solid black;
+}
+.popup tr:nth-child(even) {
+    background-color: whitesmoke;
+}
+
+.popup h1 {
+   margin: 0% 0% 0% 0%;
+}
+.align_right {
+         text-align: right;
+         }
 
     </style>
     <title>Firefly</title>
@@ -56,7 +132,10 @@
         let hostPort = location.hostname + ":" + location.port;
         let isDrawing=false;
 
-        setupStatus();
+//TODO at some point, figure out how to restore closed websocket
+        let statusUrl="ws://" + hostPort + "/status";
+        let webSocket = new WebSocket(statusUrl);
+        setupStatus(webSocket);
 
         let deck_al=new Deck("/alliance/nav");
         let deck_bo=new Deck("/border/nav");
@@ -80,6 +159,7 @@
     function Deck(navPath) {
        this.navPath=navPath;
        this.navLockPath=navPath+"/lock";
+       this.specPath=navPath+"/spec";
        this.remainingCardsCount = -1;
        this.discardsCount=-1;
        this.isLocked=false;
@@ -104,17 +184,20 @@
 	function Card(deck, action) {
 	    this.deck=deck;
 	    this.action=action;
+
+	    let cardName = this.action.replace(/[^a-zA-Z]/g, "")+".png";
+	    cardName = startWithSlash(cardName);
+	    this.url= "http://"+hostPort+ this.deck.navPath + "Card" + cardName;
+
 	}
 	Card.FromJson = function(deck, cardJsonString) {
 	    let cardj = JSON.parse(cardJsonString);
 	    return new Card(deck, cardj.action);
 	}
-
-	Card.prototype.getUrl = function () {
-        let cardName = this.action.replace(/[^a-zA-Z]/g, "")+".png";
-	    cardName = startWithSlash(cardName);
-	    return "http://"+hostPort+ this.deck.navPath + "Card" + cardName;
+	Card.prototype.getAnchor = function(anchorText) {
+		return "<a href='"+this.url+"' target='_blank'>"+ anchorText + "</a>";
 	}
+
 
 	function DeckDisplay(deck) {
 	   this.deck = deck;
@@ -123,6 +206,8 @@
 	   this.shuffleBtnId=this.deck.navPath +"/shuffleBtn";
 	   this.unlockBtnId=this.deck.navPath +"/unlockBtn";
 	   this.statusId=this.deck.navPath+"/status";
+	   this.specAreaId=this.deck.navPath+"/spec";
+
 	}
 	DeckDisplay.updateStatus = function(msg) {
 	  let deck=Deck.FindAndUpdateFrom(msg.data);
@@ -168,7 +253,7 @@
 	    this.card = card;
 	}
 	CardDisplay.prototype.display = function(teaseTimeMs, postDisplayWaitTimeMs, hasMoreDrawingToDo) {
-	  let cardUrl=this.card.getUrl();
+	  let cardUrl=this.card.url;
 	  let altText=this.card.action;
       let qm = quoteMarkFor(altText);
       let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
@@ -249,9 +334,7 @@
         return "";
     }
 
-    function setupStatus() {
-        let statusUrl="ws://" + hostPort + "/status";
-        let webSocket = new WebSocket(statusUrl);
+    function setupStatus(webSocket) {
         webSocket.onmessage = function (msg) { DeckDisplay.updateStatus(msg); };
         webSocket.onclose = function () { console.log("WebSocket connection closed ") }
         webSocket.onopen = function(e) {
@@ -315,8 +398,7 @@
 	    anchorText = anchorText.replace("/nav", "");
 	    anchorText = capitalizeFirstLetter(anchorText);
 	    anchorText += "-"+card.action;
-	    let cardUrl=card.getUrl();
-		let item = "<a href='"+cardUrl+"' target='_blank'>"+ anchorText + "</a>";
+	    let item=card.getAnchor(anchorText);
 		let history = "<li>"+item+"</li>" + document.getElementById("history").innerHTML;
 		setHistory(history);
 	}
@@ -347,6 +429,18 @@
 	  deckDisplay.updateResponse(responseText);
 	}
 
+	function displayResponseInOverlay(deckDisplay, responseText) {
+	    let html = "<table>";
+	    let cards = JSON.parse(responseText);
+	    for(let i = 0; i<cards.length;++i) {
+	       let cardCount=cards[i];
+	       let card = new Card(deckDisplay.deck, cardCount.key);
+	       html+="<tr><td class='align_right'>"+card.getAnchor(card.action)+"</td><td class='align_right'>&ensp;" +cardCount.value+"</td></tr>";
+	    }
+	    html+="</table>";
+	    updateElement(deckDisplay.specAreaId, false, html);
+	}
+
     function createOnSendErrorCallback(deckDisplay) {
         return function(xhttp){deckDisplay.reportUnexpectedError("Send failed.");};
     }
@@ -363,7 +457,7 @@
 
        disableDrawButtons();
         deckDisplay.displayCardBack();
-	  get(deck.navPath, createOnSendLoadCallback(deckDisplay, displayNavCard), createOnSendErrorCallback(deck));
+	  get(deck.navPath, createOnSendLoadCallback(deckDisplay, displayNavCard), createOnSendErrorCallback(deckDisplay));
 	}
 
 //TODO move lock, etc. into DeckDisplay? (Deck?--lots is UI related...)
@@ -380,13 +474,38 @@
 	     post(deckDisplay.deck.navPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse), createOnSendErrorCallback(deckDisplay));
 	}
 
+    function describe(deckDisplay) {
+	  get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayResponseInOverlay), createOnSendErrorCallback(deckDisplay));
+	}
+
 	function clearHistory() {
 		setHistory("");
 	}
 
+	function composeDescription(deckDisplay) {
+		  get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayResponseInOverlay), createOnSendErrorCallback(deckDisplay));
+	}
+
+    function debounce(fun, mil){
+        var timer;
+        return function(){
+            clearTimeout(timer);
+            timer = setTimeout(function(){
+                fun();
+            }, mil);
+        };
+    }
+
+    function show(hrefToShow) {
+       debounce(function() {location.href=hrefToShow;}, 250).call();
+    }
+
 	window.onload = function(e) {
 	    let history=getCookie("moveHistory");
 	    updateElement("history", false, history);
+//TODO do something about repeating over all decks
+	    forEachDeckDisplay(function(value, key, map) {composeDescription(value);});
+
 	};
 
     </script>
@@ -445,34 +564,34 @@
     </tr>
     <tr>
         <td>
-            <button id="/alliance/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
+            <button id="/alliance/nav/lockBtn" class="button_with_text" type="button"
                     onclick="lock(dd_al)">Lock Deck
             </button>
         </td>
         <td>
-            <button id="/border/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
+            <button id="/border/nav/lockBtn" class="button_with_text" type="button"
                     onclick="lock(dd_bo)">Lock Deck
             </button>
         </td>
         <td>
-            <button id="/rim/nav/lockBtn" class="button_with_text_no_top_margin" type="button"
+            <button id="/rim/nav/lockBtn" class="button_with_text" type="button"
                     onclick="lock(dd_ri)">Lock Deck
             </button>
         </td>
     </tr>
     <tr>
         <td>
-            <button id="/alliance/nav/unlockBtn" class="button_with_text" type="button"
+            <button id="/alliance/nav/unlockBtn" class="button_with_text top_margin" type="button"
                     onclick="unlock(dd_al)">Unlock Deck
             </button>
         </td>
         <td>
-            <button id="/border/nav/unlockBtn" class="button_with_text" type="button"
+            <button id="/border/nav/unlockBtn" class="button_with_text top_margin" type="button"
                     onclick="unlock(dd_bo)">Unlock Deck
             </button>
         </td>
         <td>
-            <button id="/rim/nav/unlockBtn" class="button_with_text" type="button"
+            <button id="/rim/nav/unlockBtn" class="button_with_text top_margin" type="button"
                     onclick="unlock(dd_ri)">Unlock Deck
             </button>
         </td>
@@ -480,29 +599,70 @@
 
     <tr>
         <td>
-            <button id="/alliance/nav/shuffleBtn" class="button_with_text" type="button"
+            <button id="/alliance/nav/shuffleBtn" class="button_with_text top_margin " type="button"
                     onclick="shuffle(dd_al)">Shuffle
             </button>
         </td>
         <td>
-            <button id="/border/nav/shuffleBtn" class="button_with_text" type="button"
+            <button id="/border/nav/shuffleBtn" class="button_with_text top_margin" type="button"
                     onclick="shuffle(dd_bo)">Shuffle
             </button>
         </td>
         <td>
-            <button id="/rim/nav/shuffleBtn" class="button_with_text" type="button"
+            <button id="/rim/nav/shuffleBtn" class="button_with_text top_margin" type="button"
                     onclick="shuffle(dd_ri)">
                 Shuffle
             </button>
         </td>
     </tr>
 
+    <tr>
+        <td>
+            <button id="/alliance/nav/describeBtn" class="button_with_text top_margin" type="button"
+                    onclick="show('#/alliance/nav/specOverlay');">Deck
+            </button>
+        </td>
+        <td>
+            <button id="/border/nav/describeBtn" class="button_with_text top_margin" type="button"
+                    onclick="show('#/border/nav/specOverlay');">Deck
+            </button>
+        </td>
+        <td>
+            <button id="/rim/nav/describeBtn" class="button_with_text top_margin" type="button"
+                    onclick="show('#/rim/nav/specOverlay');">Deck
+            </button>
+        </td>
+    </tr>
+
 </table>
 
+
+<div id="/alliance/nav/specOverlay" class="overlay">
+    <div class="popup">
+        <h1>Cards</h1>
+        <a class="close" href="#">&#10006;</a>
+        <div id="/alliance/nav/spec" class="content"></div>
+    </div>
+</div>
+<div id="/border/nav/specOverlay" class="overlay">
+    <div class="popup">
+        <h1>Cards</h1>
+        <a class="close" href="#">&#10006;</a>
+        <div id="/border/nav/spec" class="content"></div>
+    </div>
+</div>
+<div id="/rim/nav/specOverlay" class="overlay">
+    <div class="popup">
+        <h1>Cards</h1>
+        <a class="close" href="#">&#10006;</a>
+        <div id="/rim/nav/spec" class="content"></div>
+    </div>
+</div>
 <br>
 
 
-<button id="historyBtn" class="button_with_text" type="button" onclick="clearHistory()">Clear History</button>
+<button id="historyBtn" class="button_with_text top_margin" type="button" onclick="clearHistory()">Clear History
+</button>
 <h1>History</h1>
 <ol start="0" class="less_on_top"><span id="history"></span></ol>
 </p>
