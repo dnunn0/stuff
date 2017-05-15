@@ -101,7 +101,7 @@
     }
     .popup {
         margin: 70px auto;
-        padding: 0 0 10px 0;
+        padding: 0 0px 10px 0;
         background: #fff;
         border-radius: 5px;
         width: 85%;
@@ -131,7 +131,7 @@
         font-size: 3rem;
         width: 100%;
         border-collapse: collapse;
-        border-bottom: 5px solid black;
+        border-bottom: 8px solid grey;
     }
     .popup tr:nth-child(even) {
         background-color: whitesmoke;
@@ -141,6 +141,9 @@
     }
     .align_right {
         text-align: right;
+    }
+    .px80wide {
+        width: 80px;
     }
     .disabled {
         opacity: 0.3;
@@ -452,7 +455,7 @@
             let cardCount = cards[i];
             let card = new Card(deckDisplay.deck, cardCount.key);
             html += "<tr><td class='align_right'>" + card.getAnchor(card.action) +
-                "</td><td class='align_right'>&ensp;" + cardCount.value + "&ensp;</td></tr>";
+                "</td><td class='align_right px80wide'>" + cardCount.value + "&nbsp;</td></tr>";
         }
         html += "</table>";
         updateElement(deckDisplay.specAreaId, false, html);
