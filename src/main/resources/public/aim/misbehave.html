@@ -84,8 +84,8 @@
         border: 2px solid transparent;
     }
     .overlay {
-          overflow-y: scroll;
-      position: fixed;
+        overflow-y: scroll;
+        position: fixed;
         top: 0;
         bottom: 0;
         left: 0;
@@ -100,9 +100,8 @@
         opacity: 1;
     }
     .popup {
-    /*    overflow-y: scroll;*/
         margin: 70px auto;
-        padding: 0;
+        padding: 0 0 10px 0;
         background: #fff;
         border-radius: 5px;
         width: 85%;
@@ -131,7 +130,6 @@
     .popup table {
         font-size: 3rem;
         width: 100%;
-        margin: 0% 0px 7px 0%;
         border-collapse: collapse;
         border-bottom: 5px solid black;
     }
@@ -529,15 +527,24 @@
             location.href = hrefToShow;
         }, 200).call();
     }
-    function restorescrollingAfterClosingOverlays() {
-             let anchors = document.getElementsByClassName("close");
-         for(let i = 0; i < anchors.length; i++) {
-            let anchor = anchors[i];
-            anchor.onclick = function() {
+
+    function restoreScrolling() {
                 document.querySelector('body').classList.remove('noscroll');
                 document.querySelector('html').classList.remove('noscroll');
-            };
+
+    }
+    function restoreScrollingAfterClosingOverlays() {
+         let anchors = document.getElementsByClassName("close");
+         for(let i = 0; i < anchors.length; i++) {
+            let anchor = anchors[i];
+            anchor.onclick = function() { restoreScrolling(); };
          }
+
+         window.addEventListener('popstate', function(event) {
+          let fragment = document.location.hash;
+          if (""==fragment) restoreScrolling();
+        }, true);
+
     }
 
     window.onload = function(e) {
@@ -547,7 +554,7 @@
         forEachDeckDisplay(function(value, key, map) {
             composeDescription(value);
         });
-        restorescrollingAfterClosingOverlays();
+        restoreScrollingAfterClosingOverlays();
     };
 
     </script>
