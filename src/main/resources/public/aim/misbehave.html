@@ -13,8 +13,11 @@
             margin: 0;
             border:0;
         }
-         /* table {width:100%;margin: 2.5rem 0% 0% 0%;border: 1px solid black;} */
-          table {font-size: 3rem;width:1200px;margin: 2.5rem 0% 0% 0%;table-layout: fixed;}
+          table {font-size: 3rem;width:1200px;margin: 2.5rem 0% 0% 0%;}
+          #deckTable {
+          table-layout: fixed;
+          }
+
          button {
               border: none;
          }
@@ -530,7 +533,7 @@ overflow-y: auto;
     </tr>
 </table>
 
-<table>
+<table id="deckTable">
     <tr id="drawActions">
         <td>
             <div id="/alliance/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_al)"/>
@@ -667,7 +670,6 @@ overflow-y: auto;
 </button>
 <h1>History</h1>
 <ol start="0" class="less_on_top"><span id="history"></span></ol>
-</p>
 <p>Request id: <span id="requestId"/><br></p>
 
 
