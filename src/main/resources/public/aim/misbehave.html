@@ -252,6 +252,11 @@
         if (!isDrawing) this.applyNextDrawDisabledStatus();
         document.getElementById(this.shuffleBtnId).disabled = !this.deck.shouldShuffle;
         document.getElementById(this.unlockBtnId).disabled = !this.deck.isLocked;
+        let responseText = document.getElementById(this.responseStatusArea).innerHTML;
+        if(responseText != undefined && responseText.includes("shuffling") && !this.deck.shouldShuffle)
+            updateElement(this.responseStatusArea, false, "");
+        if(responseText != undefined && responseText.includes("Lock") && !this.deck.isLocked)
+            updateElement(this.responseStatusArea, false, "");
     }
     DeckDisplay.prototype.reportStatus = function() {
         let result = this.deck.remainingCardsCount + "/" + (this.deck.remainingCardsCount + this.deck.discardsCount);
@@ -280,8 +285,6 @@
                 await sleep(timeToSleep);
                 updateElement("/nav/card", false, newHtml);
                 await sleep(Math.max(0, postDisplayWaitTimeMs));
-                isDrawing = hasMoreDrawingToDo;
-                applyStatusForAllDecks();
             });
     }
 
@@ -398,6 +401,12 @@
             default:
                 deckDisplay.reportUnexpectedError(xhttp);
         }
+        finishRequest();
+    }
+
+    function finishRequest() {
+        isDrawing=false;
+        applyStatusForAllDecks();
     }
 
     function updateRequestId(id) {
@@ -464,6 +473,7 @@
     function createOnSendErrorCallback(deckDisplay) {
         return function(xhttp) {
             deckDisplay.reportUnexpectedError("Send failed.");
+            finishRequest();
         };
     }
 
