@@ -1,330 +1,320 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <style>
-
-         h1 {font-size: 3.5rem;}
-         p {font-size: 3rem;}
-         a {font-size: 3rem;}
-         ol {font-size: 3rem;margin-bottom: 0.5rem;margin-left:1.5rem;}
-         td {text-align: center;}
-        img {
-            padding: 0;
-            margin: 0;
-            border:0;
-        }
-          table {font-size: 3rem;width:1200px;margin: 2.5rem 0% 0% 0%;}
-          #deckTable {
-          table-layout: fixed;
-          }
-
-         button {
-              border: none;
-         }
-         button:disabled {
-              border: none;
-         }
-         .less_on_top {margin-top: -10px;}
-         .external_image {
-           -moz-force-broken-image-icon: 1;
-         }
-          .logo_image {
-             height: 1040px;width:1100px;
-         }
-         .large_card_image {
-           height: 1040px;width: 715px;
-         }
-
-        .top_margin {
-            margin: 2.5rem 0rem 0rem 0rem;
-         }
-         .button_with_text {
-            font-size: 2.5rem;
-              border: 2px solid #06D85F;
-              border-radius: 20px/50px;
-              cursor: pointer;
-              transition: all 0.3s ease-out;
-         }
-
-
-.overlay {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.7);
-  transition: opacity 500ms;
-  visibility: hidden;
-  opacity: 0;
-}
-.overlay:target {
-  visibility: visible;
-  opacity: 1;
-}
-
-.popup {
-overflow-y: auto;
-  margin: 70px auto;
-  padding: 0;
-  background: #fff;
-  border-radius: 5px;
-  width: 80%;
-    position: relative;
-  transition: all 5s ease-in-out;
-}
-
-.popup .close {
-  padding: 0;
-  margin: 0;
-  position: absolute;
-  top: 00px;
-  right: 15px;
-  transition: all 200ms;
-  font-size: 50px;
-  font-weight: bold;
-  text-decoration: none;
-  color: #333;
-}
-
-
-.popup .close:hover {
-  color: #06D85F;
-}
-.popup .content {
-  max-height: 100%;
-  overflow: auto;
-}
-
-.popup table {
-   width: 100%;
-   margin: 0% 0px 7px 0%;
-   border-collapse: collapse;
-   border-bottom: 5px solid black;
-}
-.popup tr:nth-child(even) {
-    background-color: whitesmoke;
-}
-
-.popup h1 {
-   margin: 0% 0% 0% 0%;
-}
-.align_right {
-         text-align: right;
-         }
-
-
-        .mediumCard {
-                    height: 480px;
-                    width: 335px;
-          background-repeat: no-repeat;
-          background-size: contain;
-                      cursor: pointer;
-                    transition: all 0.3s ease-out;
-        }
-
-         .disabled {
-              opacity: 0.3;
-                  pointer-events: none;
-        }
-
-        #\/alliance\/nav\/drawBtn {
-          background-image: url(/alliance/navCard/back.png);
-        }
-        #\/border\/nav\/drawBtn {
-          background-image: url(/border/navCard/back.png);
-        }
-        #\/rim\/nav\/drawBtn {
-          background-image: url(/rim/navCard/back.png);
-        }
-
+    h1 {
+        font-size: 3.5rem;
+    }
+    p {
+        font-size: 3rem;
+    }
+    a {
+        font-size: 3rem;
+    }
+    ol {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        margin-left: 1.5rem;
+    }
+    td {
+        text-align: center;
+    }
+    img {
+        padding: 0;
+        margin: 0;
+        border: 0;
+    }
+    table {
+        font-size: 3rem;
+        width: 1200px;
+        margin: 2.5rem 0% 0% 0%;
+    }
+    #deckTable {
+        table-layout: fixed;
+    }
+    button {
+        border: none;
+    }
+    button:disabled {
+        border: none;
+    }
+    .less_on_top {
+        margin-top: -10px;
+    }
+    .external_image {
+        -moz-force-broken-image-icon: 1;
+    }
+    .logo_image {
+        height: 1040px;
+        width: 1100px;
+    }
+    .large_card_image {
+        height: 1040px;
+        width: 715px;
+    }
+    .top_margin {
+        margin: 2.5rem 0rem 0rem 0rem;
+    }
+    .button_with_text {
+        font-size: 2.5rem;
+        border: 2px solid #06D85F;
+        border-radius: 20px/50px;
+        cursor: pointer;
+        transition: all 0.3s ease-out;
+    }
+    .overlay {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        transition: opacity 500ms;
+        visibility: hidden;
+        opacity: 0;
+    }
+    .overlay:target {
+        visibility: visible;
+        opacity: 1;
+    }
+    .popup {
+        overflow-y: auto;
+        margin: 70px auto;
+        padding: 0;
+        background: #fff;
+        border-radius: 5px;
+        width: 80%;
+        position: relative;
+        transition: all 5s ease-in-out;
+    }
+    .popup .close {
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        top: 00px;
+        right: 15px;
+        transition: all 200ms;
+        font-size: 50px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #333;
+    }
+    .popup .close:hover {
+        color: #06D85F;
+    }
+    .popup .content {
+        max-height: 100%;
+        overflow: auto;
+    }
+    .popup table {
+        width: 100%;
+        margin: 0% 0px 7px 0%;
+        border-collapse: collapse;
+        border-bottom: 5px solid black;
+    }
+    .popup tr:nth-child(even) {
+        background-color: whitesmoke;
+    }
+    .popup h1 {
+        margin: 0% 0% 0% 0%;
+    }
+    .align_right {
+        text-align: right;
+    }
+    .mediumCard {
+        height: 480px;
+        width: 335px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        cursor: pointer;
+        transition: all 0.3s ease-out;
+    }
+    .disabled {
+        opacity: 0.3;
+        pointer-events: none;
+    }
+    #\/alliance\/nav\/drawBtn {
+        background-image: url(/alliance/navCard/back.png);
+    }
+    #\/border\/nav\/drawBtn {
+        background-image: url(/border/navCard/back.png);
+    }
+    #\/rim\/nav\/drawBtn {
+        background-image: url(/rim/navCard/back.png);
+    }
 
     </style>
     <title>Firefly</title>
     <script>
-
-        let hostPort = location.hostname + ":" + location.port;
-        let isDrawing=false;
-
-//TODO at some point, figure out how to restore closed websocket
-        let statusUrl="ws://" + hostPort + "/status";
-        let webSocket = new WebSocket(statusUrl);
-        setupStatus(webSocket);
-
-        let deck_al=new Deck("/alliance/nav");
-        let deck_bo=new Deck("/border/nav");
-        let deck_ri=new Deck("/rim/nav");
-
-        let decks = new Map();
-        decks.set(deck_al.navPath, deck_al);
-        decks.set(deck_bo.navPath, deck_bo);
-        decks.set(deck_ri.navPath, deck_ri);
-
-        let dd_al = new DeckDisplay(deck_al);
-        let dd_bo = new DeckDisplay(deck_bo);
-        let dd_ri = new DeckDisplay(deck_ri);
-        let dds = new Map();
-        dds.set(deck_al, dd_al);
-        dds.set(deck_bo, dd_bo);
-        dds.set(deck_ri, dd_ri);
-
-
+    let hostPort = location.hostname + ":" + location.port;
+    let isDrawing = false;
+    //TODO at some point, figure out how to restore closed websocket
+    let statusUrl = "ws://" + hostPort + "/status";
+    let webSocket = new WebSocket(statusUrl);
+    setupStatus(webSocket);
+    let deck_al = new Deck("/alliance/nav");
+    let deck_bo = new Deck("/border/nav");
+    let deck_ri = new Deck("/rim/nav");
+    let decks = new Map();
+    decks.set(deck_al.navPath, deck_al);
+    decks.set(deck_bo.navPath, deck_bo);
+    decks.set(deck_ri.navPath, deck_ri);
+    let dd_al = new DeckDisplay(deck_al);
+    let dd_bo = new DeckDisplay(deck_bo);
+    let dd_ri = new DeckDisplay(deck_ri);
+    let dds = new Map();
+    dds.set(deck_al, dd_al);
+    dds.set(deck_bo, dd_bo);
+    dds.set(deck_ri, dd_ri);
 
     function Deck(navPath) {
-       this.navPath=navPath;
-       this.navLockPath=navPath+"/lock";
-       this.specPath=navPath+"/spec";
-       this.remainingCardsCount = -1;
-       this.discardsCount=-1;
-       this.isLocked=false;
-       this.hasCards=false;
-       this.nextDrawDisabledStatus=false;
-       this.shouldShuffle=false;
+        this.navPath = navPath;
+        this.navLockPath = navPath + "/lock";
+        this.specPath = navPath + "/spec";
+        this.remainingCardsCount = -1;
+        this.discardsCount = -1;
+        this.isLocked = false;
+        this.hasCards = false;
+        this.nextDrawDisabledStatus = false;
+        this.shouldShuffle = false;
     }
     Deck.FindAndUpdateFrom = function(statusJsonString) {
-        let statusj=JSON.parse(statusJsonString);
-	    let deckName = statusj.source;
-	    let deck=decks.get(deckName);
-
-        deck.remainingCardsCount=statusj.remainingCardsCount;
-        deck.discardsCount=statusj.discardsCount;
-        deck.isLocked=statusj.isLocked;
-        deck.hasCards=deck.remainingCardsCount > 0;
-        deck.nextDrawDisabledStatus=!deck.hasCards || deck.isLocked;
-        deck.shouldShuffle=!(deck.hasCards || deck.isLocked);
+        let statusj = JSON.parse(statusJsonString);
+        let deckName = statusj.source;
+        let deck = decks.get(deckName);
+        deck.remainingCardsCount = statusj.remainingCardsCount;
+        deck.discardsCount = statusj.discardsCount;
+        deck.isLocked = statusj.isLocked;
+        deck.hasCards = deck.remainingCardsCount > 0;
+        deck.nextDrawDisabledStatus = !deck.hasCards || deck.isLocked;
+        deck.shouldShuffle = !(deck.hasCards || deck.isLocked);
         return deck;
     }
 
-	function Card(deck, action) {
-	    this.deck=deck;
-	    this.action=action;
-
-	    let cardName = this.action.replace(/[^a-zA-Z]/g, "")+".png";
-	    cardName = startWithSlash(cardName);
-	    this.url= "http://"+hostPort+ this.deck.navPath + "Card" + cardName;
-
-	}
-	Card.FromJson = function(deck, cardJsonString) {
-	    let cardj = JSON.parse(cardJsonString);
-	    return new Card(deck, cardj.action);
-	}
-	Card.prototype.getAnchor = function(anchorText) {
-		return "<a href='"+this.url+"' target='_blank'>"+ anchorText + "</a>";
-	}
-
-
-	function DeckDisplay(deck) {
-	   this.deck = deck;
-	   this.responseStatusArea=deck.navPath+"/requestResult";
-	   this.drawBtnId=this.deck.navPath +"/drawBtn";
-	   this.shuffleBtnId=this.deck.navPath +"/shuffleBtn";
-	   this.unlockBtnId=this.deck.navPath +"/unlockBtn";
-	   this.statusId=this.deck.navPath+"/status";
-	   this.specAreaId=this.deck.navPath+"/spec";
-
-	}
-	DeckDisplay.updateStatus = function(msg) {
-	  let deck=Deck.FindAndUpdateFrom(msg.data);
-	  let displayDeck=dds.get(deck);
-	  displayDeck.reportStatus();
-      displayDeck.applyStatus();
+    function Card(deck, action) {
+        this.deck = deck;
+        this.action = action;
+        let cardName = this.action.replace(/[^a-zA-Z]/g, "") + ".png";
+        cardName = startWithSlash(cardName);
+        this.url = "http://" + hostPort + this.deck.navPath + "Card" + cardName;
     }
-	DeckDisplay.prototype.reportError = function(message) {
-	    updateElement(this.responseStatusArea, true, message);
-	}
-	DeckDisplay.prototype.reportUnexpectedError = function(xhttp) {
-		let result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" + xhttp.statusText + ".";
-	    this.reportError(result);
-	}
-	DeckDisplay.prototype.updateResponse = function(message) {
-	    updateElement(this.responseStatusArea, false, message);
+    Card.FromJson = function(deck, cardJsonString) {
+        let cardj = JSON.parse(cardJsonString);
+        return new Card(deck, cardj.action);
+    }
+    Card.prototype.getAnchor = function(anchorText) {
+        return "<a href='" + this.url + "' target='_blank'>" + anchorText + "</a>";
+    }
+
+    function DeckDisplay(deck) {
+        this.deck = deck;
+        this.responseStatusArea = deck.navPath + "/requestResult";
+        this.drawBtnId = this.deck.navPath + "/drawBtn";
+        this.shuffleBtnId = this.deck.navPath + "/shuffleBtn";
+        this.unlockBtnId = this.deck.navPath + "/unlockBtn";
+        this.statusId = this.deck.navPath + "/status";
+        this.specAreaId = this.deck.navPath + "/spec";
+    }
+    DeckDisplay.updateStatus = function(msg) {
+        let deck = Deck.FindAndUpdateFrom(msg.data);
+        let displayDeck = dds.get(deck);
+        displayDeck.reportStatus();
+        displayDeck.applyStatus();
+    }
+    DeckDisplay.prototype.reportError = function(message) {
+        updateElement(this.responseStatusArea, true, message);
+    }
+    DeckDisplay.prototype.reportUnexpectedError = function(xhttp) {
+        let result = "Unexpected error: ReadyState, status, text: " + xhttp.readyState + "- " + xhttp.status + "-" +
+            xhttp.statusText + ".";
+        this.reportError(result);
+    }
+    DeckDisplay.prototype.updateResponse = function(message) {
+        updateElement(this.responseStatusArea, false, message);
     }
     DeckDisplay.prototype.disableDrawCardButton = function(newState) {
         let control = document.getElementById(this.drawBtnId);
-        if(newState) control.classList.add('disabled');
+        if (newState) control.classList.add('disabled');
         else control.classList.remove('disabled');
     }
     DeckDisplay.prototype.applyNextDrawDisabledStatus = function() {
-    //TODO how to make private methods (and then can make disable(id) private too)
+        //TODO how to make private methods (and then can make disable(id) private too)
         this.disableDrawCardButton(this.deck.nextDrawDisabledStatus);
     }
     DeckDisplay.prototype.applyStatus = function() {
-        if(!isDrawing) this.applyNextDrawDisabledStatus();
+        if (!isDrawing) this.applyNextDrawDisabledStatus();
         document.getElementById(this.shuffleBtnId).disabled = !this.deck.shouldShuffle;
         document.getElementById(this.unlockBtnId).disabled = !this.deck.isLocked;
     }
     DeckDisplay.prototype.reportStatus = function() {
-	  let result = this.deck.remainingCardsCount +"/" + (this.deck.remainingCardsCount+this.deck.discardsCount);
-	  result += "&nbsp;(" + this.deck.discardsCount +")";
-	  updateElement(this.statusId, false, result);
-	}
+        let result = this.deck.remainingCardsCount + "/" + (this.deck.remainingCardsCount + this.deck.discardsCount);
+        result += "&nbsp;(" + this.deck.discardsCount + ")";
+        updateElement(this.statusId, false, result);
+    }
     DeckDisplay.prototype.displayCardBack = function() {
-	  let card = new Card(this.deck, "back");
-      let cardDisplay = new CardDisplay(card);
-      cardDisplay.display(0, 0, true);
+        let card = new Card(this.deck, "back");
+        let cardDisplay = new CardDisplay(card);
+        cardDisplay.display(0, 0, true);
     }
 
-	function CardDisplay(card) {
-	    this.card = card;
-	}
-	CardDisplay.prototype.display = function(teaseTimeMs, postDisplayWaitTimeMs, hasMoreDrawingToDo) {
-	  let cardUrl=this.card.url;
-	  let altText=this.card.action;
-      let qm = quoteMarkFor(altText);
-      let newHtml = "<img class='external_image large_card_image' src='" + cardUrl +"'"
-                + " alt="+qm+altText+qm
-                +"/>";
-      let startOfWait = (new Date()).getTime();
-	  preloadImage(cardUrl, async function() {
-	      let endOfWait = (new Date()).getTime();
-	      let timeToSleep = Math.max(0, teaseTimeMs - (endOfWait - startOfWait));
-          await sleep(timeToSleep);
-
-          updateElement("/nav/card", false, newHtml);
-          await sleep(Math.max(0, postDisplayWaitTimeMs));
-          isDrawing=hasMoreDrawingToDo;
-          applyStatusForAllDecks();
-      });
+    function CardDisplay(card) {
+        this.card = card;
+    }
+    CardDisplay.prototype.display = function(teaseTimeMs, postDisplayWaitTimeMs, hasMoreDrawingToDo) {
+        let cardUrl = this.card.url;
+        let altText = this.card.action;
+        let qm = quoteMarkFor(altText);
+        let newHtml = "<img class='external_image large_card_image' src='" + cardUrl + "'" + " alt=" + qm + altText +
+            qm + "/>";
+        let startOfWait = (new Date()).getTime();
+        preloadImage(cardUrl, async function() {
+                let endOfWait = (new Date()).getTime();
+                let timeToSleep = Math.max(0, teaseTimeMs - (endOfWait - startOfWait));
+                await sleep(timeToSleep);
+                updateElement("/nav/card", false, newHtml);
+                await sleep(Math.max(0, postDisplayWaitTimeMs));
+                isDrawing = hasMoreDrawingToDo;
+                applyStatusForAllDecks();
+            });
     }
 
-
-
-	function capitalizeFirstLetter(string) {
+    function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
-	function quoteMarkFor(text) {
-	    let qm = '"';
-	    if (text.includes(qm)) qm = "'";
-	    return qm;
-	 }
+    function quoteMarkFor(text) {
+        let qm = '"';
+        if (text.includes(qm)) qm = "'";
+        return qm;
+    }
 
     function sleep(timeToSleepMs) {
-       return new Promise(resolve => setTimeout(resolve, timeToSleepMs));
-   }
+        return new Promise(resolve => setTimeout(resolve, timeToSleepMs));
+    }
 
-	function preloadImage(url, callback) {
-        let img=new Image();
-        img.src=url;
+    function preloadImage(url, callback) {
+        let img = new Image();
+        img.src = url;
         img.onload = callback;
     }
 
     function startWithSlash(text) {
-      if ((text) && (!text.startsWith("/"))) text ="/"+text;
-      return text;
+        if ((text) && (!text.startsWith("/"))) text = "/" + text;
+        return text;
     }
 
-	function getUrl(path) {
-	    path = startWithSlash(path);
-	    return "http://"+hostPort+ path;
-	}
+    function getUrl(path) {
+        path = startWithSlash(path);
+        return "http://" + hostPort + path;
+    }
 
-	function updateElement(targetId, addEmphasis, newHtml) {
-	  if (addEmphasis) newHtml = "<font color='red'>" + newHtml + "</font>";
-	  document.getElementById(targetId).innerHTML = newHtml;
-	}
+    function updateElement(targetId, addEmphasis, newHtml) {
+        if (addEmphasis) newHtml = "<font color='red'>" + newHtml + "</font>";
+        document.getElementById(targetId).innerHTML = newHtml;
+    }
 
-	function createCookie(name, value, hours) {
+    function createCookie(name, value, hours) {
         let expires = "";
         if (hours) {
             let date = new Date();
@@ -350,178 +340,196 @@ overflow-y: auto;
     }
 
     function setupStatus(webSocket) {
-        webSocket.onmessage = function (msg) { DeckDisplay.updateStatus(msg); };
-        webSocket.onclose = function () { console.log("WebSocket connection closed ") }
+        webSocket.onmessage = function(msg) {
+            DeckDisplay.updateStatus(msg);
+        };
+        webSocket.onclose = function() {
+            console.log("WebSocket connection closed ")
+        }
         webSocket.onopen = function(e) {
             console.log("WebSocket connection open. Asking for status update. ");
             webSocket.send('update status');
         };
     }
 
-	function sendRequest(method, path, onLoadCallback, onErrorCallback) {
-	  let xhttp = new XMLHttpRequest();
-	  xhttp.addEventListener("load", function(ev){onLoadCallback(xhttp); });
-	  xhttp.addEventListener("error", function(ev){onErrorCallback(xhttp);});
-
-	  xhttp.open(method, getUrl(path), true);
-//	  xhttp.setRequestHeader("Authorize", "dm9yZGVsOnZvcmRlbA==");
-	  xhttp.send();
-	}
-
-	function get(path, onLoadCallback, onErrorCallback) {
-	  sendRequest("GET", path, onLoadCallback, onErrorCallback );
-	}
-
-	function post(path, onLoadCallback, onErrorCallback) {
-	  sendRequest("POST", path, onLoadCallback, onErrorCallback);
+    function sendRequest(method, path, onLoadCallback, onErrorCallback) {
+        let xhttp = new XMLHttpRequest();
+        xhttp.addEventListener("load", function(ev) {
+            onLoadCallback(xhttp);
+        });
+        xhttp.addEventListener("error", function(ev) {
+            onErrorCallback(xhttp);
+        });
+        xhttp.open(method, getUrl(path), true);
+        //	  xhttp.setRequestHeader("Authorize", "dm9yZGVsOnZvcmRlbA==");
+        xhttp.send();
     }
 
-	function del(path, onLoadCallback, onErrorCallback) {
-	  sendRequest("DELETE", path, onLoadCallback,onErrorCallback);
-	}
+    function get(path, onLoadCallback, onErrorCallback) {
+        sendRequest("GET", path, onLoadCallback, onErrorCallback);
+    }
 
-	function processActionResponse(xhttp, deckDisplay, successCallback) {
+    function post(path, onLoadCallback, onErrorCallback) {
+        sendRequest("POST", path, onLoadCallback, onErrorCallback);
+    }
 
-		switch (xhttp.status) {
-		  case 200:
-			successCallback(deckDisplay, xhttp.responseText)
-		    updateRequestId(xhttp.getResponseHeader("id"));
-			break;
-		  case 404:
-			deckDisplay.reportError("Needs shuffling!");
-			break;
-		  case 409:
-			deckDisplay.reportError("Locked!");
-			break;
-		  default:
-			deckDisplay.reportUnexpectedError(xhttp);
-		}
-	}
+    function del(path, onLoadCallback, onErrorCallback) {
+        sendRequest("DELETE", path, onLoadCallback, onErrorCallback);
+    }
 
-	function updateRequestId(id) {
-		let target = "requestId";
+    function processActionResponse(xhttp, deckDisplay, successCallback) {
+        switch (xhttp.status) {
+            case 200:
+                successCallback(deckDisplay, xhttp.responseText)
+                updateRequestId(xhttp.getResponseHeader("id"));
+                break;
+            case 404:
+                deckDisplay.reportError("Needs shuffling!");
+                break;
+            case 409:
+                deckDisplay.reportError("Locked!");
+                break;
+            default:
+                deckDisplay.reportUnexpectedError(xhttp);
+        }
+    }
+
+    function updateRequestId(id) {
+        let target = "requestId";
         updateElement(target, false, id);
-	}
+    }
 
     function setHistory(history) {
         updateElement("history", false, history);
-		createCookie("moveHistory", history, 12);
+        createCookie("moveHistory", history, 12);
     }
 
-	function updateHistory(card) {
-	    let anchorText = card.deck.navPath.replace("/","");
-	    anchorText = anchorText.replace("/nav", "");
-	    anchorText = capitalizeFirstLetter(anchorText);
-	    anchorText += "-"+card.action;
-	    let item=card.getAnchor(anchorText);
-		let history = "<li>"+item+"</li>" + document.getElementById("history").innerHTML;
-		setHistory(history);
-	}
-
-    function forEachDeckDisplay(valueKeyMap){
-         dds.forEach(valueKeyMap);
+    function updateHistory(card) {
+        let anchorText = card.deck.navPath.replace("/", "");
+        anchorText = anchorText.replace("/nav", "");
+        anchorText = capitalizeFirstLetter(anchorText);
+        anchorText += "-" + card.action;
+        let item = card.getAnchor(anchorText);
+        let history = "<li>" + item + "</li>" + document.getElementById("history").innerHTML;
+        setHistory(history);
     }
+
+    function forEachDeckDisplay(valueKeyMap) {
+        dds.forEach(valueKeyMap);
+    }
+
     function disableDrawButtons() {
         forEachDeckDisplay(function(value, key, map) {
             value.disableDrawCardButton(true);
         });
     }
+
     function applyStatusForAllDecks() {
         forEachDeckDisplay(function(value, key, map) {
             value.applyStatus();
         });
     }
 
-	function displayNavCard(deckDisplay, responseText) {
-	  let card = Card.FromJson(deckDisplay.deck, responseText);
-	  let cardDisplay = new CardDisplay(card);
-	  cardDisplay.display(400, 700, false);
-      deckDisplay.updateResponse("&nbsp;");
-	  updateHistory(card);
-	}
+    function displayNavCard(deckDisplay, responseText) {
+        let card = Card.FromJson(deckDisplay.deck, responseText);
+        let cardDisplay = new CardDisplay(card);
+        cardDisplay.display(400, 700, false);
+        deckDisplay.updateResponse("&nbsp;");
+        updateHistory(card);
+    }
 
-	function justDisplayResponse(deckDisplay, responseText) {
-	  deckDisplay.updateResponse(responseText);
-	}
+    function justDisplayResponse(deckDisplay, responseText) {
+        deckDisplay.updateResponse(responseText);
+    }
 
-	function displayResponseInOverlay(deckDisplay, responseText) {
-	    let html = "<table>";
-	    let cards = JSON.parse(responseText);
-	    for(let i = 0; i<cards.length;++i) {
-	       let cardCount=cards[i];
-	       let card = new Card(deckDisplay.deck, cardCount.key);
-	       html+="<tr><td class='align_right'>"+card.getAnchor(card.action)+"</td><td class='align_right'>&ensp;" +cardCount.value+"</td></tr>";
-	    }
-	    html+="</table>";
-	    updateElement(deckDisplay.specAreaId, false, html);
-	}
+    function displayResponseInOverlay(deckDisplay, responseText) {
+        let html = "<table>";
+        let cards = JSON.parse(responseText);
+        for (let i = 0; i < cards.length; ++i) {
+            let cardCount = cards[i];
+            let card = new Card(deckDisplay.deck, cardCount.key);
+            html += "<tr><td class='align_right'>" + card.getAnchor(card.action) +
+                "</td><td class='align_right'>&ensp;" + cardCount.value + "</td></tr>";
+        }
+        html += "</table>";
+        updateElement(deckDisplay.specAreaId, false, html);
+    }
 
     function createOnSendErrorCallback(deckDisplay) {
-        return function(xhttp){deckDisplay.reportUnexpectedError("Send failed.");};
+        return function(xhttp) {
+            deckDisplay.reportUnexpectedError("Send failed.");
+        };
     }
 
     function createOnSendLoadCallback(deck, successCallback) {
-        return function(xhttp){return processActionResponse(xhttp, deck, successCallback);};
+            return function(xhttp) {
+                return processActionResponse(xhttp, deck, successCallback);
+            };
+        }
+        //TODO put drawCard et. al on DeckDisplay when i figure out private functions (which most of these shoudl be)
+        //     or is this now modules?
+    function drawCard(deckDisplay) {
+            let deck = deckDisplay.deck;
+            isDrawing = true;
+            disableDrawButtons();
+            deckDisplay.displayCardBack();
+            get(deck.navPath, createOnSendLoadCallback(deckDisplay, displayNavCard), createOnSendErrorCallback(
+                deckDisplay));
+        }
+        //TODO move lock, etc. into DeckDisplay? (Deck?--lots is UI related...)
+    function lock(deckDisplay) {
+        post(deckDisplay.deck.navLockPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse),
+            createOnSendErrorCallback(deckDisplay));
     }
 
-//TODO put drawCard et. al on DeckDisplay when i figure out private functions (which most of these shoudl be)
-//     or is this now modules?
-	function drawCard(deckDisplay) {
-	  let deck=deckDisplay.deck;
-	  isDrawing=true;
+    function unlock(deckDisplay) {
+        del(deckDisplay.deck.navLockPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse),
+            createOnSendErrorCallback(deckDisplay));
+    }
 
-       disableDrawButtons();
-        deckDisplay.displayCardBack();
-	  get(deck.navPath, createOnSendLoadCallback(deckDisplay, displayNavCard), createOnSendErrorCallback(deckDisplay));
-	}
-
-//TODO move lock, etc. into DeckDisplay? (Deck?--lots is UI related...)
-	function lock(deckDisplay) {
-	  post(deckDisplay.deck.navLockPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse), createOnSendErrorCallback(deckDisplay));
-	}
-
-	function unlock(deckDisplay) {
-	  del(deckDisplay.deck.navLockPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse), createOnSendErrorCallback(deckDisplay));
-	}
-
-	function shuffle(deckDisplay) {
-	  if(confirm("Are you sure?")==true)
-	     post(deckDisplay.deck.navPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse), createOnSendErrorCallback(deckDisplay));
-	}
+    function shuffle(deckDisplay) {
+        if (confirm("Are you sure?") == true)
+            post(deckDisplay.deck.navPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse),
+                createOnSendErrorCallback(deckDisplay));
+    }
 
     function describe(deckDisplay) {
-	  get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayResponseInOverlay), createOnSendErrorCallback(deckDisplay));
-	}
+        get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayResponseInOverlay),
+            createOnSendErrorCallback(deckDisplay));
+    }
 
-	function clearHistory() {
-		setHistory("");
-	}
+    function clearHistory() {
+        setHistory("");
+    }
 
-	function composeDescription(deckDisplay) {
-		  get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayResponseInOverlay), createOnSendErrorCallback(deckDisplay));
-	}
+    function composeDescription(deckDisplay) {
+        get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayResponseInOverlay),
+            createOnSendErrorCallback(deckDisplay));
+    }
 
-    function debounce(fun, mil){
+    function debounce(fun, mil) {
         var timer;
-        return function(){
+        return function() {
             clearTimeout(timer);
-            timer = setTimeout(function(){
+            timer = setTimeout(function() {
                 fun();
             }, mil);
         };
     }
 
     function show(hrefToShow) {
-       debounce(function() {location.href=hrefToShow;}, 250).call();
+        debounce(function() {
+            location.href = hrefToShow;
+        }, 250).call();
     }
-
-	window.onload = function(e) {
-	    let history=getCookie("moveHistory");
-	    updateElement("history", false, history);
-//TODO do something about repeating over all decks
-	    forEachDeckDisplay(function(value, key, map) {composeDescription(value);});
-
-	};
+    window.onload = function(e) {
+        let history = getCookie("moveHistory");
+        updateElement("history", false, history);
+        //TODO do something about repeating over all decks
+        forEachDeckDisplay(function(value, key, map) {
+            composeDescription(value);
+        });
+    };
 
     </script>
 </head>
@@ -529,7 +537,9 @@ overflow-y: auto;
 <body>
 <table>
     <tr>
-        <td><span id="/nav/card"><img src="/SerenityLogo.png" class='external_image logo_image'></span><br></td>
+        <td><span id="/nav/card"><img src="/SerenityLogo.png" class='external_image logo_image'></span>
+            <br>
+        </td>
     </tr>
 </table>
 
@@ -558,29 +568,29 @@ overflow-y: auto;
     </tr>
     <tr>
         <td>
-            <p class="less_on_top"><span id="/alliance/nav/requestResult">&nbsp;</span></p>
+            <p class="less_on_top"><span id="/alliance/nav/requestResult">&nbsp;</span>
+            </p>
         </td>
         <td>
-            <p class="less_on_top"><span id="/border/nav/requestResult">&nbsp;</span></p>
+            <p class="less_on_top"><span id="/border/nav/requestResult">&nbsp;</span>
+            </p>
         </td>
         <td>
-            <p class="less_on_top"><span id="/rim/nav/requestResult">&nbsp;</span></p>
+            <p class="less_on_top"><span id="/rim/nav/requestResult">&nbsp;</span>
+            </p>
         </td>
     </tr>
     <tr>
         <td>
-            <button id="/alliance/nav/lockBtn" class="button_with_text" type="button"
-                    onclick="lock(dd_al)">Lock Deck
+            <button id="/alliance/nav/lockBtn" class="button_with_text" type="button" onclick="lock(dd_al)">Lock Deck
             </button>
         </td>
         <td>
-            <button id="/border/nav/lockBtn" class="button_with_text" type="button"
-                    onclick="lock(dd_bo)">Lock Deck
+            <button id="/border/nav/lockBtn" class="button_with_text" type="button" onclick="lock(dd_bo)">Lock Deck
             </button>
         </td>
         <td>
-            <button id="/rim/nav/lockBtn" class="button_with_text" type="button"
-                    onclick="lock(dd_ri)">Lock Deck
+            <button id="/rim/nav/lockBtn" class="button_with_text" type="button" onclick="lock(dd_ri)">Lock Deck
             </button>
         </td>
     </tr>
@@ -596,8 +606,8 @@ overflow-y: auto;
             </button>
         </td>
         <td>
-            <button id="/rim/nav/unlockBtn" class="button_with_text top_margin" type="button"
-                    onclick="unlock(dd_ri)">Unlock Deck
+            <button id="/rim/nav/unlockBtn" class="button_with_text top_margin" type="button" onclick="unlock(dd_ri)">
+                Unlock Deck
             </button>
         </td>
     </tr>
@@ -614,8 +624,7 @@ overflow-y: auto;
             </button>
         </td>
         <td>
-            <button id="/rim/nav/shuffleBtn" class="button_with_text top_margin" type="button"
-                    onclick="shuffle(dd_ri)">
+            <button id="/rim/nav/shuffleBtn" class="button_with_text top_margin" type="button" onclick="shuffle(dd_ri)">
                 Shuffle
             </button>
         </td>
@@ -641,7 +650,6 @@ overflow-y: auto;
 
 </table>
 
-
 <div id="/alliance/nav/specOverlay" class="overlay">
     <div class="popup">
         <h1>Cards</h1>
@@ -665,14 +673,15 @@ overflow-y: auto;
 </div>
 <br>
 
-
 <button id="historyBtn" class="button_with_text top_margin" type="button" onclick="clearHistory()">Clear History
 </button>
 <h1>History</h1>
-<ol start="0" class="less_on_top"><span id="history"></span></ol>
-<p>Request id: <span id="requestId"/><br></p>
-
+<ol start="0" class="less_on_top"><span id="history"></span>
+</ol>
+<p>Request id: <span id="requestId"/>
+    <br>
+</p>
 
 </body>
-</html>
 
+</html>
