@@ -106,7 +106,7 @@
         border-radius: 5px;
         width: 80%;
         position: relative;
-        transition: all 5s ease-in-out;
+        transition: all 0.5s ease-in-out;
     }
     .popup .close {
         padding: 0;
@@ -523,7 +523,7 @@
 
     function show(hrefToShow) {
         debounce(function() {
-          //  body.classList.toggle('noscroll');
+            document.querySelector('body').classList.add('noscroll');
             location.href = hrefToShow;
         }, 200).call();
     }
@@ -534,6 +534,13 @@
         forEachDeckDisplay(function(value, key, map) {
             composeDescription(value);
         });
+         let anchors = document.getElementsByClassName("close");
+         for(let i = 0; i < anchors.length; i++) {
+            let anchor = anchors[i];
+            anchor.onclick = function() {
+                document.querySelector('body').classList.remove('noscroll');
+            };
+         }
     };
 
     </script>
