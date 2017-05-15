@@ -3,6 +3,11 @@
 
 <head>
     <style>
+    html, body {
+        height: 100%;
+    }
+    .noscroll { overflow: hidden; }
+
     h1 {
         font-size: 3.5rem;
     }
@@ -15,7 +20,7 @@
     ol {
         font-size: 3rem;
         margin-bottom: 0.5rem;
-        margin-left: 1.5rem;
+        margin-left: 3.5rem;
     }
     td {
         text-align: center;
@@ -25,18 +30,14 @@
         margin: 0;
         border: 0;
     }
-    table {
-        font-size: 3rem;
-        width: 1200px;
-        margin: 2.5rem 0% 0% 0%;
+    td {
+        text-align: center;
     }
     #deckTable {
         table-layout: fixed;
     }
     button {
-        border: none;
-    }
-    button:disabled {
+        font-size: 3rem;
         border: none;
     }
     .less_on_top {
@@ -46,22 +47,41 @@
         -moz-force-broken-image-icon: 1;
     }
     .logo_image {
-        height: 1040px;
-        width: 1100px;
+        height: 800px;
     }
     .large_card_image {
-        height: 1040px;
-        width: 715px;
+        height: 800px;
     }
+    .mediumCard {
+        height: 384px;
+        width: 264px;
+        margin: 0 10px 0 30px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        cursor: pointer;
+        transition: all 0.3s ease-out;
+    }
+    #\/alliance\/nav\/drawBtn {
+        background-image: url(/alliance/navCard/back.png);
+    }
+    #\/border\/nav\/drawBtn {
+        background-image: url(/border/navCard/back.png);
+    }
+    #\/rim\/nav\/drawBtn {
+        background-image: url(/rim/navCard/back.png);
+    }
+
     .top_margin {
-        margin: 2.5rem 0rem 0rem 0rem;
+        margin: 50px 0 0 0;
     }
     .button_with_text {
-        font-size: 2.5rem;
         border: 2px solid #06D85F;
         border-radius: 20px/50px;
         cursor: pointer;
         transition: all 0.3s ease-out;
+    }
+    .button_with_text:disabled {
+        border: 2px solid transparent;
     }
     .overlay {
         position: fixed;
@@ -108,6 +128,7 @@
         overflow: auto;
     }
     .popup table {
+        font-size: 3rem;
         width: 100%;
         margin: 0% 0px 7px 0%;
         border-collapse: collapse;
@@ -122,26 +143,9 @@
     .align_right {
         text-align: right;
     }
-    .mediumCard {
-        height: 480px;
-        width: 335px;
-        background-repeat: no-repeat;
-        background-size: contain;
-        cursor: pointer;
-        transition: all 0.3s ease-out;
-    }
     .disabled {
         opacity: 0.3;
         pointer-events: none;
-    }
-    #\/alliance\/nav\/drawBtn {
-        background-image: url(/alliance/navCard/back.png);
-    }
-    #\/border\/nav\/drawBtn {
-        background-image: url(/border/navCard/back.png);
-    }
-    #\/rim\/nav\/drawBtn {
-        background-image: url(/rim/navCard/back.png);
     }
 
     </style>
@@ -449,7 +453,7 @@
             let cardCount = cards[i];
             let card = new Card(deckDisplay.deck, cardCount.key);
             html += "<tr><td class='align_right'>" + card.getAnchor(card.action) +
-                "</td><td class='align_right'>&ensp;" + cardCount.value + "</td></tr>";
+                "</td><td class='align_right'>&ensp;" + cardCount.value + "&emsp;</td></tr>";
         }
         html += "</table>";
         updateElement(deckDisplay.specAreaId, false, html);
@@ -519,8 +523,9 @@
 
     function show(hrefToShow) {
         debounce(function() {
+          //  body.classList.toggle('noscroll');
             location.href = hrefToShow;
-        }, 250).call();
+        }, 200).call();
     }
     window.onload = function(e) {
         let history = getCookie("moveHistory");
@@ -535,15 +540,13 @@
 </head>
 
 <body>
-<table>
-    <tr>
-        <td><span id="/nav/card"><img src="/SerenityLogo.png" class='external_image logo_image'></span>
-            <br>
-        </td>
-    </tr>
-</table>
+<div>
 
 <table id="deckTable">
+    <tr>
+        <td id="/nav/card" colspan="3"><img src="/SerenityLogo.png" class='external_image logo_image'>
+        </td>
+    </tr>
     <tr id="drawActions">
         <td>
             <div id="/alliance/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_al)"/>
@@ -557,13 +560,13 @@
     </tr>
     <tr>
         <td>
-            <p class="less_on_top"><span id="/alliance/nav/status"></span>&emsp;&emsp;</p>
+            <p class="less_on_top"><span id="/alliance/nav/status"></span></p>
         </td>
         <td>
-            <p class="less_on_top"><span id="/border/nav/status"></span>&emsp;&emsp;</p>
+            <p class="less_on_top"><span id="/border/nav/status"></span></p>
         </td>
         <td>
-            <p class="less_on_top"><span id="/rim/nav/status"></span>&emsp;&emsp;</p>
+            <p class="less_on_top"><span id="/rim/nav/status"></span></p>
         </td>
     </tr>
     <tr>
@@ -650,6 +653,16 @@
 
 </table>
 
+<br>
+
+<button id="historyBtn" class="button_with_text top_margin" type="button" onclick="clearHistory()">Clear History
+</button>
+<h1>History</h1>
+<ol start="0" class="less_on_top"><span id="history"></span>
+</ol>
+    <p>Request id: <span id="requestId"/></p>
+</div>
+
 <div id="/alliance/nav/specOverlay" class="overlay">
     <div class="popup">
         <h1>Cards</h1>
@@ -671,17 +684,6 @@
         <div id="/rim/nav/spec" class="content"></div>
     </div>
 </div>
-<br>
-
-<button id="historyBtn" class="button_with_text top_margin" type="button" onclick="clearHistory()">Clear History
-</button>
-<h1>History</h1>
-<ol start="0" class="less_on_top"><span id="history"></span>
-</ol>
-<p>Request id: <span id="requestId"/>
-    <br>
-</p>
-
 </body>
 
 </html>
