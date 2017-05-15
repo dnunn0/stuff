@@ -14,7 +14,7 @@
             border:0;
         }
          /* table {width:100%;margin: 2.5rem 0% 0% 0%;border: 1px solid black;} */
-          table {font-size: 3rem;width:1200px;margin: 2.5rem 0% 0% 0%;}
+          table {font-size: 3rem;width:1200px;margin: 2.5rem 0% 0% 0%;table-layout: fixed;}
          button {
               border: none;
          }
@@ -31,21 +31,7 @@
          .large_card_image {
            height: 1040px;width: 715px;
          }
-         .button_image {
-            height: 480px;
-            width: 330px;
-         }
-        .button_with_image {
-            width:335px;
-            padding: 0 0 0 0;
-            background: none;
-            margin: 0 100px 0 0;
-            cursor: pointer;
-            transition: all 0.3s ease-out;
-         }
-         button.button_with_image:disabled {
-              opacity: 0.3;
-        }
+
         .top_margin {
             margin: 2.5rem 0rem 0rem 0rem;
          }
@@ -81,7 +67,6 @@ overflow-y: auto;
   background: #fff;
   border-radius: 5px;
   width: 80%;
- /* height: 95%;*/
     position: relative;
   transition: all 5s ease-in-out;
 }
@@ -124,6 +109,32 @@ overflow-y: auto;
 .align_right {
          text-align: right;
          }
+
+
+        .mediumCard {
+                    height: 480px;
+                    width: 335px;
+          background-repeat: no-repeat;
+          background-size: contain;
+                      cursor: pointer;
+                    transition: all 0.3s ease-out;
+        }
+
+         .disabled {
+              opacity: 0.3;
+                  pointer-events: none;
+        }
+
+        #\/alliance\/nav\/drawBtn {
+          background-image: url(/alliance/navCard/back.png);
+        }
+        #\/border\/nav\/drawBtn {
+          background-image: url(/border/navCard/back.png);
+        }
+        #\/rim\/nav\/drawBtn {
+          background-image: url(/rim/navCard/back.png);
+        }
+
 
     </style>
     <title>Firefly</title>
@@ -227,7 +238,8 @@ overflow-y: auto;
     }
     DeckDisplay.prototype.disableDrawCardButton = function(newState) {
         let control = document.getElementById(this.drawBtnId);
-        control.disabled = newState;
+        if(newState) control.classList.add('disabled');
+        else control.classList.remove('disabled');
     }
     DeckDisplay.prototype.applyNextDrawDisabledStatus = function() {
     //TODO how to make private methods (and then can make disable(id) private too)
@@ -521,23 +533,13 @@ overflow-y: auto;
 <table>
     <tr id="drawActions">
         <td>
-            <button class="button_with_image" id="/alliance/nav/drawBtn" type="button"
-                    onclick="drawCard(dd_al)">
-                <img src="/alliance/navCard/back.png" -alt='Request Alliance Nav card'
-                     class="external_image button_image"/>
-            </button>
+            <div id="/alliance/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_al)"/>
         </td>
         <td>
-            <button class="button_with_image" id="/border/nav/drawBtn" type="button"
-                    onclick="drawCard(dd_bo)">
-                <img src="/border/navCard/back.png" -alt='Request Border Nav card' class="external_image button_image"/>
-            </button>
+            <div id="/border/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_bo)"/>
         </td>
         <td>
-            <button class="button_with_image" id="/rim/nav/drawBtn" type="button"
-                    onclick="drawCard(dd_ri)">
-                <img src="/rim/navCard/back.png" -alt='Request Rim Nav card' class="external_image button_image"/>
-            </button>
+            <div id="/rim/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_ri)"/>
         </td>
     </tr>
     <tr>
