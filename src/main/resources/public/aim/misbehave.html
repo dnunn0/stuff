@@ -84,7 +84,8 @@
         border: 2px solid transparent;
     }
     .overlay {
-        position: fixed;
+          overflow-y: scroll;
+      position: fixed;
         top: 0;
         bottom: 0;
         left: 0;
@@ -99,12 +100,12 @@
         opacity: 1;
     }
     .popup {
-        overflow-y: auto;
+    /*    overflow-y: scroll;*/
         margin: 70px auto;
         padding: 0;
         background: #fff;
         border-radius: 5px;
-        width: 80%;
+        width: 85%;
         position: relative;
         transition: all 0.5s ease-in-out;
     }
@@ -124,8 +125,8 @@
         color: #06D85F;
     }
     .popup .content {
-        max-height: 100%;
-        overflow: auto;
+      /*  max-height: 100%;
+        overflow-y: scroll;*/
     }
     .popup table {
         font-size: 3rem;
@@ -453,7 +454,7 @@
             let cardCount = cards[i];
             let card = new Card(deckDisplay.deck, cardCount.key);
             html += "<tr><td class='align_right'>" + card.getAnchor(card.action) +
-                "</td><td class='align_right'>&ensp;" + cardCount.value + "&emsp;</td></tr>";
+                "</td><td class='align_right'>&ensp;" + cardCount.value + "&ensp;</td></tr>";
         }
         html += "</table>";
         updateElement(deckDisplay.specAreaId, false, html);
@@ -524,9 +525,21 @@
     function show(hrefToShow) {
         debounce(function() {
             document.querySelector('body').classList.add('noscroll');
+            document.querySelector('html').classList.add('noscroll');
             location.href = hrefToShow;
         }, 200).call();
     }
+    function restorescrollingAfterClosingOverlays() {
+             let anchors = document.getElementsByClassName("close");
+         for(let i = 0; i < anchors.length; i++) {
+            let anchor = anchors[i];
+            anchor.onclick = function() {
+                document.querySelector('body').classList.remove('noscroll');
+                document.querySelector('html').classList.remove('noscroll');
+            };
+         }
+    }
+
     window.onload = function(e) {
         let history = getCookie("moveHistory");
         updateElement("history", false, history);
@@ -534,13 +547,7 @@
         forEachDeckDisplay(function(value, key, map) {
             composeDescription(value);
         });
-         let anchors = document.getElementsByClassName("close");
-         for(let i = 0; i < anchors.length; i++) {
-            let anchor = anchors[i];
-            anchor.onclick = function() {
-                document.querySelector('body').classList.remove('noscroll');
-            };
-         }
+        restorescrollingAfterClosingOverlays();
     };
 
     </script>
