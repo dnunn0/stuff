@@ -22,7 +22,7 @@ public class MemoryMappedFile {
                 byte[] buffer = storage.getBytes();
                 mbb.position(position);
                 mbb.putInt(buffer.length);
-                System.out.format("put %d mbb %d fc %d\n", buffer.length, mbb.position(), fc.position());
+//                System.out.format("put %d mbb %d fc %d\n", buffer.length, mbb.position(), fc.position());
                 mbb.put(buffer);
             }
         } catch (IOException ex) {
@@ -37,7 +37,7 @@ public class MemoryMappedFile {
                 mbb.position(position);
                 int size = mbb.getInt(0);
                 mbb.position(position + 4);
-                System.out.format("read %d mbb %d fc %d\n", size, mbb.position(), fc.position());
+//                System.out.format("read %d mbb %d fc %d\n", size, mbb.position(), fc.position());
                 byte[] buffer = new byte[size];
                 mbb.get(buffer);
                 return new String(buffer);

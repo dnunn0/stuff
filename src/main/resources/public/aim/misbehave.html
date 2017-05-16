@@ -504,9 +504,17 @@
     }
 
     function shuffle(deckDisplay) {
-        if (confirm("Are you sure?") == true)
-            post(deckDisplay.deck.navPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse),
-                createOnSendErrorCallback(deckDisplay));
+        if (confirm("Are you sure?") == true) shuffleDontAsk(deckDisplay);
+    }
+
+    function shuffleDontAsk(deckDisplay) {
+        post(deckDisplay.deck.navPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse),
+        createOnSendErrorCallback(deckDisplay));
+    }
+
+    function resetAll() {
+        if (confirm("Are you *really* sure?") == true)
+            forEachDeckDisplay(function(value, key, map) {  shuffleDontAsk(value);  });
     }
 
     function describe(deckDisplay) {
@@ -689,6 +697,9 @@
 
 <br>
 
+    <button id="resetAllBtn" class="button_with_text top_margin" type="button" onclick="resetAll()">Shuffle All
+    </button>
+    <br>
 <button id="historyBtn" class="button_with_text top_margin" type="button" onclick="clearHistory()">Clear History
 </button>
 <h1>History</h1>
