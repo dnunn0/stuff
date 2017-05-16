@@ -285,6 +285,7 @@
                 await sleep(timeToSleep);
                 updateElement("/nav/card", false, newHtml);
                 await sleep(Math.max(0, postDisplayWaitTimeMs));
+                finishRequest(hasMoreDrawingToDo);
             });
     }
 
@@ -391,7 +392,7 @@
             case 200:
                 successCallback(deckDisplay, xhttp.responseText)
                 updateRequestId(xhttp.getResponseHeader("id"));
-                break;
+                return;
             case 404:
                 deckDisplay.reportError("Needs shuffling!");
                 break;
@@ -401,11 +402,11 @@
             default:
                 deckDisplay.reportUnexpectedError(xhttp);
         }
-        finishRequest();
+        finishRequest(false);
     }
 
-    function finishRequest() {
-        isDrawing=false;
+    function finishRequest(hasMoreDrawingToDo) {
+        if(isDrawing) isDrawing=hasMoreDrawingToDo;
         applyStatusForAllDecks();
     }
 
@@ -448,7 +449,7 @@
     function displayNavCard(deckDisplay, responseText) {
         let card = Card.FromJson(deckDisplay.deck, responseText);
         let cardDisplay = new CardDisplay(card);
-        cardDisplay.display(400, 700, false);
+        cardDisplay.display(500, 500, false);
         deckDisplay.updateResponse("&nbsp;");
         updateHistory(card);
     }
