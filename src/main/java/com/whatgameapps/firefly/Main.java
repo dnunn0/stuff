@@ -67,7 +67,7 @@ public class Main {
         //TODO need to implement join here. for now, just assume no joining
         NavDeck alliance = configureNavDeck(AllianceNavDeckSpecification.class);
         NavDeck border = configureNavDeck(BorderNavDeckSpecification.class);
-        NavDeck rim = configureNavDeck(BorderNavDeckSpecification.class);
+        NavDeck rim = configureNavDeck(RimNavDeckSpecification.class);
 
         new NavController(spark(), NavController.ALLIANCE_SPACE, alliance, statusServer.broadcaster);
         new NavController(spark(), NavController.BORDER_SPACE, border, statusServer.broadcaster);
@@ -83,33 +83,36 @@ public class Main {
 
     private NavDeck configureNavDeck(Class<? extends NavDeckSpecification> specClass) throws Exception {
         String entryKey = specClass.getName();
-        //TODO refactor
-        String decks = this.memory.read();
-        String[] split = decks.split(entryKey);
+        String decks = getMetadata();
 
-        String decksBefore = decks;
         if (shouldJoinExisting()) {
-            decksBefore = split[0];
-        }
-        int deckNbr = countEntries(decksBefore);
-
-        this.memory.write(decks + entryKey + METADATA_SEPARATOR + this.specName + METADATA_DELIMITER);
-
-        int position = METADATA_STORAGE_SIZE + (DECK_STORAGE_SIZE * deckNbr);
-        final MappedByteBuffer mbb = fc.map(FileChannel.MapMode.READ_WRITE, position, DECK_STORAGE_SIZE);
-        final PersistedDeck storage = new PersistedDeckMemoryMappedFile(fc, mbb);
-
-        NavDeck navDeck;
-        if (shouldJoinExisting()) {
+            String[] split = decks.split(entryKey);
+            String decksBefore = split[0];
+            int deckNbr = countEntries(decksBefore);
+            final PersistedDeck storage = createStorage(deckNbr);
+            System.out.format("Spec class %s deckNbr %d split %s\n", entryKey, deckNbr, split);
             String runningSpecName = split[1].split("" + METADATA_DELIMITER)[0].replace(METADATA_SEPARATOR, "");
-            navDeck = NavDeck.OldFrom(getSpecForSpecName(specClass, runningSpecName), storage);
-        } else
-            navDeck = NavDeck.NewFrom(getSpecForSpecName(specClass, specName), storage);
-        return navDeck;
+            return NavDeck.OldFrom(getSpecForSpecName(specClass, runningSpecName), storage);
+        } else {
+            int deckNbr = countEntries(decks);
+            final PersistedDeck storage = createStorage(deckNbr);
+            this.memory.write(decks + entryKey + METADATA_SEPARATOR + this.specName + METADATA_DELIMITER);
+            return NavDeck.NewFrom(getSpecForSpecName(specClass, specName), storage);
+        }
+    }
+
+    public String getMetadata() {
+        return this.memory.read();
     }
 
     private int countEntries(String decks) {
         return (int) decks.chars().filter(ch -> ch == METADATA_DELIMITER).count();
+    }
+
+    private PersistedDeck createStorage(int deckNbr) throws IOException {
+        int position = METADATA_STORAGE_SIZE + (DECK_STORAGE_SIZE * deckNbr);
+        final MappedByteBuffer mbb = fc.map(FileChannel.MapMode.READ_WRITE, position, DECK_STORAGE_SIZE);
+        return new PersistedDeckMemoryMappedFile(fc, mbb);
     }
 
     private NavDeckSpecification getSpecForSpecName(Class clazz, String specName) throws IllegalAccessException, NoSuchFieldException {
@@ -117,7 +120,13 @@ public class Main {
     }
 
     public static void main(String args[]) throws Exception {
-        new Main(args);
+        try {
+            new Main(args);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.format("Fatal error. Exiting.============================\n");
+            System.exit(-1);
+        }
     }
 
     public void stop() {

@@ -13,10 +13,12 @@ import org.junit.After;
 import org.junit.Test;
 
 import static org.hamcrest.core.StringContains.containsString;
+import static org.junit.Assert.assertEquals;
 
-public class MainJoinPreviousGameIntegratedTest {
-    private static final String NAV_PATH = NavController.ALLIANCE_SPACE + NavController.NAV;
-    private static final String STATUS_PATH = NAV_PATH + NavController.STATUS;
+public class MainPreviousGameIntegratedTest {
+    private static final String BORDER_NAV = NavController.BORDER_SPACE + NavController.NAV;
+    private static final String RIM_NAV = NavController.RIM_SPACE + NavController.NAV;
+    private static final String STATUS_PATH = RIM_NAV + NavController.STATUS;
     private TestUtils testUtils = new TestUtils(8888, "RESHUFFLE");
 
     @After
@@ -25,11 +27,13 @@ public class MainJoinPreviousGameIntegratedTest {
     }
 
     @Test
-    public void shouldJoinPreviousGameWhenAskedToDoSo() {
-        fly(getSpecBuilder().build());
+    public void shouldTakeTakeFromPreviousGame() {
+        fly(getSpecBuilder().build(), BORDER_NAV);
+        fly(getSpecBuilder().build(), RIM_NAV);
+
         final TestUtils test2 = new TestUtils(testUtils.main.spark().port() + 1, "join");
         try {
-            final String expectedStatus = new Gson().toJson(new NavDeckStatus(NAV_PATH, 0, 1, false));
+            final String expectedStatus = new Gson().toJson(new NavDeckStatus(RIM_NAV, 0, 1, false));
             ResponseSpecification statusSpec = getSpecBuilder().expectContent(containsString(expectedStatus)).build();
             Response response = RestAssured.when().get(STATUS_PATH).andReturn();
             response.then().spec(statusSpec);
@@ -38,13 +42,19 @@ public class MainJoinPreviousGameIntegratedTest {
         }
     }
 
-    private Response fly(ResponseSpecification spec) {
-        Response response = RestAssured.when().get(NAV_PATH).andReturn();
+    private Response fly(ResponseSpecification spec, String path) {
+        Response response = RestAssured.when().get(path).andReturn();
         response.then().spec(spec);
         return response;
     }
 
     private ResponseSpecBuilder getSpecBuilder() {
         return testUtils.getSpecBuilder(HttpStatus.OK_200);
+    }
+
+    @Test
+    public void shouldNotAddMoreDecksToGame() {
+        final TestUtils test2 = new TestUtils(testUtils.main.spark().port() + 1, "join");
+        assertEquals(3, test2.main.getMetadata().split("" + Main.METADATA_DELIMITER).length);
     }
 }
