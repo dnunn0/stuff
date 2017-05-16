@@ -2,7 +2,7 @@ Set app_dir=%~dp0
 for %%* in (.) do set app_name=%%~nx*
 
 if not "%1"=="" goto HAS_FILE
-echo usage: %0 batch-file-name main-class
+  @echo usage: %0 batch-file-name main-class
 goto :eof
 
 :HAS_FILE
