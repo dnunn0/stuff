@@ -6,5 +6,6 @@ build
 classes
 packages
 dist
+distribute
 out
 *.swp
