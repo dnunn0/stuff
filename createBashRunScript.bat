@@ -1,12 +1,17 @@
 Set app_dir=%~dp0
 for %%* in (.) do set app_name=%%~nx*
 
-set mainClassName=com.whatgameapps.%app_name%.Main
-if "%1"=="" goto HAS_MAIN
-  set mainClassName=%1
-:HAS_MAIN
+if not "%1"=="" goto HAS_FILE
+echo usage: %0 batch-file-name main-class
+goto :eof
 
-set batchfile= dist\%app_name%\run
+:HAS_FILE
+set batchfile= %1
+
+set mainClassName=com.whatgameapps.%app_name%.Main
+if "%2"=="" goto HAS_MAIN
+  set mainClassName=%2
+:HAS_MAIN
 
 Echo #!/bin/bash> %batchfile%
 Echo app_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" > /dev/null && pwd )">> %batchfile%
