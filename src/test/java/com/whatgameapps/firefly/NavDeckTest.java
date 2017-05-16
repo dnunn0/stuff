@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 
 public class NavDeckTest {
     private final TestUtils testUtils = new TestUtils();
-    private final NavDeck sut = createDeck();
+    private NavDeck sut = createDeck();
 
     @After
     public void restoreStdout() {
@@ -28,7 +28,7 @@ public class NavDeckTest {
     }
 
     private void createAndCheckDeck(final AllianceNavDeckSpecification expectedDeck) {
-        final NavDeck sut = new NavDeck(expectedDeck);
+        final NavDeck sut = new NavDeck(expectedDeck, new PersistedDeckInMemory());
         expectedDeck.entrySet().stream().forEach((spec) ->
                 assertEquals(spec.getElement(), spec.getCount(), sut.countCards(spec.getElement())));
     }
@@ -36,7 +36,7 @@ public class NavDeckTest {
     @Test
     public void deckContainsRightNumberOfCardsKalidasaDeck() {
         AllianceNavDeckSpecification spec = AllianceNavDeckSpecification.KALIDASA;
-        final NavDeck sut = new NavDeck(spec);
+        final NavDeck sut = new NavDeck(spec, new PersistedDeckInMemory());
         assertEquals(spec.count, sut.size());
     }
 
@@ -45,12 +45,13 @@ public class NavDeckTest {
         AllianceNavDeckSpecification spec2 = new AllianceNavDeckSpecification(AllianceNavDeckSpecification.RESHUFFLE, 4, ImmutableMultimap.<String, Integer>builder()
                 .put("Alliance Cruiser - Reshuffle", 3)
                 .build());
-        final NavDeck sut = new NavDeck(spec2);
+        final NavDeck sut = new NavDeck(spec2, new PersistedDeckInMemory());
         assertEquals(spec2.count, sut.size());
     }
 
     @Test
     public void deckShuffledAfterCreation() {
+        sut = createDeck();
         testUtils.redirectStdout();
         int deckCount = 20000;
         String cardToFind = sut.take().get().action;
@@ -67,7 +68,7 @@ public class NavDeckTest {
     }
 
     private NavDeck createDeck() {
-        return new NavDeck(AllianceNavDeckSpecification.BASIC);
+        return new NavDeck(AllianceNavDeckSpecification.BASIC, new PersistedDeckInMemory());
     }
 
     @Test
@@ -113,3 +114,4 @@ public class NavDeckTest {
     }
 
 }
+

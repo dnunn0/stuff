@@ -1,7 +1,6 @@
 package com.whatgameapps.firefly.controller;
 
 import com.whatgameapps.firefly.NavDeck;
-import com.whatgameapps.firefly.NavDeckSpecification;
 import com.whatgameapps.firefly.rest.NavCard;
 import com.whatgameapps.firefly.rest.NavDeckStatus;
 import org.eclipse.jetty.http.HttpStatus;
@@ -30,8 +29,8 @@ public class NavController {
     final StatusBroadcaster listeners;
     volatile DeckState deckState;
 
-    public NavController(Service spark, String spaceSectorPath, NavDeckSpecification spec, StatusBroadcaster listeners) {
-        this(spaceSectorPath, spec, listeners);
+    public NavController(Service spark, String spaceSectorPath, NavDeck deck, StatusBroadcaster listeners) {
+        this(spaceSectorPath, deck, listeners);
         spark.post(getLockPath(), this::lock);
         spark.delete(getLockPath(), this::unlock);
         spark.options(getLockPath(), this::allowCors);
@@ -44,9 +43,9 @@ public class NavController {
         spark.options(getSpecPath(), this::allowCors);
     }
 
-    public NavController(String spaceSectorPath, NavDeckSpecification spec, StatusBroadcaster listeners) {
+    public NavController(String spaceSectorPath, NavDeck deck, StatusBroadcaster listeners) {
         this.spaceSectorPath = spaceSectorPath;
-        this.deck = new NavDeck(spec);
+        this.deck = deck;
         this.listeners = listeners;
         this.listeners.addSource(this);
         this.deckState = new UnlockedDeckState();
@@ -120,7 +119,6 @@ public class NavController {
         this.deck.spec.entrySet().forEach(e -> reply.add(new AbstractMap.SimpleEntry<String, Integer>(e.getElement(), e.getCount())));
         return reply;
     }
-
 
     NavDeckStatus status(Request req, Response res) {
         return status();

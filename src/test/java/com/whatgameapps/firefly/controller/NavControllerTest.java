@@ -2,7 +2,9 @@ package com.whatgameapps.firefly.controller;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.whatgameapps.firefly.AllianceNavDeckSpecification;
+import com.whatgameapps.firefly.NavDeck;
 import com.whatgameapps.firefly.NavDeckSpecification;
+import com.whatgameapps.firefly.PersistedDeckInMemory;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
 import com.whatgameapps.firefly.rest.NavCard;
 import com.whatgameapps.firefly.rest.NavDeckStatus;
@@ -119,7 +121,7 @@ public class NavControllerTest {
     }
 
     private NavController createNavController(NavDeckSpecification spec) {
-        return new NavController(NavController.ALLIANCE_SPACE, spec, middleman);
+        return new NavController(NavController.ALLIANCE_SPACE, new NavDeck(spec, new PersistedDeckInMemory()), middleman);
     }
 
     @Test

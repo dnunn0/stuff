@@ -15,9 +15,10 @@ import java.util.stream.IntStream;
 
 public class NavDeck {
     public transient final NavDeckSpecification spec;
-    private transient String externalized;
+    private PersistedDeck storedDeck;
 
-    public NavDeck(NavDeckSpecification deckSpec) {
+    public NavDeck(NavDeckSpecification deckSpec, PersistedDeck storage) {
+        this.storedDeck = storage;
         this.spec = deckSpec;
         createDeck(deckSpec);
     }
@@ -44,13 +45,17 @@ public class NavDeck {
     }
 
     private void storeStacks(CardStacks stacks) {
-        this.externalized = stacks.externalize();
+        this.storedDeck.write(stacks.externalize());
     }
 
     public void shuffle() {
-        final CardStacks stacks = CardStacks.From(this.externalized);
+        final CardStacks stacks = retrieveStacks();
         stacks.shuffle();
         storeStacks(stacks);
+    }
+
+    private CardStacks retrieveStacks() {
+        return CardStacks.From(this.storedDeck.read());
     }
 
     /**
@@ -59,24 +64,24 @@ public class NavDeck {
      * @return
      */
     public int size() {
-        final CardStacks stacks = CardStacks.From(this.externalized);
+        final CardStacks stacks = retrieveStacks();
         return stacks.cards.size();
     }
 
     public int countCards(String target) {
-        final CardStacks stacks = CardStacks.From(this.externalized);
+        final CardStacks stacks = retrieveStacks();
         return stacks.countCards(target);
     }
 
     public Optional<NavCard> take() {
-        final CardStacks stacks = CardStacks.From(this.externalized);
+        final CardStacks stacks = retrieveStacks();
         final Optional<NavCard> result = stacks.take();
         storeStacks(stacks);
         return result;
     }
 
     public Stack<NavCard> discards() {
-        final CardStacks stacks = CardStacks.From(this.externalized);
+        final CardStacks stacks = retrieveStacks();
         return stacks.discards;
     }
 
@@ -88,8 +93,6 @@ public class NavDeck {
         static CardStacks From(String storage) {
             CardStacks result = new CardStacks();
             return result.readFrom(storage);
-
-            // return gson.fromJson(externalized, NavDeck.CardStacks.class);
         }
 
         private CardStacks readFrom(String storage) {
