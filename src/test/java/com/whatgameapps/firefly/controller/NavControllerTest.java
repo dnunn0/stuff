@@ -121,7 +121,7 @@ public class NavControllerTest {
     }
 
     private NavController createNavController(NavDeckSpecification spec) {
-        return new NavController(NavController.ALLIANCE_SPACE, new NavDeck(spec, new PersistedDeckInMemory()), middleman);
+        return new NavController(NavController.ALLIANCE_SPACE, NavDeck.NewFrom(spec, new PersistedDeckInMemory()), middleman);
     }
 
     @Test

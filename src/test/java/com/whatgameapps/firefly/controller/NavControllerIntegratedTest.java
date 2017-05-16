@@ -66,7 +66,7 @@ public class NavControllerIntegratedTest {
     }
 
     private String getTopCardAsJson() {
-        NavDeck deck = new NavDeck(AllianceNavDeckSpecification.RESHUFFLE, new PersistedDeckInMemory());
+        NavDeck deck = NavDeck.NewFrom(AllianceNavDeckSpecification.RESHUFFLE, new PersistedDeckInMemory());
         final NavCard card = deck.take().get();
         return gson.toJson(card);
     }

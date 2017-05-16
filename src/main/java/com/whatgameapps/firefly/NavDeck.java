@@ -14,24 +14,29 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class NavDeck {
-    public transient final NavDeckSpecification spec;
+    public final transient NavDeckSpecification spec;
     private PersistedDeck storedDeck;
 
-    public NavDeck(NavDeckSpecification deckSpec, PersistedDeck storage) {
+    private NavDeck(NavDeckSpecification deckSpec, PersistedDeck storage) {
         this.storedDeck = storage;
         this.spec = deckSpec;
-        createDeck(deckSpec);
     }
 
-    private void createDeck(final NavDeckSpecification deckSpec) {
+    public static NavDeck NewFrom(NavDeckSpecification deckSpec, PersistedDeck storage) {
+        NavDeck result = new NavDeck(deckSpec, storage);
+        result.createDeck();
+        return result;
+    }
+
+    private void createDeck() {
         final CardStacks stacks = new CardStacks();
-        List<NavCard> cardList = deckSpec.entrySet().stream()
+        List<NavCard> cardList = this.spec.entrySet().stream()
                 .map(cardsSpec -> createCards(cardsSpec.getElement(), cardsSpec.getCount()))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
         stacks.cards.addAll(cardList);
-        stacks.cards.addAll(createCards(NavCard.UNKNOWN, deckSpec.count - stacks.cards.size()));
+        stacks.cards.addAll(createCards(NavCard.UNKNOWN, this.spec.count - stacks.cards.size()));
 
         stacks.shuffle();
         storeStacks(stacks);
@@ -46,6 +51,10 @@ public class NavDeck {
 
     private void storeStacks(CardStacks stacks) {
         this.storedDeck.write(stacks.externalize());
+    }
+
+    public static NavDeck OldFrom(NavDeckSpecification deckSpec, PersistedDeck storage) {
+        return new NavDeck(deckSpec, storage);
     }
 
     public void shuffle() {

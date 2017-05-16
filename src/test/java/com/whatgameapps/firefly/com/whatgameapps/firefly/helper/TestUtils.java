@@ -16,7 +16,7 @@ public class TestUtils {
     public final PrintStream originalOut = System.out;
     public final ByteArrayOutputStream outStream = new ByteArrayOutputStream();
     public final PrintStream output = new PrintStream(outStream, true);
-    private Main main;
+    public Main main;
 
     public TestUtils(int port, String spec) {
         this();
@@ -57,10 +57,14 @@ public class TestUtils {
         stopApplication();
     }
 
-    private void stopApplication() {
+    public void stopApplication() {
         main.stop();
+        sleep(30);
+    }
+
+    public void sleep(int millis) {
         try {
-            Thread.sleep(30);
+            Thread.sleep(millis);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

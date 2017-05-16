@@ -28,7 +28,7 @@ public class NavDeckTest {
     }
 
     private void createAndCheckDeck(final AllianceNavDeckSpecification expectedDeck) {
-        final NavDeck sut = new NavDeck(expectedDeck, new PersistedDeckInMemory());
+        final NavDeck sut = NavDeck.NewFrom(expectedDeck, new PersistedDeckInMemory());
         expectedDeck.entrySet().stream().forEach((spec) ->
                 assertEquals(spec.getElement(), spec.getCount(), sut.countCards(spec.getElement())));
     }
@@ -36,7 +36,7 @@ public class NavDeckTest {
     @Test
     public void deckContainsRightNumberOfCardsKalidasaDeck() {
         AllianceNavDeckSpecification spec = AllianceNavDeckSpecification.KALIDASA;
-        final NavDeck sut = new NavDeck(spec, new PersistedDeckInMemory());
+        final NavDeck sut = NavDeck.NewFrom(spec, new PersistedDeckInMemory());
         assertEquals(spec.count, sut.size());
     }
 
@@ -45,7 +45,7 @@ public class NavDeckTest {
         AllianceNavDeckSpecification spec2 = new AllianceNavDeckSpecification(AllianceNavDeckSpecification.RESHUFFLE, 4, ImmutableMultimap.<String, Integer>builder()
                 .put("Alliance Cruiser - Reshuffle", 3)
                 .build());
-        final NavDeck sut = new NavDeck(spec2, new PersistedDeckInMemory());
+        final NavDeck sut = NavDeck.NewFrom(spec2, new PersistedDeckInMemory());
         assertEquals(spec2.count, sut.size());
     }
 
@@ -68,7 +68,7 @@ public class NavDeckTest {
     }
 
     private NavDeck createDeck() {
-        return new NavDeck(AllianceNavDeckSpecification.BASIC, new PersistedDeckInMemory());
+        return NavDeck.NewFrom(AllianceNavDeckSpecification.BASIC, new PersistedDeckInMemory());
     }
 
     @Test
