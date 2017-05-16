@@ -155,10 +155,8 @@
     <script>
     let hostPort = location.hostname + ":" + location.port;
     let isDrawing = false;
-    //TODO at some point, figure out how to restore closed websocket
     let statusUrl = "ws://" + hostPort + "/status";
-    let webSocket = new WebSocket(statusUrl);
-    setupStatus(webSocket);
+    let webSocket = setupStatus(statusUrl);
     let deck_al = new Deck("/alliance/nav");
     let deck_bo = new Deck("/border/nav");
     let deck_ri = new Deck("/rim/nav");
@@ -197,6 +195,10 @@
         deck.shouldShuffle = !(deck.hasCards || deck.isLocked);
         return deck;
     }
+    Deck.prototype.matches = function(path) {
+        return (this.navPath==path) || (this.navLockPath==path) || (this.specPath==path);
+    }
+
 
     function Card(deck, action) {
         this.deck = deck;
@@ -267,6 +269,9 @@
         let card = new Card(this.deck, "back");
         let cardDisplay = new CardDisplay(card);
         cardDisplay.display(0, 0, true);
+    }
+    DeckDisplay.prototype.matches = function(path) {
+        return this.deck.matches(path);
     }
 
     function CardDisplay(card) {
@@ -349,7 +354,8 @@
         return "";
     }
 
-    function setupStatus(webSocket) {
+    function setupStatus(statusUrl) {
+        let webSocket = new WebSocket(statusUrl)
         webSocket.onmessage = function(msg) {
             DeckDisplay.updateStatus(msg);
         };
@@ -360,9 +366,23 @@
             console.log("WebSocket connection open. Asking for status update. ");
             webSocket.send('update status');
         };
+        return webSocket;
     }
 
+    function statusResetRequired(path) {
+       if(webSocket.readyState < 2) return false;
+
+       webSocket = setupStatus(statusUrl);
+       let deckDisplay = dd_al;
+       forEachDeckDisplay(function(value, key, map) {if (key.matches(path)) deckDisplay=value;});
+       deckDisplay.reportError("Status restored. Try again!");
+       finishRequest(false);
+       return true;
+       }
+
     function sendRequest(method, path, onLoadCallback, onErrorCallback) {
+        if (statusResetRequired(path)) return;
+
         let xhttp = new XMLHttpRequest();
         xhttp.addEventListener("load", function(ev) {
             onLoadCallback(xhttp);
@@ -388,7 +408,9 @@
     }
 
     function processActionResponse(xhttp, deckDisplay, successCallback) {
-        switch (xhttp.status) {
+        let requestStatusCode = xhttp.status;
+
+        switch (requestStatusCode) {
             case 200:
                 successCallback(deckDisplay, xhttp.responseText)
                 updateRequestId(xhttp.getResponseHeader("id"));
@@ -398,7 +420,6 @@
                 break;
             case 409:
                 deckDisplay.reportError("Locked!");
-                break;
             default:
                 deckDisplay.reportUnexpectedError(xhttp);
         }
@@ -455,6 +476,7 @@
     }
 
     function justDisplayResponse(deckDisplay, responseText) {
+        forEachDeckDisplay(function(value, key, map) {value.updateResponse("&nbsp;");});
         deckDisplay.updateResponse(responseText);
     }
 
