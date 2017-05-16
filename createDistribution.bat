@@ -1,10 +1,10 @@
 setlocal
-echo ====================================================================
-echo ====================================================================
-echo ====================================================================
+@echo ====================================================================
+@echo ====================================================================
+@echo ====================================================================
 
 if not "%JAVA_HOME%"=="" goto JAVA_HOME_SET
-    Echo JAVA_HOME not set
+    @Echo JAVA_HOME not set
     goto :eof
 :JAVA_HOME_SET
 
@@ -46,7 +46,7 @@ for /f "tokens=1-2" %%a in (META-INF\MANIFEST.MF) do (
 )
 
 if NOT "%mainClassName%"=="" goto HAS_MAIN
-    Echo this script requires %archive_name%.jar include a manifest with the main class
+    @Echo this script requires %archive_name%.jar include a manifest with the main class
 Goto :eof
 
 :HAS_MAIN
