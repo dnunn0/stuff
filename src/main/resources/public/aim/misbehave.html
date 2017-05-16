@@ -514,8 +514,8 @@
             deckDisplay.displayCardBack();
             get(deck.navPath, createOnSendLoadCallback(deckDisplay, displayNavCard), createOnSendErrorCallback(
                 deckDisplay));
-        }
-        //TODO move lock, etc. into DeckDisplay? (Deck?--lots is UI related...)
+    }
+
     function lock(deckDisplay) {
         post(deckDisplay.deck.navLockPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse),
             createOnSendErrorCallback(deckDisplay));
