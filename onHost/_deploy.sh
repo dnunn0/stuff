@@ -24,4 +24,4 @@ echo ===================== New Version ========================>/dev/null
 date
 echo ==========================================================>/dev/null
 echo ==>/dev/null
-/c/firefly/run.bat 24680 KALIDASA >>$logfile 2>&1
+/c/firefly/run.bat 24680 join >>$logfile 2>&1
