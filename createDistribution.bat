@@ -1,4 +1,5 @@
 setlocal
+cls
 @echo ====================================================================
 @echo ====================================================================
 @echo ====================================================================
@@ -11,11 +12,19 @@ if not "%JAVA_HOME%"=="" goto JAVA_HOME_SET
 Set app_dir=%~dp0
 for %%* in (.) do set app_name=%%~nx*
 Set dist_dir=%app_dir%distribute\
-Set dist_app_dir=%dist_dir%%app_name%\
+FOR /F "tokens=*" %%a in ('git describe --tags --long') do SET Version=%%a
+SET Version=%version:.=-%
+
+set app_instance=%app_name%-%version%
+
+Set dist_app_dir=%dist_dir%%app_instance%\
 
 Set ROBOCOPY_OK=3
 CALL :DELETE_DIR %dist_dir% || Exit /b 1
 
+mkdir %dist_app_dir%
+
+echo %version%>%dist_app_dir%version.txt
 
 robocopy "%JAVA_HOME%\jre" "%dist_app_dir%runtime\jre" /E /PURGE /COPY:DAT /DCOPY:T /NS /NC /NFL /NDL /NP
 IF %ERRORLEVEL% GTR %ROBOCOPY_OK% goto done
@@ -52,19 +61,21 @@ Goto :eof
 :HAS_MAIN
 CALL :DELETE_DIR META-INF || Exit /b 1
 
-rem robocopy %app_dir%build\resources\main\public resources\public
 popd
 
 call createCmdRunScript.bat %dist_app_dir%run.bat %mainClassName%  || Exit /b 1
 
 call createBashRunScript.bat %dist_app_dir%run.sh %mainClassName%  || Exit /b 1
 
-pushd %dist_dir% && "C:\Program Files (x86)\7-Zip\7z" a -tzip -mx7 %app_name% && popd
+pushd %dist_dir% && "C:\Program Files (x86)\7-Zip\7z" a -tzip -mx7 "%app_instance%" %app_instance%
 
 if "%1"=="" goto done
-copy /Y %dist_dir%\%app_name%.zip %1
+copy /Y %dist_dir%* %1
+echo %version%>%1\version.txt
 
 dir %1
+
+popd
 
 goto :done
 

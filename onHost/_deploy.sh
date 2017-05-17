@@ -4,7 +4,12 @@ PS4='$LINENO: '
 set -x
 
 cmd //c "robocopy /J \\\\tsclient\C\WithAws %TEMP%"
-unzip /tmp/firefly -d c:/firefly-wait
+version=`cat /tmp/version.txt`
+
+app=firefly-$version
+
+rm -r c:/firefly/$app
+unzip /tmp/$app -d c:/firefly
 
 echo -->/dev/null
 echo ----------------- Kill Old Version ----------------- > /dev/null
@@ -12,16 +17,17 @@ date
 echo ---------------------------------------------------->/dev/null
 echo -->/dev/null
 
+port=`cat /tmp/LastPort.txt`
+port=$((port+1))
+echo "$port">/tmp/LastPort.txt
+
 cmd //c "taskkill /f /im java*"
 # doesn't kill java process kill $(ps -e | grep "firefly/run.bat"| awk '{print $1}')
 sleep 1s
 
-rm -r /c/firefly
-mv /c/firefly-wait/firefly /c/firefly
-rm -r /c/firefly-wait
 echo ==>/dev/null
 echo ===================== New Version ========================>/dev/null
 date
 echo ==========================================================>/dev/null
 echo ==>/dev/null
-/c/firefly/run.bat 24680 join >>$logfile 2>&1
+/c/firefly/$app/run.bat $port join>>$logfile 2>&1
