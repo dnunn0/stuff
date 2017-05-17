@@ -90,7 +90,7 @@ public class Main {
             String decksBefore = split[0];
             int deckNbr = countEntries(decksBefore);
             final PersistedDeck storage = createStorage(deckNbr);
-            System.out.format("Spec class %s deckNbr %d split %s\n", entryKey, deckNbr, split);
+            System.out.format("Spec class %s deckNbr %d split {%s}\n", entryKey, deckNbr, Arrays.asList(split));
             String runningSpecName = split[1].split("" + METADATA_DELIMITER)[0].replace(METADATA_SEPARATOR, "");
             return NavDeck.OldFrom(getSpecForSpecName(specClass, runningSpecName), storage);
         } else {
