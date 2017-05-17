@@ -70,6 +70,7 @@ call createBashRunScript.bat %dist_app_dir%run.sh %mainClassName%  || Exit /b 1
 pushd %dist_dir% && "C:\Program Files (x86)\7-Zip\7z" a -tzip -mx7 "%app_instance%" %app_instance%
 
 if "%1"=="" goto done
+del %1\*.zip
 copy /Y %dist_dir%* %1
 echo %version%>%1\version.txt
 
