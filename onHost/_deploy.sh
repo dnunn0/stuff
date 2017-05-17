@@ -46,4 +46,6 @@ exec /c/firefly/run$app.sh &
 #new app should be up. redirect requests to it.
 sleep 2s
 # have to do netsh int ipv4 install & reboot, also the service IP Helper must be running
+#  netsh interface portproxy show all
+#  netsh interface portproxy reset
 netsh interface portproxy set v4tov4 24680 127.0.0.1 $port
