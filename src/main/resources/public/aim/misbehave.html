@@ -442,10 +442,11 @@
     }
 
     function updateHistory(card) {
-        let anchorText = card.deck.navPath.replace("/", "");
-        anchorText = anchorText.replace("/nav", "");
-        anchorText = capitalizeFirstLetter(anchorText);
-        anchorText += "-" + card.action;
+        let anchorText = new Date().toLocaleTimeString('en-US', {hour12: false });
+        let sector = card.deck.navPath.replace("/", "");
+        sector = sector.replace("/nav", "");
+        sector = capitalizeFirstLetter(sector);
+        anchorText += " " + sector + "-" + card.action;
         let item = card.getAnchor(anchorText);
         let history = "<li>" + item + "</li>" + document.getElementById("history").innerHTML;
         setHistory(history);
@@ -564,7 +565,7 @@
         };
     }
 
-    function show(hrefToShow) {
+    function showOverlay(hrefToShow) {
         debounce(function() {
             document.querySelector('body').classList.add('noscroll');
             document.querySelector('html').classList.add('noscroll');
@@ -701,17 +702,17 @@
     <tr>
         <td>
             <button id="/alliance/nav/describeBtn" class="button_with_text top_margin" type="button"
-                    onclick="show('#/alliance/nav/specOverlay');">Deck
+                    onclick="showOverlay('#/alliance/nav/specOverlay');">Deck
             </button>
         </td>
         <td>
             <button id="/border/nav/describeBtn" class="button_with_text top_margin" type="button"
-                    onclick="show('#/border/nav/specOverlay');">Deck
+                    onclick="showOverlay('#/border/nav/specOverlay');">Deck
             </button>
         </td>
         <td>
             <button id="/rim/nav/describeBtn" class="button_with_text top_margin" type="button"
-                    onclick="show('#/rim/nav/specOverlay');">Deck
+                    onclick="showOverlay('#/rim/nav/specOverlay');">Deck
             </button>
         </td>
     </tr>
