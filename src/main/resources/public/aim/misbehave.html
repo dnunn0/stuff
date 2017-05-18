@@ -212,39 +212,60 @@
     let backoff=[1000, 3000];
     let attemptCount = 0;
 
-    function setupStatus() {
+    async function setupStatus() {
+   // if(webSocket)
+      //  alert("entering setupStatus ws rs " + webSocket.readyState);
         webSocket = new WebSocket("ws://" + hostPort + "/status")
         webSocket.onmessage = function(msg) {
             console.log("websocket to send " + msg + " " + webSocket.readyState);
             DeckDisplay.updateStatus(msg);
         };
         webSocket.onclose = async function() {
+        //Note: chrome on phone doesn't actually close until about a minute afterwards
+        //  in the interim, state is "connecting", state 0.
+        // Chrome on desktop closes immediately.
+         //   alert("onclose wsrs " + webSocket.readyState);
             showOverlay("#balladOverlay");
             console.log("WebSocket connection closed " + webSocket.readyState)
-            if (attemptCount < backoff.length) {
-                let timeToSleep = backoff[attemptCount];
-                attemptCount++;
-                await sleep(timeToSleep);
-                console.log("re-establish connection after close " + attemptCount);
-              //  setupStatus();
-            }
+            <!--if (attemptCount < backoff.length) {-->
+                <!--let timeToSleep = backoff[attemptCount];-->
+                <!--attemptCount++;-->
+                <!--await sleep(timeToSleep);-->
+                <!--console.log("re-establish connection after close " + attemptCount);-->
+              <!--//  setupStatus();-->
+            <!--}-->
         }
         webSocket.onopen = function(e) {
+   //         alert("onopen wsrs " + webSocket.readyState);
             console.log("WebSocket connection open. Asking for status update. " + webSocket.readyState);
             attemptCount = 0;
             window.location="#";
             webSocket.send('update status');
-
         };
+        webSocket.onerror = function(e) {showOverlay("#balladOverlay");
+            //alert("Error in web socket. not sure why.");
+            };
+        await sleep(100); //give some time to connect
         return webSocket;
     }
 
+    async function tryStatusAgain() {
+      //  alert("try status again!" + webSocket.readyState);
+        if (!isWebSocketOpen()) showOverlay("#balladOverlay");
+        await sleep(100); //give some time to connect
+        setupStatus();
+    }
+
+    function isWebSocketOpen() {
+        return webSocket.readyState == 1
+    }
+
     function statusResetRequired(path) {
-       if(webSocket.readyState < 2) return false;
+       if(isWebSocketOpen()) return false;
 
        webSocket = setupStatus();
-       alert("ws rs" + webSocket.readyState);
-       if(webSocket.readyState > 1) {
+     //  alert("ws rs srr" + webSocket.readyState);
+       if(!isWebSocketOpen()) {
            showOverlay("#balladOverlay");
            return true;
        }
@@ -257,6 +278,7 @@
        }
 
     function sendRequest(method, path, onLoadCallback, onErrorCallback) {
+       // alert("send request " + webSocket.readyState);
         if (statusResetRequired(path)) return;
 
         let xhttp = new XMLHttpRequest();
@@ -726,7 +748,7 @@
     <div id="balladOverlay" class="overlay to-the-black">
         <div id="balladPopup" class="popup to-the-black">
             <h1 class="to-the-black">Ballad of Serenity<br>&emsp;by Sonny Rhodes</h1>
-            <a class="close to-the-black" onclick="setupStatus()" href="#">&#10006;</a>
+            <a class="close to-the-black" onclick="tryStatusAgain()" href="#">&#10006;</a>
             <div id="balladOverlayDiv" class="content to-the-black">
                 Take my love.<br>
                 Take my land.<br>
