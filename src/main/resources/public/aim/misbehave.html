@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <link rel="stylesheet" type="text/css" href="css.css" media="screen"/>
     <title>Firefly</title>
     <script>
@@ -209,76 +210,78 @@
         return "";
     }
 
-    let backoff=[1000, 3000];
-    let attemptCount = 0;
+    function webSocketState(socketToCheck) {
+        return socketToCheck==null?"undefined": socketToCheck.readyState;
+    }
 
     async function setupStatus() {
-   // if(webSocket)
-      //  alert("entering setupStatus ws rs " + webSocket.readyState);
-        webSocket = new WebSocket("ws://" + hostPort + "/status")
+        let socketToCheck = webSocket;
+
+        if(socketToCheck) {
+            console.log("entering setupStatus ws rs " + socketToCheck.readyState);
+            }
+        else console.log(" entering setupStatus, ws is undefined");
+
+        if(isWebSocketOpen(socketToCheck) ) {
+            console.log("setupStatus false alarm. returning");
+            return;
+        } else {
+            console.log("after check setupStatus ws rs, status? "
+            + (socketToCheck==null?"undefined": socketToCheck.readyState));
+            if (socketToCheck != null) socketToCheck.close(3000, "not open");
+            console.log("closed socket");
+        }
+
+        let newSocket = new WebSocket("ws://" + hostPort + "/status");
+        webSocket=newSocket;
+
         webSocket.onmessage = function(msg) {
-            console.log("websocket to send " + msg + " " + webSocket.readyState);
+            console.log("websocket message from " + msg.origin + " " + webSocketState(this));
             DeckDisplay.updateStatus(msg);
         };
         webSocket.onclose = async function() {
-        //Note: chrome on phone doesn't actually close until about a minute afterwards
-        //  in the interim, state is "connecting", state 0.
-        // Chrome on desktop closes immediately.
-         //   alert("onclose wsrs " + webSocket.readyState);
             showOverlay("#balladOverlay");
-            console.log("WebSocket connection closed " + webSocket.readyState)
-            <!--if (attemptCount < backoff.length) {-->
-                <!--let timeToSleep = backoff[attemptCount];-->
-                <!--attemptCount++;-->
-                <!--await sleep(timeToSleep);-->
-                <!--console.log("re-establish connection after close " + attemptCount);-->
-              <!--//  setupStatus();-->
-            <!--}-->
-        }
+         }
         webSocket.onopen = function(e) {
-   //         alert("onopen wsrs " + webSocket.readyState);
-            console.log("WebSocket connection open. Asking for status update. " + webSocket.readyState);
-            attemptCount = 0;
-            window.location="#";
-            webSocket.send('update status');
+            console.log("WebSocket connection open. Asking for status update. " + this.readyState);
+            window.location.href="#";
+            this.send('update status');
+             //TODO do something about repeating over all decks
+            forEachDeckDisplay(function(value, key, map) {composeDescription(value);});
+
         };
         webSocket.onerror = function(e) {showOverlay("#balladOverlay");
-            //alert("Error in web socket. not sure why.");
+            // console.log("Error in web socket. EOF?." + webSocketState(this)+ " top?" + (this==aSockets[aSockets.length - 1]));
             };
-        await sleep(100); //give some time to connect
-        return webSocket;
+        return newSocket;
     }
 
-    async function tryStatusAgain() {
-      //  alert("try status again!" + webSocket.readyState);
-        if (!isWebSocketOpen()) showOverlay("#balladOverlay");
-        await sleep(100); //give some time to connect
+    function tryStatusAgain() {
         setupStatus();
+        if (isWebSocketOpen(webSocket)) {
+            location.href="#";
+            return;
+        }
     }
 
-    function isWebSocketOpen() {
-        return webSocket.readyState == 1
+    function isWebSocketOpen(socketToCheck) {
+        let isWebSocketOpen = (socketToCheck != null) && socketToCheck.readyState == 1;
+        return isWebSocketOpen;
     }
 
     function statusResetRequired(path) {
-       if(isWebSocketOpen()) return false;
+       if(isWebSocketOpen(webSocket)) return false;
 
-       webSocket = setupStatus();
-     //  alert("ws rs srr" + webSocket.readyState);
+       setupStatus();
        if(!isWebSocketOpen()) {
            showOverlay("#balladOverlay");
            return true;
        }
 
-       let deckDisplay = dd_al;
-       forEachDeckDisplay(function(value, key, map) {if (key.matches(path)) deckDisplay=value;});
-       deckDisplay.reportError("Status restored. Try again!");
-       finishRequest(false);
-       return true;
-       }
+       return false;
+      }
 
     function sendRequest(method, path, onLoadCallback, onErrorCallback) {
-       // alert("send request " + webSocket.readyState);
         if (statusResetRequired(path)) return;
 
         let xhttp = new XMLHttpRequest();
@@ -510,17 +513,18 @@
             createOnSendErrorCallback(deckDisplay));
     }
 
-    function debounce(fun, mil) {
+    function debounce(fun, milliSeconds) {
         var timer;
         return function() {
             clearTimeout(timer);
             timer = setTimeout(function() {
                 fun();
-            }, mil);
+            }, milliSeconds);
         };
     }
 
     function showOverlay(hrefToShow) {
+        if (location.hash == hrefToShow) return;
         debounce(function() {
             document.querySelector('body').classList.add('noscroll');
             document.querySelector('html').classList.add('noscroll');
@@ -547,15 +551,31 @@
 
     }
 
-    window.onload = function(e) {
+    window.onerror = function (msg, url, lineNo, columnNo, error) {
+        var string = msg.toLowerCase();
+        var substring = "script error";
+        if (string.indexOf(substring) > -1){
+            alert('Script Error: See Browser Console for Detail');
+        } else {
+            var message = [
+                'Message: ' + msg,
+                'URL: ' + url,
+                'Line: ' + lineNo,
+                'Column: ' + columnNo,
+                'Error object: ' + JSON.stringify(error)
+            ].join(' - ');
+
+            alert(message);
+        }
+
+        return false;
+    };
+
+    window.onload = async function(e) {
         let history = getCookie("moveHistory");
         updateElement("history", false, history);
-        //TODO do something about repeating over all decks
-        forEachDeckDisplay(function(value, key, map) {
-            composeDescription(value);
-        });
         restoreScrollingAfterClosingOverlays();
-    };
+     };
 
     </script>
 </head>
@@ -747,9 +767,11 @@
     </div>
     <div id="balladOverlay" class="overlay to-the-black">
         <div id="balladPopup" class="popup to-the-black">
-            <h1 class="to-the-black">Ballad of Serenity<br>&emsp;by Sonny Rhodes</h1>
-            <a class="close to-the-black" onclick="tryStatusAgain()" href="#">&#10006;</a>
+            <h1 class="to-the-black"><a href="https://www.youtube.com/watch?v=7DiWxcilWtU" target="_blank">Ballad of
+                Serenity</a><br>&emsp;by Sonny Rhodes</h1>
+            <a class="close to-the-black" onclick="tryStatusAgain()">&#10006;</a>
             <div id="balladOverlayDiv" class="content to-the-black">
+
                 Take my love.<br>
                 Take my land.<br>
                 Take me where I cannot stand.<br>
@@ -765,7 +787,8 @@
                 <br>
                 There's no place I can't be<br>
                 Since I found Serenity.<br>
-                But you can't take the sky from me.<br>
+                <a href="https://www.youtube.com/watch?v=opZIBaBjN08" target="_blank">But you can't take the sky from
+                    me.</a><br>
 
             </div>
         </div>

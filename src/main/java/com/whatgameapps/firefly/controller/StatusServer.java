@@ -12,21 +12,23 @@ public class StatusServer {
 
     @OnWebSocketConnect
     public void onConnect(Session user) throws Exception {
-        System.out.println("Received connect request " + user.getRemoteAddress());
+        System.out.format("\n%TD:%<TT - Received connect request %s",
+                System.currentTimeMillis(), user.getRemoteAddress());
         broadcaster.addSubscriber(user);
     }
 
     @OnWebSocketClose
     public void onClose(Session user, int statusCode, String reason) {
-        System.out.format("Received close request from %s reason: %d %s\n",
-                user.getRemoteAddress(), statusCode, reason);
+        System.out.format("\n%TD:%<TT - Received close request from %s reason: %d %s\n",
+                System.currentTimeMillis(), user.getRemoteAddress(), statusCode, reason);
 
         broadcaster.removeSubscriber(user);
     }
 
     @OnWebSocketMessage
     public void onMessage(Session user, String message) {
-        System.out.format("Received message from %s message: [%s]\n", user.getRemoteAddress(), message);
+        System.out.format("\n%TD:%<TT - Received message from %s message: [%s]\n",
+                System.currentTimeMillis(), user.getRemoteAddress(), message);
         broadcaster.update(user);
     }
 

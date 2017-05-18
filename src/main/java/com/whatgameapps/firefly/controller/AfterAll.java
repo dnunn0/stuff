@@ -5,10 +5,12 @@ import spark.Request;
 import spark.Response;
 import spark.Service;
 
+import java.sql.Timestamp;
+
 public class AfterAll {
     public AfterAll(Service spark) {
         spark.after((Request req, Response res) -> {
-            System.out.format("\t%s - Status %d. ResponseText: [%s]\n", res.raw().getHeader(NavController.ID_HEADER), res.status(), res.body());
+            System.out.format("\t%TD:%<TT - %s - Status %d. ResponseText: [%s]\n", new Timestamp(System.currentTimeMillis()), res.raw().getHeader(NavController.ID_HEADER), res.status(), res.body());
 
             res.type(ContentType.APPLICATION_JSON.toString());
                     res.header("Access-Control-Allow-Origin", "*");
