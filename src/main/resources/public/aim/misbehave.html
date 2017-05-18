@@ -2,161 +2,13 @@
 <html>
 
 <head>
-    <style>
-    html, body {
-        height: 100%;
-    }
-    .noscroll { overflow: hidden; }
-
-    h1 {
-        font-size: 3.5rem;
-    }
-    p {
-        font-size: 3rem;
-    }
-    a {
-        font-size: 3rem;
-    }
-    ol {
-        font-size: 3rem;
-        margin-bottom: 0.5rem;
-        margin-left: 3.5rem;
-    }
-    td {
-        text-align: center;
-    }
-    img {
-        padding: 0;
-        margin: 0;
-        border: 0;
-    }
-    td {
-        text-align: center;
-    }
-    #deckTable {
-        table-layout: fixed;
-    }
-    button {
-        font-size: 3rem;
-        border: none;
-    }
-    .less_on_top {
-        margin-top: -10px;
-    }
-    .external_image {
-        -moz-force-broken-image-icon: 1;
-    }
-    .logo_image {
-        height: 800px;
-    }
-    .large_card_image {
-        height: 800px;
-    }
-    .mediumCard {
-        height: 384px;
-        width: 264px;
-        margin: 0 10px 0 30px;
-        background-repeat: no-repeat;
-        background-size: contain;
-        cursor: pointer;
-        transition: all 0.3s ease-out;
-    }
-    #\/alliance\/nav\/drawBtn {
-        background-image: url(/alliance/navCard/back.png);
-    }
-    #\/border\/nav\/drawBtn {
-        background-image: url(/border/navCard/back.png);
-    }
-    #\/rim\/nav\/drawBtn {
-        background-image: url(/rim/navCard/back.png);
-    }
-
-    .top_margin {
-        margin: 50px 0 0 0;
-    }
-    .button_with_text {
-        border: 2px solid #06D85F;
-        border-radius: 20px/50px;
-        cursor: pointer;
-        transition: all 0.3s ease-out;
-    }
-    .button_with_text:disabled {
-        border: 2px solid transparent;
-    }
-    .overlay {
-        overflow-y: scroll;
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(0, 0, 0, 0.7);
-        transition: opacity 500ms;
-        visibility: hidden;
-        opacity: 0;
-    }
-    .overlay:target {
-        visibility: visible;
-        opacity: 1;
-    }
-    .popup {
-        margin: 70px auto;
-        padding: 0 0px 10px 0;
-        background: #fff;
-        border-radius: 5px;
-        width: 85%;
-        position: relative;
-        transition: all 0.5s ease-in-out;
-    }
-    .popup .close {
-        padding: 0;
-        margin: 0;
-        position: absolute;
-        top: 00px;
-        right: 15px;
-        transition: all 200ms;
-        font-size: 50px;
-        font-weight: bold;
-        text-decoration: none;
-        color: #333;
-    }
-    .popup .close:hover {
-        color: #06D85F;
-    }
-    .popup .content {
-      /*  max-height: 100%;
-        overflow-y: scroll;*/
-    }
-    .popup table {
-        font-size: 3rem;
-        width: 100%;
-        border-collapse: collapse;
-        border-bottom: 8px solid grey;
-    }
-    .popup tr:nth-child(even) {
-        background-color: whitesmoke;
-    }
-    .popup h1 {
-        margin: 0% 0% 0% 0%;
-    }
-    .align_right {
-        text-align: right;
-    }
-    .px80wide {
-        width: 80px;
-    }
-    .disabled {
-        opacity: 0.3;
-        pointer-events: none;
-    }
-
-    </style>
+    <link rel="stylesheet" type="text/css" href="css.css" media="screen"/>
     <title>Firefly</title>
     <script>
     let hostPort = location.hostname + ":" + location.port;
     let isDrawing = false;
-    let statusUrl = "ws://" + hostPort + "/status";
-    let webSocket = setupStatus(statusUrl);
+    let webSocket = null;
+    setupStatus();
     let deck_al = new Deck("/alliance/nav");
     let deck_bo = new Deck("/border/nav");
     let deck_ri = new Deck("/rim/nav");
@@ -354,17 +206,31 @@
         return "";
     }
 
-    function setupStatus(statusUrl) {
-        let webSocket = new WebSocket(statusUrl)
+    let backoff=[1000, 3000];
+    let attemptCount = 0;
+
+    function setupStatus() {
+        webSocket = new WebSocket("ws://" + hostPort + "/status")
         webSocket.onmessage = function(msg) {
+            console.log("websocket to send " + msg + " " + webSocket.readyState);
             DeckDisplay.updateStatus(msg);
         };
-        webSocket.onclose = function() {
-            console.log("WebSocket connection closed ")
+        webSocket.onclose = async function() {
+            showOverlay("#balladOverlay");
+            console.log("WebSocket connection closed " + webSocket.readyState)
+            if (attemptCount < backoff.length) {
+                let timeToSleep = backoff[attemptCount];
+                attemptCount++;
+                await sleep(timeToSleep);
+                setupStatus();
+            }
         }
         webSocket.onopen = function(e) {
-            console.log("WebSocket connection open. Asking for status update. ");
+            console.log("WebSocket connection open. Asking for status update. " + webSocket.readyState);
+            attemptCount = 0;
+            window.location="#";
             webSocket.send('update status');
+
         };
         return webSocket;
     }
@@ -372,7 +238,7 @@
     function statusResetRequired(path) {
        if(webSocket.readyState < 2) return false;
 
-       webSocket = setupStatus(statusUrl);
+       webSocket = setupStatus();
        let deckDisplay = dd_al;
        forEachDeckDisplay(function(value, key, map) {if (key.matches(path)) deckDisplay=value;});
        deckDisplay.reportError("Status restored. Try again!");
@@ -546,7 +412,12 @@
             createOnSendErrorCallback(deckDisplay));
     }
 
+    function showWebsocketState() {
+        console.log("ws " + webSocket.readyState);
+    }
+
     function clearHistory() {
+        //webSocket.close();
         setHistory("");
     }
 
@@ -576,13 +447,13 @@
     function restoreScrolling() {
                 document.querySelector('body').classList.remove('noscroll');
                 document.querySelector('html').classList.remove('noscroll');
-
     }
+
     function restoreScrollingAfterClosingOverlays() {
          let anchors = document.getElementsByClassName("close");
          for(let i = 0; i < anchors.length; i++) {
             let anchor = anchors[i];
-            anchor.onclick = function() { restoreScrolling(); };
+            anchor.addEventListener("click",restoreScrolling(),false);
          }
 
          window.addEventListener('popstate', function(event) {
@@ -729,30 +600,58 @@
 <h1>History</h1>
 <ol start="0" class="less_on_top"><span id="history"></span>
 </ol>
-    <p>Request id: <span id="requestId"/></p>
+    <p>Request id: <span id="requestId"></span></p>
 </div>
 
-<div id="/alliance/nav/specOverlay" class="overlay">
-    <div class="popup">
-        <h1>Cards</h1>
-        <a class="close" href="#">&#10006;</a>
-        <div id="/alliance/nav/spec" class="content"></div>
+
+<section>
+    <div id="/alliance/nav/specOverlay" class="overlay">
+        <div class="popup">
+            <h1>Cards</h1>
+            <a class="close" href="#">&#10006;</a>
+            <div id="/alliance/nav/spec" class="content"></div>
+        </div>
     </div>
-</div>
-<div id="/border/nav/specOverlay" class="overlay">
-    <div class="popup">
-        <h1>Cards</h1>
-        <a class="close" href="#">&#10006;</a>
-        <div id="/border/nav/spec" class="content"></div>
+    <div id="/border/nav/specOverlay" class="overlay">
+        <div class="popup">
+            <h1>Cards</h1>
+            <a class="close" href="#">&#10006;</a>
+            <div id="/border/nav/spec" class="content"></div>
+        </div>
     </div>
-</div>
-<div id="/rim/nav/specOverlay" class="overlay">
-    <div class="popup">
-        <h1>Cards</h1>
-        <a class="close" href="#">&#10006;</a>
-        <div id="/rim/nav/spec" class="content"></div>
+    <div id="/rim/nav/specOverlay" class="overlay">
+        <div class="popup">
+            <h1>Cards</h1>
+            <a class="close" href="#">&#10006;</a>
+            <div id="/rim/nav/spec" class="content"></div>
+        </div>
     </div>
-</div>
+    <div id="balladOverlay" class="overlay to-the-black">
+        <div id="balladPopup" class="popup to-the-black">
+            <h1 class="to-the-black">Ballad of Serenity<br>&emsp;by Sonny Rhodes</h1>
+            <a class="close to-the-black" onclick="setupStatus()" href="#">&#10006;</a>
+            <div id="balladOverlayDiv" class="content to-the-black">
+                Take my love.<br>
+                Take my land.<br>
+                Take me where I cannot stand.<br>
+                I don't care,<br>
+                I'm still free.<br>
+                You can't take the sky from me.<br>
+                <br>
+                Take me out to the black.<br>
+                Tell em I ain't comin' back.<br>
+                Burn the land<br>
+                And boil the sea.<br>
+                You can't take the sky from me.<br>
+                <br>
+                There's no place I can't be<br>
+                Since I found Serenity.<br>
+                But you can't take the sky from me.<br>
+
+            </div>
+        </div>
+    </div>
+</section>
 </body>
 
 </html>

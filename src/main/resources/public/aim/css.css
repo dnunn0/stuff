@@ -1,0 +1,159 @@
+    html, body {
+        height: 100%;
+    }
+    .noscroll { overflow: hidden; }
+    .disabled {
+        opacity: 0.3;
+        pointer-events: none;
+    }
+    h1 {
+        font-size: 3.5rem;
+    }
+    p {
+        font-size: 3rem;
+    }
+    a {
+        font-size: 3rem;
+    }
+    ol {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        margin-left: 3.5rem;
+    }
+    td {
+        text-align: center;
+    }
+    img {
+        padding: 0;
+        margin: 0;
+        border: 0;
+    }
+    td {
+        text-align: center;
+    }
+    #deckTable {
+        table-layout: fixed;
+    }
+    button {
+        font-size: 3rem;
+        border: none;
+    }
+    .less_on_top {
+        margin-top: -10px;
+    }
+    .external_image {
+        -moz-force-broken-image-icon: 1;
+    }
+    .logo_image {
+        height: 800px;
+    }
+    .large_card_image {
+        height: 800px;
+    }
+    .mediumCard {
+        height: 384px;
+        width: 264px;
+        margin: 0 10px 0 30px;
+        background-repeat: no-repeat;
+        background-size: contain;
+        cursor: pointer;
+        transition: all 0.3s ease-out;
+    }
+    #\/alliance\/nav\/drawBtn {
+        background-image: url(/alliance/navCard/back.png);
+    }
+    #\/border\/nav\/drawBtn {
+        background-image: url(/border/navCard/back.png);
+    }
+    #\/rim\/nav\/drawBtn {
+        background-image: url(/rim/navCard/back.png);
+    }
+
+    .top_margin {
+        margin: 50px 0 0 0;
+    }
+    .button_with_text {
+        border: 2px solid #06D85F;
+        border-radius: 20px/50px;
+        cursor: pointer;
+        transition: all 0.3s ease-out;
+    }
+    .button_with_text:disabled {
+        border: 2px solid transparent;
+    }
+    .overlay {
+        overflow-y: scroll;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        transition: opacity 500ms;
+        visibility: hidden;
+        opacity: 0;
+    }
+    .overlay:target {
+        visibility: visible;
+        opacity: 1;
+    }
+    .popup {
+        margin: 70px auto;
+        padding: 0 0px 10px 0;
+        background: #fff;
+        border-radius: 5px;
+        width: 85%;
+        position: relative;
+        transition: all 0.5s ease-in-out;
+    }
+    #balladPopup {
+        width: 900px;
+        margin: 0px auto;
+        padding: 0;
+    }
+    .popup .close {
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        top: 00px;
+        right: 15px;
+        transition: all 200ms;
+        font-size: 50px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #333;
+    }
+    .popup .close:hover {
+        color: #06D85F;
+    }
+    .popup .content {
+      /*  max-height: 100%;
+        overflow-y: scroll;*/
+    }
+    .popup .to-the-black {
+        color: white;
+        background: black;
+    }
+    .popup table {
+        font-size: 3rem;
+        width: 100%;
+        border-collapse: collapse;
+        border-bottom: 8px solid grey;
+    }
+    .popup tr:nth-child(even) {
+        background-color: whitesmoke;
+    }
+    .popup h1 {
+        margin: 0% 0% 0% 0%;
+    }
+
+    .popup div {
+        font-size: 3rem;
+    }
+
+    .align_right {
+        text-align: right;
+    }
+    .px80wide {
+        width: 80px;
+    }
