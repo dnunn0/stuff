@@ -250,12 +250,8 @@
         if (statusResetRequired(path)) return;
 
         let xhttp = new XMLHttpRequest();
-        xhttp.addEventListener("load", function(ev) {
-            onLoadCallback(xhttp);
-        });
-        xhttp.addEventListener("error", function(ev) {
-            onErrorCallback(xhttp);
-        });
+        xhttp.addEventListener("load", function(ev) { onLoadCallback(xhttp); });
+        xhttp.addEventListener("error", function(ev) {  onErrorCallback(xhttp);   });
         xhttp.open(method, getUrl(path), true);
         //	  xhttp.setRequestHeader("Authorize", "dm9yZGVsOnZvcmRlbA==");
         xhttp.send();
