@@ -24,6 +24,9 @@
     dds.set(deck_bo, dd_bo);
     dds.set(deck_ri, dd_ri);
 
+    let actionCheckboxes = ["workCb", "buyCb", "dealCb", "flyCb"];
+
+
     function Deck(navPath) {
         this.navPath = navPath;
         this.navLockPath = navPath + "/lock";
@@ -222,7 +225,8 @@
                 let timeToSleep = backoff[attemptCount];
                 attemptCount++;
                 await sleep(timeToSleep);
-                setupStatus();
+                console.log("re-establish connection after close " + attemptCount);
+              //  setupStatus();
             }
         }
         webSocket.onopen = function(e) {
@@ -239,6 +243,12 @@
        if(webSocket.readyState < 2) return false;
 
        webSocket = setupStatus();
+       alert("ws rs" + webSocket.readyState);
+       if(webSocket.readyState > 1) {
+           showOverlay("#balladOverlay");
+           return true;
+       }
+
        let deckDisplay = dd_al;
        forEachDeckDisplay(function(value, key, map) {if (key.matches(path)) deckDisplay=value;});
        deckDisplay.reportError("Status restored. Try again!");
@@ -303,8 +313,11 @@
         createCookie("moveHistory", history, 12);
     }
 
+    function getTimestamp() {
+        return new Date().toLocaleTimeString('en-US', {hour12: false });
+    }
     function updateHistory(card) {
-        let anchorText = new Date().toLocaleTimeString('en-US', {hour12: false });
+        let anchorText = getTimestamp();
         let sector = card.deck.navPath.replace("/", "");
         sector = sector.replace("/nav", "");
         sector = capitalizeFirstLetter(sector);
@@ -344,7 +357,7 @@
     }
 
     function displayResponseInOverlay(deckDisplay, responseText) {
-        let html = "<table>";
+        let html = "<table class='border-on-bottom'>";
         let cards = JSON.parse(responseText);
         for (let i = 0; i < cards.length; ++i) {
             let cardCount = cards[i];
@@ -368,15 +381,19 @@
                 return processActionResponse(xhttp, deck, successCallback);
             };
         }
+
         //TODO put drawCard et. al on DeckDisplay when i figure out private functions (which most of these shoudl be)
         //     or is this now modules?
     function drawCard(deckDisplay) {
-            let deck = deckDisplay.deck;
-            isDrawing = true;
-            disableDrawButtons();
-            deckDisplay.displayCardBack();
-            get(deck.navPath, createOnSendLoadCallback(deckDisplay, displayNavCard), createOnSendErrorCallback(
-                deckDisplay));
+        recordFlyAction();
+        if (!continueIfMoreThan2Actions(document.getElementById("flyCb"))) return;
+
+        let deck = deckDisplay.deck;
+        isDrawing = true;
+        disableDrawButtons();
+        deckDisplay.displayCardBack();
+        get(deck.navPath, createOnSendLoadCallback(deckDisplay, displayNavCard), createOnSendErrorCallback(
+            deckDisplay));
     }
 
     function lock(deckDisplay) {
@@ -390,7 +407,7 @@
     }
 
     function shuffle(deckDisplay) {
-        if (confirm("Are you sure?") == true) shuffleDontAsk(deckDisplay);
+        if (confirm("Are you sure?")) shuffleDontAsk(deckDisplay);
     }
 
     function shuffleDontAsk(deckDisplay) {
@@ -399,7 +416,7 @@
     }
 
     function resetAll() {
-        if (confirm("Are you *really* sure?") == true)
+        if (confirm("Are you *really* sure?"))
             forEachDeckDisplay(function(value, key, map) {  shuffleDontAsk(value);  });
     }
 
@@ -415,6 +432,55 @@
     function clearHistory() {
         //webSocket.close();
         setHistory("");
+    }
+
+    function countCheckboxes() {
+        let counter = 0;
+        for(let i = 0; i < actionCheckboxes.length; ++i) {
+            let checkbox=document.getElementById(actionCheckboxes[i]);
+            if (checkbox.checked) counter++;
+        }
+        return counter;
+    }
+
+    function startTurn() {
+        let checks = countCheckboxes();
+        if (checks < 2 && (!confirm("Fewer than 2 actions. Are you sure?"))) return;
+
+        //TODO use closure to dry looping over checkboxes.
+        for(let i = 0; i < actionCheckboxes.length; ++i)
+            document.getElementById(actionCheckboxes[i]).checked = false;
+
+        let item="<p>" + getTimestamp() + "</p>" + "<hr class='half-line'>";
+        let history = "<li>" + item + "</li>" + document.getElementById("history").innerHTML;
+        setHistory(history);
+        updateElement("/nav/card", false,
+            "<img src='/SerenityLogo.png' class='external_image logo_image'>");
+    }
+
+    function recordFlyAction() {
+        document.getElementById("flyCb").disabled=false;
+        document.getElementById("flyCb").checked=true;
+        document.getElementById("flyCb").disabled=true;
+    }
+
+    function continueIfMoreThan2Actions(checkbox) {
+        let checks = countCheckboxes();
+        if (checks > 2 && (!confirm("More than 2 actions. Are you sure?"))) {
+            checkbox.checked = false;
+            return false;
+        }
+        return true;
+    }
+
+    function recordAction(checkbox) {
+        if (!checkbox.checked) return;
+
+        if (!continueIfMoreThan2Actions(checkbox)) return;
+
+        let item="<p>" + getTimestamp() + "&nbsp;" + checkbox.name +"</p>";
+        let history = "<li>" + item + "</li>" + document.getElementById("history").innerHTML;
+        setHistory(history);
     }
 
     function composeDescription(deckDisplay) {
@@ -472,9 +538,41 @@
     </script>
 </head>
 
-<body>
-<div>
+<body style="width=100%;">
+<section style="width=1000px;">
+    <table id="turnTable"
+           style="position: relative;margin: 3px;border: 1px solid black;display: table; border-collapse: collapse;">
+        <tr>
+            <td class="align_left">
+                <button id="turnBtn" class="button_with_text" type="button" onclick="startTurn()">Next Turn
+                </button>
+            </td>
+            <td class="align_right">
+                <input type="checkbox" id="workCb" name="Work" class="large" style="width:70px;"
+                       onclick="recordAction(this)"/>
+                <label for="workCb">Work</label>
+            </td>
+            <td class="align_right">
+                <input type="checkbox" id="buyCb" name="Buy" class="large align_right" style="width:70px;"
+                       onclick="recordAction(this)"/>
+                <label for="buyCb">Buy</label>
+            </td>
 
+            <td class="align_right">
+                <input type="checkbox" id="dealCb" name="Deal" class="large" style="width:70px;"
+                       onclick="recordAction(this)"/>
+                <label for="dealCb">Deal</label>
+            </td>
+            <td class="align_right">
+                <input type="checkbox" id="flyCb" name="flyName" class="large" style="width:70px;" class="disabled"
+                       disabled/>
+                <label for="flyCb" class="disabled">Fly</label>
+            </td>
+        </tr>
+    </table>
+</section>
+<hr size="2">
+<section style="width: 100%;">
 <table id="deckTable">
     <tr>
         <td id="/nav/card" colspan="3"><img src="/SerenityLogo.png" class='external_image logo_image'>
@@ -482,13 +580,13 @@
     </tr>
     <tr id="drawActions">
         <td>
-            <div id="/alliance/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_al)"/>
+            <div id="/alliance/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_al)"></div>
         </td>
         <td>
-            <div id="/border/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_bo)"/>
+            <div id="/border/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_bo)"></div>
         </td>
         <td>
-            <div id="/rim/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_ri)"/>
+            <div id="/rim/nav/drawBtn" class="mediumCard" onclick="drawCard(dd_ri)"></div>
         </td>
     </tr>
     <tr>
@@ -585,19 +683,22 @@
     </tr>
 
 </table>
+</section>
 
 <br>
 
-    <button id="resetAllBtn" class="button_with_text top_margin" type="button" onclick="resetAll()">Shuffle All
-    </button>
-    <br>
+<hr size="2">
+
+<button id="resetAllBtn" class="button_with_text top_margin" type="button" onclick="resetAll()">Shuffle All
+</button>
+<br>
 <button id="historyBtn" class="button_with_text top_margin" type="button" onclick="clearHistory()">Clear History
 </button>
 <h1>History</h1>
 <ol start="0" class="less_on_top"><span id="history"></span>
 </ol>
     <p>Request id: <span id="requestId"></span></p>
-</div>
+</section>
 
 
 <section>
