@@ -4,6 +4,8 @@ cls
 @echo ====================================================================
 @echo ====================================================================
 
+taskkill /f /im Java(*
+
 if not "%JAVA_HOME%"=="" goto JAVA_HOME_SET
     @Echo JAVA_HOME not set
     goto :eof
@@ -31,7 +33,7 @@ IF %ERRORLEVEL% GTR %ROBOCOPY_OK% goto done
 
 CALL :SHRINK_JRE   || Exit /b 1
 
-Set archive_name=%app_name%-1.0-SNAPSHOT
+Set archive_name=%app_name%-%version%
 robocopy "%app_dir%build\distributions" "%dist_app_dir%app" /E /PURGE /COPY:DAT /DCOPY:T /NS /NC /NFL /NDL /NP
 IF %ERRORLEVEL% GTR %ROBOCOPY_OK% goto done
 
