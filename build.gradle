@@ -24,6 +24,25 @@ dependencies {
     testCompile 'com.jayway.restassured:rest-assured:2.4.0'
 }
 
+/*
+ * Gets the version name from the latest Git tag
+ */
+def getVersionName = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'describe', '--tags'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+project.version = getVersionName()
+
+processResources {
+    filesMatching("**/misbehave.html") {
+        expand(project: project)
+    }
+}
+
 mainClassName = 'com.whatgameapps.firefly.Main'
 
 jar {

@@ -3,11 +3,10 @@
 
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <link href="css.css?ver=1" rel="stylesheet" type="text/css" media="screen"/>
-    <script src="firefly.js?ver=1" type="text/javascript"></script>
+    <link href="css.css?ver=${project.version}" rel="stylesheet" type="text/css" media="screen"/>
+    <script src="firefly.js?ver=${project.version}" type="text/javascript"></script>
     <title>Firefly</title>
 </head>
-
 <body style="width=100%;">
 <section>
     <!--TODO use the fieldset to get the checkboxes, not the array-->
@@ -219,6 +218,7 @@
         </div>
     </div>
 </section>
+<p>Version: ${project.version}</p>
 </body>
 
 </html>

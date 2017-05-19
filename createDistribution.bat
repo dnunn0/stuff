@@ -12,7 +12,7 @@ if not "%JAVA_HOME%"=="" goto JAVA_HOME_SET
 Set app_dir=%~dp0
 for %%* in (.) do set app_name=%%~nx*
 Set dist_dir=%app_dir%distribute\
-FOR /F "tokens=*" %%a in ('git describe --tags --long') do SET Version=%%a
+FOR /F "tokens=*" %%a in ('git describe --tags') do SET Version=%%a
 SET Version=%version:.=-%
 
 set app_instance=%app_name%-%version%
