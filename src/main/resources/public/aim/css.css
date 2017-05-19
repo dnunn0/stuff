@@ -11,20 +11,28 @@
         width: 3rem;
         height: 3rem;
     }
-    input {
+    td, th {
+         margin: 0;
+         padding: 0;
+    }
+      input {
         margin: 0;
-        padding: 0px;
+        padding: 0;
         float: right;
     }
-    label {
-        margin: 0;
-        padding: 0px;
-        width: 100px;
-        float: left;
+
+    .chkbox {
         font-size: 3rem;
+        padding-left: 25px;
+        margin-right: 0px;
+        float: left;
+        display:inline-block;
     }
     h1 {
         font-size: 3.5rem;
+    }
+    .rem3 {
+            font-size: 3rem;
     }
     p {
         font-size: 3rem;
@@ -38,7 +46,8 @@
         margin-left: 3.5rem;
     }
     td {
-      /*  text-align: center;*/
+     margin:0;
+     padding:0;
     }
     img {
         padding: 0;
@@ -54,6 +63,8 @@
     button {
         font-size: 3rem;
         border: none;
+        margin: 0;
+        padding:0;
     }
     .less_on_top {
         margin-top: -10px;
@@ -144,10 +155,6 @@
     .popup .close:hover {
         color: #06D85F;
     }
-    .popup .content {
-      /*  max-height: 100%;
-        overflow-y: scroll;*/
-    }
     .popup .to-the-black {
         color: white;
         background: black;
@@ -170,10 +177,14 @@
     }
 
     .align_right {
-        text-align: right;
+       margin: 0;
+       padding: 0;
+      text-align: right;
     }
     .align_left {
-            text-align: center;
+            text-align: left;
+            padding-left: 0;
+            margin-left: 0;
     }
 
     .px80wide {

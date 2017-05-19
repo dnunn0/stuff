@@ -476,7 +476,7 @@
         for(let i = 0; i < actionCheckboxes.length; ++i)
             document.getElementById(actionCheckboxes[i]).checked = false;
 
-        let item="<p>" + getTimestamp() + "</p>" + "<hr class='half-line'>";
+        let item="<p>" + getTimestamp() + " Start Turn</p>" + "<hr class='half-line'>";
         let history = "<li>" + item + "</li>" + document.getElementById("history").innerHTML;
         setHistory(history);
         updateElement("/nav/card", false,
@@ -499,11 +499,16 @@
     }
 
     function recordAction(checkbox) {
-        if (!checkbox.checked) return;
+        if (!checkbox.checked) {
+            let item="<p>" + getTimestamp() + " Un-" + checkbox.name +"</p>";
+            let history = "<li>" + item + "</li>" + document.getElementById("history").innerHTML;
+            setHistory(history);
+            return;
+        }
 
         if (!continueIfMoreThan2Actions(checkbox)) return;
 
-        let item="<p>" + getTimestamp() + "&nbsp;" + checkbox.name +"</p>";
+        let item="<p>" + getTimestamp() + " " + checkbox.name +"</p>";
         let history = "<li>" + item + "</li>" + document.getElementById("history").innerHTML;
         setHistory(history);
     }
@@ -575,43 +580,41 @@
         let history = getCookie("moveHistory");
         updateElement("history", false, history);
         restoreScrollingAfterClosingOverlays();
+      //  alert("user agent " +  navigator.userAgent);
      };
 
     </script>
 </head>
 
 <body style="width=100%;">
-<section style="width=1000px;">
-    <table id="turnTable"
-           style="position: relative;margin: 3px;border: 1px solid black;display: table; border-collapse: collapse;">
-        <tr>
-            <td class="align_left">
+<section>
+    <!--TODO use the fieldset to get the checkboxes, not the array-->
+    <fieldset>
+        <table style="width:909px;border-collapse: collapse;">
+            <tr>
+                <td style="width:150px;">
                 <button id="turnBtn" class="button_with_text" type="button" onclick="startTurn()">Next Turn
                 </button>
             </td>
-            <td class="align_right">
-                <input type="checkbox" id="workCb" name="Work" class="large" style="width:70px;"
-                       onclick="recordAction(this)"/>
-                <label for="workCb">Work</label>
-            </td>
-            <td class="align_right">
-                <input type="checkbox" id="buyCb" name="Buy" class="large align_right" style="width:70px;"
-                       onclick="recordAction(this)"/>
-                <label for="buyCb">Buy</label>
-            </td>
 
-            <td class="align_right">
-                <input type="checkbox" id="dealCb" name="Deal" class="large" style="width:70px;"
-                       onclick="recordAction(this)"/>
-                <label for="dealCb">Deal</label>
-            </td>
-            <td class="align_right">
-                <input type="checkbox" id="flyCb" name="flyName" class="large" style="width:70px;" class="disabled"
-                       disabled/>
-                <label for="flyCb" class="disabled">Fly</label>
-            </td>
-        </tr>
-    </table>
+
+                <td>
+                    <input type="checkbox" name="Work" id="workCb" class="large" onclick="recordAction(this)"/>
+                    <label for="workCb" class="chkbox">&nbsp;Work</label></td>
+                <td>
+                    <input type="checkbox" name="Deal" id="dealCb" class="large" onclick="recordAction(this)"/>
+                    <label for="dealCb" class="chkbox">&nbsp;&nbsp;Deal</label></td>
+                <td>
+                    <input type="checkbox" name="Buy" id="buyCb" class="large" onclick="recordAction(this)"/>
+                    <label for="buyCb" class="chkbox">&nbsp;&nbsp;&nbsp;Buy</label></td>
+                <td>
+                    <input type="checkbox" name="Fly" id="flyCb" class="large" disabled/>
+                    <label for="flyCb" class="chkbox disabled">&nbsp;&nbsp;&nbsp;Fly</label></td>
+
+            </tr>
+        </table>
+    </fieldset>
+
 </section>
 <hr size="2">
 <section style="width: 100%;">
