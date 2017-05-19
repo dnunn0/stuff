@@ -483,8 +483,10 @@ function recordAction(checkbox) {
 }
 
 function composeDescription(deckDisplay) {
-    get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayResponseInOverlay),
-        createOnSendErrorCallback(deckDisplay));
+    let current = document.getElementById(deckDisplay.deck.specPath).innerHTML;
+    if (!current || current == "")
+        get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayResponseInOverlay),
+            createOnSendErrorCallback(deckDisplay));
 }
 
 function debounce(fun, milliSeconds) {
