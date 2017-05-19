@@ -175,7 +175,9 @@
     .popup div {
         font-size: 3rem;
     }
-
+    #balladOverlay a {
+     color: grey;
+    }
     .align_right {
        margin: 0;
        padding: 0;
