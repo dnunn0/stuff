@@ -406,7 +406,8 @@ function unlock(deckDisplay) {
 }
 
 function shuffle(deckDisplay) {
-    if (confirm("Are you sure?")) shuffleDontAsk(deckDisplay);
+    if (deckDisplay.deck.remainingCardsCount <= 0 || (confirm("Are you sure you want to shuffle?")))
+        shuffleDontAsk(deckDisplay);
 }
 
 function shuffleDontAsk(deckDisplay) {
@@ -415,7 +416,7 @@ function shuffleDontAsk(deckDisplay) {
 }
 
 function resetAll() {
-    if (confirm("Are you *really* sure?"))
+    if (confirm("Are you sure you want to shuffle all decks?"))
         forEachDeckDisplay(function(value, key, map) {  shuffleDontAsk(value);  });
 }
 
