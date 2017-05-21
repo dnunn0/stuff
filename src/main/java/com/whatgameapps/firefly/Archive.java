@@ -1,6 +1,6 @@
 package com.whatgameapps.firefly;
 
-public interface PersistedDeck {
+public interface Archive {
     void write(String storage);
 
     String read();

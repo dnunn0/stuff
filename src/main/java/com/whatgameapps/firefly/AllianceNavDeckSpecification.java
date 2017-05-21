@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMultimap;
 import org.apache.http.annotation.Immutable;
 
 @Immutable
-public class AllianceNavDeckSpecification extends NavDeckSpecification {
+public class AllianceNavDeckSpecification extends CardDeckSpecification {
     public static final AllianceNavDeckSpecification RESHUFFLE = new AllianceNavDeckSpecification(1, ImmutableMultimap.<String, Integer>builder()
             .put("Alliance Cruiser - Reshuffle", 1)
             .build());

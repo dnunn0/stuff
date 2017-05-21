@@ -13,9 +13,9 @@ import java.util.stream.IntStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class NavDeckTest {
+public class CardDeckTest {
     private final TestUtils testUtils = new TestUtils();
-    private NavDeck sut = createDeck();
+    private CardDeck sut = createDeck();
 
     @After
     public void restoreStdout() {
@@ -28,7 +28,7 @@ public class NavDeckTest {
     }
 
     private void createAndCheckDeck(final AllianceNavDeckSpecification expectedDeck) {
-        final NavDeck sut = NavDeck.NewFrom(expectedDeck, new PersistedDeckInMemory());
+        final CardDeck sut = CardDeck.NewFrom(expectedDeck, new ArchiveInMemory());
         expectedDeck.entrySet().stream().forEach((spec) ->
                 assertEquals(spec.getElement(), spec.getCount(), sut.countCards(spec.getElement())));
     }
@@ -36,7 +36,7 @@ public class NavDeckTest {
     @Test
     public void deckContainsRightNumberOfCardsKalidasaDeck() {
         AllianceNavDeckSpecification spec = AllianceNavDeckSpecification.KALIDASA;
-        final NavDeck sut = NavDeck.NewFrom(spec, new PersistedDeckInMemory());
+        final CardDeck sut = CardDeck.NewFrom(spec, new ArchiveInMemory());
         assertEquals(spec.count, sut.size());
     }
 
@@ -45,7 +45,7 @@ public class NavDeckTest {
         AllianceNavDeckSpecification spec2 = new AllianceNavDeckSpecification(AllianceNavDeckSpecification.RESHUFFLE, 4, ImmutableMultimap.<String, Integer>builder()
                 .put("Alliance Cruiser - Reshuffle", 3)
                 .build());
-        final NavDeck sut = NavDeck.NewFrom(spec2, new PersistedDeckInMemory());
+        final CardDeck sut = CardDeck.NewFrom(spec2, new ArchiveInMemory());
         assertEquals(spec2.count, sut.size());
     }
 
@@ -63,12 +63,12 @@ public class NavDeckTest {
                 .filter(cardToFind::equals)
                 .count();
 
-        NavDeck stdDeck = createDeck();
+        CardDeck stdDeck = createDeck();
         assertEquals(((double) stdDeck.countCards(cardToFind)) / stdDeck.size(), ((double) count) / deckCount, 0.02);
     }
 
-    private NavDeck createDeck() {
-        return NavDeck.NewFrom(AllianceNavDeckSpecification.BASIC, new PersistedDeckInMemory());
+    private CardDeck createDeck() {
+        return CardDeck.NewFrom(AllianceNavDeckSpecification.BASIC, new ArchiveInMemory());
     }
 
     @Test

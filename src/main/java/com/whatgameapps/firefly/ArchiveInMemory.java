@@ -1,6 +1,6 @@
 package com.whatgameapps.firefly;
 
-public class PersistedDeckInMemory implements PersistedDeck {
+public class ArchiveInMemory implements Archive {
     private String storage;
 
     @Override

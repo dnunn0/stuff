@@ -65,9 +65,9 @@ public class Main {
         new DosFilter(spark());
 
         //TODO need to implement join here. for now, just assume no joining
-        NavDeck alliance = configureNavDeck(AllianceNavDeckSpecification.class);
-        NavDeck border = configureNavDeck(BorderNavDeckSpecification.class);
-        NavDeck rim = configureNavDeck(RimNavDeckSpecification.class);
+        CardDeck alliance = configureNavDeck(AllianceNavDeckSpecification.class);
+        CardDeck border = configureNavDeck(BorderNavDeckSpecification.class);
+        CardDeck rim = configureNavDeck(RimNavDeckSpecification.class);
 
         new NavController(spark(), NavController.ALLIANCE_SPACE, alliance, statusServer.broadcaster);
         new NavController(spark(), NavController.BORDER_SPACE, border, statusServer.broadcaster);
@@ -81,7 +81,7 @@ public class Main {
         return spark.spark();
     }
 
-    private NavDeck configureNavDeck(Class<? extends NavDeckSpecification> specClass) throws Exception {
+    private CardDeck configureNavDeck(Class<? extends CardDeckSpecification> specClass) throws Exception {
         String entryKey = specClass.getName();
         String decks = getMetadata();
 
@@ -89,15 +89,15 @@ public class Main {
             String[] split = decks.split(entryKey);
             String decksBefore = split[0];
             int deckNbr = countEntries(decksBefore);
-            final PersistedDeck storage = createStorage(deckNbr);
+            final Archive storage = createStorage(deckNbr);
             System.out.format("Spec class %s deckNbr %d split {%s}\n", entryKey, deckNbr, Arrays.asList(split));
             String runningSpecName = split[1].split("" + METADATA_DELIMITER)[0].replace(METADATA_SEPARATOR, "");
-            return NavDeck.OldFrom(getSpecForSpecName(specClass, runningSpecName), storage);
+            return CardDeck.OldFrom(getSpecForSpecName(specClass, runningSpecName), storage);
         } else {
             int deckNbr = countEntries(decks);
-            final PersistedDeck storage = createStorage(deckNbr);
+            final Archive storage = createStorage(deckNbr);
             this.memory.write(decks + entryKey + METADATA_SEPARATOR + this.specName + METADATA_DELIMITER);
-            return NavDeck.NewFrom(getSpecForSpecName(specClass, specName), storage);
+            return CardDeck.NewFrom(getSpecForSpecName(specClass, specName), storage);
         }
     }
 
@@ -109,14 +109,14 @@ public class Main {
         return (int) decks.chars().filter(ch -> ch == METADATA_DELIMITER).count();
     }
 
-    private PersistedDeck createStorage(int deckNbr) throws IOException {
+    private Archive createStorage(int deckNbr) throws IOException {
         int position = METADATA_STORAGE_SIZE + (DECK_STORAGE_SIZE * deckNbr);
         final MappedByteBuffer mbb = fc.map(FileChannel.MapMode.READ_WRITE, position, DECK_STORAGE_SIZE);
-        return new PersistedDeckMemoryMappedFile(fc, mbb);
+        return new ArchiveMemoryMappedFile(fc, mbb);
     }
 
-    private NavDeckSpecification getSpecForSpecName(Class clazz, String specName) throws IllegalAccessException, NoSuchFieldException {
-        return (NavDeckSpecification) clazz.getField(specName).get(null);
+    private CardDeckSpecification getSpecForSpecName(Class clazz, String specName) throws IllegalAccessException, NoSuchFieldException {
+        return (CardDeckSpecification) clazz.getField(specName).get(null);
     }
 
     public static void main(String args[]) throws Exception {

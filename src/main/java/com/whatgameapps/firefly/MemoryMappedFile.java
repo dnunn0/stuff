@@ -6,6 +6,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 
 public class MemoryMappedFile {
+    private static final int MAX_RETRIES = 3;
     private final MappedByteBuffer mbb; //TODO do I need this? or just recreate it?
     private final FileChannel fc;
     private final int position;
@@ -17,6 +18,10 @@ public class MemoryMappedFile {
     }
 
     public void write(String storage) {
+        write(storage, 0);
+    }
+
+    public void write(String storage, int attemptCount) {
         try {
             try (FileLock lock = fc.lock(this.position, this.mbb.capacity(), false)) {
                 byte[] buffer = storage.getBytes();
@@ -26,11 +31,16 @@ public class MemoryMappedFile {
                 mbb.put(buffer);
             }
         } catch (IOException ex) {
+            if (attemptCount < MAX_RETRIES) write(storage, attemptCount + 1);
             throw new RuntimeException(ex);
         }
     }
 
     public String read() {
+        return read(0);
+    }
+
+    private String read(int attemptCount) {
         try {
 
             try (FileLock lock = fc.lock(this.position, this.mbb.capacity(), false)) {
@@ -43,6 +53,7 @@ public class MemoryMappedFile {
                 return new String(buffer);
             }
         } catch (IOException ex) {
+            if (attemptCount < MAX_RETRIES) return read(attemptCount + 1);
             throw new RuntimeException(ex);
         }
     }

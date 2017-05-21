@@ -13,58 +13,27 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class NavDeck {
-    public final transient NavDeckSpecification spec;
-    private PersistedDeck storedDeck;
+public class CardDeck {
+    public final transient CardDeckSpecification spec;
+    private Archive storedDeck;
 
-    private NavDeck(NavDeckSpecification deckSpec, PersistedDeck storage) {
+    private CardDeck(CardDeckSpecification deckSpec, Archive storage) {
         this.storedDeck = storage;
         this.spec = deckSpec;
     }
 
-    public static NavDeck NewFrom(NavDeckSpecification deckSpec, PersistedDeck storage) {
-        NavDeck result = new NavDeck(deckSpec, storage);
-        result.createDeck();
-        return result;
+    public static CardDeck NewFrom(CardDeckSpecification deckSpec, Archive storage) {
+        createAndStore(deckSpec, storage);
+        return OldFrom(deckSpec, storage);
     }
 
-    private void createDeck() {
-        final CardStacks stacks = new CardStacks();
-        List<NavCard> cardList = this.spec.entrySet().stream()
-                .map(cardsSpec -> createCards(cardsSpec.getElement(), cardsSpec.getCount()))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-
-        stacks.cards.addAll(cardList);
-        stacks.cards.addAll(createCards(NavCard.UNKNOWN, this.spec.count - stacks.cards.size()));
-
-        stacks.shuffle();
-        storeStacks(stacks);
+    private static void createAndStore(CardDeckSpecification deckSpec, Archive storage) {
+        CardStacks stacks = CardStacks.Create(deckSpec);
+        storage.write(stacks.externalize());
     }
 
-    private List<NavCard> createCards(String cardTitle, final Integer count) {
-        if (count <= 0) return Collections.emptyList();
-
-        final NavCard prototype = new NavCard(cardTitle);
-        return Collections.nCopies(count, prototype);
-    }
-
-    private void storeStacks(CardStacks stacks) {
-        this.storedDeck.write(stacks.externalize());
-    }
-
-    public static NavDeck OldFrom(NavDeckSpecification deckSpec, PersistedDeck storage) {
-        return new NavDeck(deckSpec, storage);
-    }
-
-    public void shuffle() {
-        final CardStacks stacks = retrieveStacks();
-        stacks.shuffle();
-        storeStacks(stacks);
-    }
-
-    private CardStacks retrieveStacks() {
-        return CardStacks.From(this.storedDeck.read());
+    public static CardDeck OldFrom(CardDeckSpecification deckSpec, Archive storage) {
+        return new CardDeck(deckSpec, storage);
     }
 
     /**
@@ -75,6 +44,10 @@ public class NavDeck {
     public int size() {
         final CardStacks stacks = retrieveStacks();
         return stacks.cards.size();
+    }
+
+    private CardStacks retrieveStacks() {
+        return CardStacks.From(this.storedDeck.read());
     }
 
     public int countCards(String target) {
@@ -89,6 +62,17 @@ public class NavDeck {
         return result;
     }
 
+    private void storeStacks(CardStacks stacks) {
+        this.storedDeck.write(stacks.externalize());
+    }
+
+    public void shuffle() {
+        final CardStacks stacks = retrieveStacks();
+        stacks.shuffle();
+        storeStacks(stacks);
+    }
+
+
     public Stack<NavCard> discards() {
         final CardStacks stacks = retrieveStacks();
         return stacks.discards;
@@ -98,6 +82,45 @@ public class NavDeck {
         private static final char DELIMITER_CHAR = '\n';
         private final Stack<NavCard> cards = new Stack<>();
         private final Stack<NavCard> discards = new Stack<>();
+
+        static CardStacks Create(CardDeckSpecification spec) {
+            final CardStacks stacks = new CardStacks();
+            stacks.createDeck(spec);
+            return stacks;
+        }
+
+        private void createDeck(CardDeckSpecification spec) {
+            List<NavCard> cardList = spec.entrySet().stream()
+                    .map(cardsSpec -> createCards(cardsSpec.getElement(), cardsSpec.getCount()))
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
+
+            this.cards.addAll(cardList);
+            this.cards.addAll(createCards(NavCard.UNKNOWN, spec.count - this.cards.size()));
+
+            this.shuffle();
+        }
+
+        private List<NavCard> createCards(String cardTitle, final Integer count) {
+            if (count <= 0) return Collections.emptyList();
+
+            final NavCard prototype = new NavCard(cardTitle);
+            return Collections.nCopies(count, prototype);
+        }
+
+        void shuffle() {
+            this.mergeIntoCards();
+            Collections.shuffle(this.cards);
+        }
+
+        private void mergeIntoCards() {
+            this.moveCardsToOtherPile(this.discards, this.cards);
+        }
+
+        private void moveCardsToOtherPile(final Stack<NavCard> source, final Stack<NavCard> destination) {
+            destination.addAll(source);
+            source.clear();
+        }
 
         static CardStacks From(String storage) {
             CardStacks result = new CardStacks();
@@ -154,20 +177,6 @@ public class NavDeck {
 
         private void discardAll() {
             this.moveCardsToOtherPile(this.cards, this.discards);
-        }
-
-        private void moveCardsToOtherPile(final Stack<NavCard> source, final Stack<NavCard> destination) {
-            destination.addAll(source);
-            source.clear();
-        }
-
-        void shuffle() {
-            this.mergeIntoCards();
-            Collections.shuffle(this.cards);
-        }
-
-        private void mergeIntoCards() {
-            this.moveCardsToOtherPile(this.discards, this.cards);
         }
 
         int countCards(String target) {

@@ -1,6 +1,6 @@
 package com.whatgameapps.firefly.controller;
 
-import com.whatgameapps.firefly.NavDeck;
+import com.whatgameapps.firefly.CardDeck;
 import com.whatgameapps.firefly.rest.NavCard;
 import com.whatgameapps.firefly.rest.NavDeckStatus;
 import org.eclipse.jetty.http.HttpStatus;
@@ -25,11 +25,11 @@ public class NavController {
     public static String RIM_SPACE = "/rim";
     public static String BORDER_SPACE = "/border";
     final String spaceSectorPath;
-    final NavDeck deck;
+    final CardDeck deck;
     final StatusBroadcaster listeners;
     volatile DeckState deckState;
 
-    public NavController(Service spark, String spaceSectorPath, NavDeck deck, StatusBroadcaster listeners) {
+    public NavController(Service spark, String spaceSectorPath, CardDeck deck, StatusBroadcaster listeners) {
         this(spaceSectorPath, deck, listeners);
         spark.post(getLockPath(), this::lock);
         spark.delete(getLockPath(), this::unlock);
@@ -43,7 +43,7 @@ public class NavController {
         spark.options(getSpecPath(), this::allowCors);
     }
 
-    public NavController(String spaceSectorPath, NavDeck deck, StatusBroadcaster listeners) {
+    public NavController(String spaceSectorPath, CardDeck deck, StatusBroadcaster listeners) {
         this.spaceSectorPath = spaceSectorPath;
         this.deck = deck;
         this.listeners = listeners;

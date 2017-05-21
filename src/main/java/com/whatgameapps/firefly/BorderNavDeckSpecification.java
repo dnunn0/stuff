@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMultimap;
 import org.apache.http.annotation.Immutable;
 
 @Immutable
-public class BorderNavDeckSpecification extends NavDeckSpecification {
+public class BorderNavDeckSpecification extends CardDeckSpecification {
     public static final BorderNavDeckSpecification RESHUFFLE = new BorderNavDeckSpecification(1, ImmutableMultimap.<String, Integer>builder()
             .put("Reaver Cutter - Reshuffle", 1)
             .build());

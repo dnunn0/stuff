@@ -2,9 +2,9 @@ package com.whatgameapps.firefly.controller;
 
 import com.google.common.collect.ImmutableMultimap;
 import com.whatgameapps.firefly.AllianceNavDeckSpecification;
-import com.whatgameapps.firefly.NavDeck;
-import com.whatgameapps.firefly.NavDeckSpecification;
-import com.whatgameapps.firefly.PersistedDeckInMemory;
+import com.whatgameapps.firefly.ArchiveInMemory;
+import com.whatgameapps.firefly.CardDeck;
+import com.whatgameapps.firefly.CardDeckSpecification;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
 import com.whatgameapps.firefly.rest.NavCard;
 import com.whatgameapps.firefly.rest.NavDeckStatus;
@@ -120,8 +120,8 @@ public class NavControllerTest {
         checkStatus(sut.deck.spec.count - 1, 1, false, sut.status(req, res));
     }
 
-    private NavController createNavController(NavDeckSpecification spec) {
-        return new NavController(NavController.ALLIANCE_SPACE, NavDeck.NewFrom(spec, new PersistedDeckInMemory()), middleman);
+    private NavController createNavController(CardDeckSpecification spec) {
+        return new NavController(NavController.ALLIANCE_SPACE, CardDeck.NewFrom(spec, new ArchiveInMemory()), middleman);
     }
 
     @Test

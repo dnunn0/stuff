@@ -6,8 +6,8 @@ import com.jayway.restassured.builder.ResponseSpecBuilder;
 import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.ResponseSpecification;
 import com.whatgameapps.firefly.AllianceNavDeckSpecification;
-import com.whatgameapps.firefly.NavDeck;
-import com.whatgameapps.firefly.PersistedDeckInMemory;
+import com.whatgameapps.firefly.ArchiveInMemory;
+import com.whatgameapps.firefly.CardDeck;
 import com.whatgameapps.firefly.com.whatgameapps.firefly.helper.TestUtils;
 import com.whatgameapps.firefly.rest.NavCard;
 import org.eclipse.jetty.http.HttpStatus;
@@ -66,7 +66,7 @@ public class NavControllerIntegratedTest {
     }
 
     private String getTopCardAsJson() {
-        NavDeck deck = NavDeck.NewFrom(AllianceNavDeckSpecification.RESHUFFLE, new PersistedDeckInMemory());
+        CardDeck deck = CardDeck.NewFrom(AllianceNavDeckSpecification.RESHUFFLE, new ArchiveInMemory());
         final NavCard card = deck.take().get();
         return gson.toJson(card);
     }

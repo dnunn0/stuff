@@ -9,16 +9,16 @@ import org.apache.http.annotation.Immutable;
 import java.util.Set;
 
 @Immutable
-public class NavDeckSpecification {
+public class CardDeckSpecification {
     public final int count;
     private final SortedMultiset<String> foo = TreeMultiset.create();
 
-    public NavDeckSpecification(final NavDeckSpecification basis, final int cumulativeCardCount, final ImmutableMultimap<String, Integer> addedCards) {
+    public CardDeckSpecification(final CardDeckSpecification basis, final int cumulativeCardCount, final ImmutableMultimap<String, Integer> addedCards) {
         this(cumulativeCardCount, addedCards);
         this.addCards(basis.entrySet());
     }
 
-    public NavDeckSpecification(int count, ImmutableMultimap<String, Integer> deckSpec) {
+    public CardDeckSpecification(int count, ImmutableMultimap<String, Integer> deckSpec) {
         this.count = count;
         addCards(deckSpec);
     }
