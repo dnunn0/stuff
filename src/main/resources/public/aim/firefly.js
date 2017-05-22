@@ -1,7 +1,7 @@
 let hostPort = location.hostname + ":" + location.port;
 let isDrawing = false;
 let webSocket = null;
-setupStatus();
+webSocket = setupStatus();
 let deck_al = new Deck("/alliance/nav");
 let deck_bo = new Deck("/border/nav");
 let deck_ri = new Deck("/rim/nav");
@@ -181,35 +181,31 @@ function webSocketState(socketToCheck) {
     return socketToCheck==null?"undefined": socketToCheck.readyState;
 }
 
-async function setupStatus() {
-    let socketToCheck = webSocket;
+function setupStatus() {
+    if (webSocket != null) {
+        let socketToCheck = webSocket;
 
-    if(socketToCheck) {
-        console.log("entering setupStatus ws rs " + socketToCheck.readyState);
+        if(isWebSocketOpen(socketToCheck) ) {
+            console.log("setupStatus false alarm. returning");
+            return;
+        } else {
+            console.log("after check setupStatus ws rs, status? "
+                + (socketToCheck==null?"undefined": socketToCheck.readyState));
+            if (socketToCheck != null) socketToCheck.close(3000, "not open");
+            console.log("closed socket");
         }
-    else console.log(" entering setupStatus, ws is undefined");
-
-    if(isWebSocketOpen(socketToCheck) ) {
-        console.log("setupStatus false alarm. returning");
-        return;
-    } else {
-        console.log("after check setupStatus ws rs, status? "
-        + (socketToCheck==null?"undefined": socketToCheck.readyState));
-        if (socketToCheck != null) socketToCheck.close(3000, "not open");
-        console.log("closed socket");
     }
 
     let newSocket = new WebSocket("ws://" + hostPort + "/status");
-    webSocket=newSocket;
 
-    webSocket.onmessage = function(msg) {
+    newSocket.onmessage = function(msg) {
         console.log("websocket message from " + msg.origin + " " + webSocketState(this));
         DeckDisplay.updateStatus(msg);
     };
-    webSocket.onclose = async function() {
+    newSocket.onclose = async function() {
         showOverlay("#balladOverlay");
      }
-    webSocket.onopen = function(e) {
+    newSocket.onopen = function(e) {
         console.log("WebSocket connection open. Asking for status update. " + this.readyState);
         window.location.href="#";
         this.send('update status');
@@ -217,14 +213,12 @@ async function setupStatus() {
         forEachDeckDisplay(function(value, key, map) {composeDescription(value);});
 
     };
-    webSocket.onerror = function(e) {showOverlay("#balladOverlay");
-        // console.log("Error in web socket. EOF?." + webSocketState(this)+ " top?" + (this==aSockets[aSockets.length - 1]));
-        };
+    newSocket.onerror = function(e) {showOverlay("#balladOverlay"); };
     return newSocket;
 }
 
 function tryStatusAgain() {
-    setupStatus();
+    webSocket = setupStatus();
     if (isWebSocketOpen(webSocket)) {
         location.href="#";
         return;
@@ -239,8 +233,8 @@ function isWebSocketOpen(socketToCheck) {
 function statusResetRequired(path) {
    if(isWebSocketOpen(webSocket)) return false;
 
-   setupStatus();
-   if(!isWebSocketOpen()) {
+   webSocket = setupStatus();
+   if(!isWebSocketOpen(webSocket)) {
        showOverlay("#balladOverlay");
        return true;
    }
@@ -355,7 +349,7 @@ function justDisplayResponse(deckDisplay, responseText) {
     deckDisplay.updateResponse(responseText);
 }
 
-function displayResponseInOverlay(deckDisplay, responseText) {
+function displayCardsInOverlay(deckDisplay, responseText) {
     let html = "<table class='border-on-bottom'>";
     let cards = JSON.parse(responseText);
     for (let i = 0; i < cards.length; ++i) {
@@ -412,7 +406,7 @@ function shuffle(deckDisplay) {
 
 function shuffleDontAsk(deckDisplay) {
     post(deckDisplay.deck.navPath, createOnSendLoadCallback(deckDisplay, justDisplayResponse),
-    createOnSendErrorCallback(deckDisplay));
+        createOnSendErrorCallback(deckDisplay));
 }
 
 function resetAll() {
@@ -420,21 +414,11 @@ function resetAll() {
         forEachDeckDisplay(function(value, key, map) {  shuffleDontAsk(value);  });
 }
 
-function describe(deckDisplay) {
-    get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayResponseInOverlay),
-        createOnSendErrorCallback(deckDisplay));
-}
-
-function showWebsocketState() {
-    console.log("ws " + webSocket.readyState);
-}
-
 function clearHistory() {
-   // webSocket.close();
     setHistory("");
 }
 
-function countCheckboxes() {
+function actionsTaken() {
     let counter = 0;
     for(let i = 0; i < actionCheckboxes.length; ++i) {
         let checkbox=document.getElementById(actionCheckboxes[i]);
@@ -444,8 +428,7 @@ function countCheckboxes() {
 }
 
 function startTurn() {
-    let checks = countCheckboxes();
-    if (checks < 2 && (!confirm("Fewer than 2 actions. Are you sure?"))) return;
+    if (actionsTaken() < 2 && (!confirm("Fewer than 2 actions. Are you sure?"))) return;
 
     //TODO use closure to dry looping over checkboxes.
     for(let i = 0; i < actionCheckboxes.length; ++i)
@@ -463,8 +446,7 @@ function recordFlyAction() {
 }
 
 function continueIfMoreThan2Actions(checkbox) {
-    let checks = countCheckboxes();
-    if (checks > 2 && (!confirm("More than 2 actions. Are you sure?"))) {
+    if (actionsTaken() > 2 && (!confirm("More than 2 actions. Are you sure?"))) {
         checkbox.checked = false;
         return false;
     }
@@ -486,7 +468,7 @@ function recordAction(checkbox) {
 function composeDescription(deckDisplay) {
     let current = document.getElementById(deckDisplay.deck.specPath).innerHTML;
     if (!current || current == "")
-        get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayResponseInOverlay),
+        get(deckDisplay.deck.specPath, createOnSendLoadCallback(deckDisplay, displayCardsInOverlay),
             createOnSendErrorCallback(deckDisplay));
 }
 
