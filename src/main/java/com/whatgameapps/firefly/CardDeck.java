@@ -5,6 +5,7 @@ import com.whatgameapps.firefly.rest.NavCard;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.security.SecureRandom;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -110,7 +111,7 @@ public class CardDeck {
 
         void shuffle() {
             this.mergeIntoCards();
-            Collections.shuffle(this.cards);
+            Collections.shuffle(this.cards, new SecureRandom());
         }
 
         private void mergeIntoCards() {
