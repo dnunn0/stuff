@@ -28,7 +28,7 @@ public class BorderNavDeckSpecification extends CardDeckSpecification {
             .put("Punctured Fuel Lines", 1)
             .put("Reaver Bait!", 1)
             .put("Reavers, Dead Ahead", 3)
-            .put("Reavers On The Hunt", 5)
+            .put("Reavers On The Hunt", 7)
             .put("Ruttin' Drive Core's Blown", 1)
             .put("Scrapper Ambush", 1)
             .put("She's Tore Up Plenty", 1)
