@@ -64,7 +64,6 @@ public class Main {
         new BeforeAll(spark());
         new DosFilter(spark());
 
-        //TODO need to implement join here. for now, just assume no joining
         CardDeck alliance = configureNavDeck(AllianceNavDeckSpecification.class);
         CardDeck border = configureNavDeck(BorderNavDeckSpecification.class);
         CardDeck rim = configureNavDeck(RimNavDeckSpecification.class);
